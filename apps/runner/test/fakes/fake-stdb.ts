@@ -10,6 +10,8 @@ type M = { status: Status; createdAt: number; seq: number; events: FightEnvelope
 export class FakeStdb implements Stdb {
   readonly matches = new Map<string, M>();
   readonly calls: { name: string; matchId?: string }[] = [];
+  readonly settles: Parameters<Stdb['settleMatch']>[0][] = [];
+  readonly finalizes: Parameters<Stdb['finalizeMatch']>[0][] = [];
   readonly postBatches: { matchId: string; types: string[] }[] = [];
   private listeners = new Map<string, Set<(e: FightEventRow) => void>>();
 
@@ -21,6 +23,11 @@ export class FakeStdb implements Stdb {
     if (!s) this.listeners.set(matchId, (s = new Set()));
     s.add(f);
     return () => { s!.delete(f); };
+  }
+
+  /** Optional capability used by recoverOrphans. */
+  async listActiveMatches(): Promise<{ id: string; status: string }[]> {
+    return [...this.matches].filter(([, m]) => m.status !== 'settled' && m.status !== 'void').map(([id, m]) => ({ id, status: m.status }));
   }
 
   /** Test helpers. */
@@ -93,14 +100,17 @@ export class FakeStdb implements Stdb {
     m.status = 'review'; this.emit(m, a.matchId, 'match.timeup', {});
   }
   async finalizeMatch(a: Parameters<Stdb['finalizeMatch']>[0]): Promise<void> {
+    this.calls.push({ name: 'finalizeMatch', matchId: a.matchId }); this.finalizes.push(a);
     const m = this.get(a.matchId); this.gate(m, ['review'], 'finalize_match');
     this.emit(m, a.matchId, 'match.result', { standings: a.standings });
   }
   async revealMatch(a: { matchId: string; problemSetJson: string; salt: string }): Promise<void> {
+    this.calls.push({ name: 'revealMatch', matchId: a.matchId });
     const m = this.get(a.matchId); this.gate(m, ['review'], 'reveal_match');
     this.emit(m, a.matchId, 'match.revealed', { problemSet: JSON.parse(a.problemSetJson), salt: a.salt });
   }
   async settleMatch(a: Parameters<Stdb['settleMatch']>[0]): Promise<void> {
+    this.calls.push({ name: 'settleMatch', matchId: a.matchId }); this.settles.push(a);
     const m = this.get(a.matchId); this.gate(m, ['review'], 'settle_match');
     m.status = 'settled'; this.emit(m, a.matchId, 'match.settled', { results: a.results, totalPaid: 0, elo: {}, ovr: {} });
   }
