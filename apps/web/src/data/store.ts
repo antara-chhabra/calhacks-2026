@@ -45,7 +45,11 @@ function safeInitialState(): MatchState {
 
 let liveAdapter: LiveAdapter | null = null;
 /** K-06b seam: the SpacetimeDB adapter registers here; network actions delegate to it (see adapter.ts). */
-export function setLiveAdapter(a: LiveAdapter | null): void { liveAdapter = a; }
+export function setLiveAdapter(a: LiveAdapter | null): void {
+  liveAdapter = a;
+  const watch = useStore.getState().watch;
+  if (a && watch.mode === 'live' && watch.matchId) a.watchMatch(watch.matchId);
+}
 const viaAdapter = <A extends unknown[], R>(name: keyof LiveAdapter) => async (...args: A): Promise<R> => {
   const fn = liveAdapter?.[name] as ((...a: A) => Promise<R>) | undefined;
   if (!fn) throw new Error('not_connected');
@@ -110,3 +114,17 @@ export const useStore = create<Store>()((set, get) => {
   setPlaying: (on) => { replay?.setPlaying(on); set((s) => ({ watch: { ...s.watch, playing: on } })); },
   };
 });
+
+// Keep startup inside the HEAD-owned data boundary: App/ui/arena need no binding imports.
+// Explicit fixture URLs stay offline. Vite includes generated bindings only when codegen exists.
+if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/replay/') &&
+    new URLSearchParams(window.location.search).get('demo') !== '1') {
+  useStore.setState({ conn: 'connecting' });
+  void Promise.all([import('./live'), import('../config')]).then(([{ createLiveAdapter }, { config }]) => {
+    const adapter = createLiveAdapter({ uri: config.stdbUri, db: config.stdbDb, store: useStore, emitCue,
+      storage: { getItem: (key) => window.localStorage.getItem(key), setItem: (key, value) => window.localStorage.setItem(key, value) } });
+    setLiveAdapter(adapter);
+    adapter.connect();
+    if (import.meta.hot) import.meta.hot.dispose(() => { adapter.disconnect(); setLiveAdapter(null); });
+  }).catch(() => { useStore.setState({ conn: 'offline' }); });
+}

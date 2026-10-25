@@ -5,6 +5,8 @@ import type {
   EngineTier, FighterId, FighterPublic, FighterStats, MarketSpec, MatchMode, ProblemMeta, Slot, Standing, Strategy, Category,
 } from '@fc/contracts';
 import type { Env } from './env.js';
+import { fightEnvelopeSchema, parseRunnerPostable } from '@fc/contracts';
+import { Identity, Timestamp } from 'spacetimedb';
 
 export type FightEventRow = { matchId: string; seq: number; t: number; type: string; data: unknown };
 
@@ -63,17 +65,28 @@ export async function connectRaw(o: StdbOptions): Promise<RawConn> {
   const DbConnection = bindings.DbConnection;
   if (!DbConnection?.builder) throw new Error('bindings_missing');
   return new Promise<RawConn>((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error('connect_timeout')), o.timeoutMs ?? 8000);
+    let connection: any, finished = false;
+    const local = /^wss?:\/\/(localhost|127\.0\.0\.1)(:|\/|$)/.test(o.uri);
+    const fail = (error: unknown) => {
+      if (finished) return;
+      finished = true; clearTimeout(timer);
+      connection?.disconnect();
+      reject(error);
+    };
+    const timer = setTimeout(() => fail(new Error('connect_timeout')), o.timeoutMs ?? (local ? 4000 : 8000));
     try {
       const b = DbConnection.builder().withUri(o.uri).withDatabaseName(o.db);
       if (o.token) b.withToken(o.token);
       b.onConnect((conn: any, identity: any, token: string) => {
+        if (finished) { conn.disconnect(); return; }
+        finished = true;
         clearTimeout(timer);
         resolve({ conn, identity: String(identity?.toHexString?.() ?? identity), token, bindings });
       });
-      b.onConnectError((_ctx: unknown, err: Error) => { clearTimeout(timer); reject(err instanceof Error ? err : new Error(String(err))); });
-      b.build();
-    } catch (e) { clearTimeout(timer); reject(e); }
+      b.onConnectError((_ctx: unknown, err: Error) => fail(err instanceof Error ? err : new Error('connect_failed')));
+      b.onDisconnect((_ctx: unknown, err: Error | undefined) => { if (!finished) fail(err ?? new Error('connection_closed')); });
+      connection = b.build();
+    } catch (e) { fail(e); }
   });
 }
 
@@ -86,10 +99,27 @@ const METHODS = {
 type ReducerName = keyof typeof METHODS;
 
 /** u64 columns are bigint on the wire; contracts use plain integer numbers. */
-const toWire = (a: Record<string, unknown> | undefined): Record<string, unknown> | undefined => {
+export const toWire = (name: ReducerName, a: Record<string, unknown> | undefined): Record<string, unknown> | undefined => {
   if (!a) return a;
   const out: Record<string, unknown> = { ...a };
   if (typeof out.amountCents === 'number') out.amountCents = BigInt(out.amountCents);
+  if (name === 'creditTestFunds' && typeof out.identity === 'string') out.identity = Identity.fromString(out.identity);
+  if (name === 'createMatch') {
+    out.slots = Uint8Array.from(out.slots as number[]);
+    out.markets = (out.markets as MarketSpec[]).map((m) => ({ ...m, subject: m.subject ?? undefined, line: m.line ?? undefined,
+      seeds: m.seeds.map((s) => BigInt(s)) }));
+  }
+  if (name === 'finalizeMatch') {
+    out.standings = (out.standings as Standing[]).map((s) => ({ ...s, firstHitMs: s.firstHitMs ?? undefined, lastScoreMs: s.lastScoreMs ?? undefined }));
+  }
+  if (name === 'settleMatch') {
+    out.stats = (out.stats as FighterStats[]).map((s) => ({ ...s, upsetUntil: s.upsetUntil == null ? undefined : new Timestamp(BigInt(Math.trunc(s.upsetUntil)) * 1000n) }));
+  }
+  if (name === 'postEvents') {
+    for (const e of out.events as { type: string; data: string }[]) {
+      if (!parseRunnerPostable(e.type, e.data).ok) throw new Error('bad_event');
+    }
+  }
   return out;
 };
 
@@ -117,21 +147,27 @@ export async function connectStdb(env: Pick<Env, 'FC_STDB_URI' | 'FC_STDB_DB' | 
   const listeners = new Map<string, Set<(e: FightEventRow) => void>>();
   conn.onDisconnect?.(() => { up = false; console.warn('[stdb] disconnected'); });
   try {
-    conn.subscriptionBuilder().subscribe(['SELECT * FROM fight_event']);
     conn.db.fightEvent.onInsert((_ctx: unknown, row: any) => {
       const set = listeners.get(row.matchId);
       if (!set) return;
       let data: unknown = row.data;
       try { data = JSON.parse(row.data); } catch { /* keep raw string */ }
-      const ev: FightEventRow = { matchId: row.matchId, seq: Number(row.seq), t: Number(row.t), type: row.type, data };
+      const parsed = fightEnvelopeSchema.safeParse({ v: 1, matchId: row.matchId, seq: Number(row.seq), t: Number(row.t), type: row.type, data });
+      if (!parsed.success) { console.warn('[stdb] rejected invalid fight event'); return; }
+      const ev: FightEventRow = parsed.data;
       for (const f of [...set]) { try { f(ev); } catch (err) { console.warn(`[stdb] onEvent listener threw: ${(err as Error).message}`); } }
     });
+    await new Promise<void>((resolve, reject) => {
+      const timer = setTimeout(() => reject(new Error('subscription_timeout')), 8000);
+      conn.subscriptionBuilder().onApplied(() => { clearTimeout(timer); resolve(); })
+        .onError(() => { clearTimeout(timer); reject(new Error('subscription_failed')); }).subscribe(['SELECT * FROM fight_event', 'SELECT * FROM match']);
+    });
   } catch (e) {
-    console.warn(`[stdb] event subscription unavailable (${(e as Error).message})`);
+    conn.disconnect();
+    return makeDown(`event subscription unavailable (${(e as Error).message})`);
   }
   let matchTable = false;
   try {
-    conn.subscriptionBuilder().onError?.(() => { matchTable = false; }).subscribe(['SELECT * FROM match']);
     matchTable = typeof conn.db?.match?.iter === 'function';
   } catch { /* match table unavailable: orphan recovery is skipped */ }
 
@@ -139,7 +175,7 @@ export async function connectStdb(env: Pick<Env, 'FC_STDB_URI' | 'FC_STDB_DB' | 
     if (!up) throw new Error('stdb_down');
     const fn = conn.reducers?.[METHODS[name]];
     if (typeof fn !== 'function') throw new Error(`stdb_reducer_missing:${name}`);
-    const wire = toWire(args);
+    const wire = toWire(name, args);
     await (wire === undefined ? fn.call(conn.reducers) : fn.call(conn.reducers, wire));
   };
   const c = (n: ReducerName) => call(n) as any;
@@ -156,7 +192,7 @@ export async function connectStdb(env: Pick<Env, 'FC_STDB_URI' | 'FC_STDB_DB' | 
     ...(matchTable ? {
       async listActiveMatches() {
         const out: { id: string; status: string }[] = [];
-        for (const row of conn.db.match.iter()) out.push({ id: String(row.id), status: String(row.status) });
+        for (const row of conn.db.match.iter()) if (['open', 'locked', 'live', 'review'].includes(row.status)) out.push({ id: String(row.id), status: String(row.status) });
         return out;
       },
     } : {}),
