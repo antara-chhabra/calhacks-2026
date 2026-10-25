@@ -8,6 +8,7 @@ import { buildRig, type Rig } from './rig';
 import { createPoseDriver } from './clips';
 import { CuePlayer, type FighterHandle } from './cues';
 import { createVfx, hexToInt, type Vfx } from './vfx';
+import { createLabelLayer } from './labels';
 import { createStage, SLOTS, STAGE_H as SH, STAGE_W as SW } from './stage';
 
 /** Logical stage (PRD §10.6). A-04 owns the real backdrop; A-02 only places rigs in the four slots. */
@@ -32,7 +33,7 @@ export function ArenaCanvas(props: { reducedMotion: boolean }): JSX.Element {
       playing: () => useStore.getState().watch.playing,
       fighterState: (id) => useStore.getState().watch.state?.fighters[id],
       reduced: () => props.reducedMotion,
-      hooks: { onCue: (c) => { vfxRef.v?.hooks.onCue(c); }, onImpact: (c, second) => { vfxRef.v?.hooks.onImpact(c, second); } },
+      hooks: { onCue: (c) => { vfxRef.v?.hooks.onCue(c); labels.onCue(c); }, onImpact: (c, second) => { vfxRef.v?.hooks.onImpact(c, second); } },
     });
     let baseX = 0, baseY = 0;   // world position without shake
     const vfx = createVfx({
@@ -47,6 +48,15 @@ export function ArenaCanvas(props: { reducedMotion: boolean }): JSX.Element {
       },
     });
     vfxRef.v = vfx;
+    const headHeight = (id: string): number => { const b = skinOf(id).build; return b === 'heavy' ? 320 : b === 'lean' ? 285 : 300; };
+    const labels = createLabelLayer({   // A-08: above the VFX, anchored over each rig's head
+      parent: stage.vfx, reducedMotion: props.reducedMotion,
+      getAnchor: (id) => { const r = rigs.get(id)?.rig; return r ? { x: r.root.x, y: r.root.y - headHeight(id) - 24 } : null; },
+      getState: () => useStore.getState().watch.state,
+      getName: (id) => useStore.getState().fighters[id]?.name ?? id.toUpperCase(),
+      getSpeed: () => useStore.getState().watch.speed || 1,
+      getColor: (id) => hexToInt(skinOf(id).palette.primary),
+    });
     const handles = new Map<string, FighterHandle>();
     const handleFor = (id: string, rig: Rig, i: number): FighterHandle => {
       const old = handles.get(id), sl = SLOTS[i]!;
@@ -90,7 +100,7 @@ export function ArenaCanvas(props: { reducedMotion: boolean }): JSX.Element {
       });
       for (const id of handles.keys()) if (!rigs.has(id)) handles.delete(id);
       player.setFighters(built.map((b, i) => handleFor(b.id, b.rig, i)));
-      if (snap) { player.snap(); vfx.clear(); }   // catch-up rule (PRD §8.7): kill timelines, clear queues, state-derived pose
+      if (snap) { player.snap(); vfx.clear(); labels.snap(); }   // catch-up rule (PRD §8.7): kill timelines, clear queues, state-derived pose
     };
 
     const ready = app.init({ resizeTo: el, background: 0x000000, antialias: true, autoDensity: true, resolution: Math.min(window.devicePixelRatio || 1, 2) }).then(() => {
@@ -103,6 +113,7 @@ export function ArenaCanvas(props: { reducedMotion: boolean }): JSX.Element {
         stage.tick(t.deltaMS); player.tick(t.deltaMS);
         const st = useStore.getState().watch;
         vfx.tick(st.playing ? Math.min(t.deltaMS, 100) * (st.speed || 1) : 0);   // same clock as the cue player: pause/speed apply
+        labels.update(st.playing ? t.deltaMS : 0);
       });
       fit();
       app.renderer.on('resize', fit);
@@ -126,7 +137,7 @@ export function ArenaCanvas(props: { reducedMotion: boolean }): JSX.Element {
 
     return () => {
       disposed = true;
-      clearTimeout(report); vfx.destroy(); player.setFighters([]);
+      clearTimeout(report); vfx.destroy(); labels.destroy(); player.setFighters([]);
       stage.destroy();
       unsubOrder(); unsubCues();
       void ready.then(() => { app.destroy(true, { children: true }); }).catch(() => undefined);
