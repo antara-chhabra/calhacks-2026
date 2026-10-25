@@ -99,10 +99,16 @@ function Bet({ replay }: { replay: boolean }) {
           <label className="text-xs text-zinc-500" htmlFor="h">Your handle</label>
           <input id="h" value={handle} onChange={(e) => setHandle(e.target.value)} autoCapitalize="off" autoCorrect="off" maxLength={16}
             className="min-h-[48px] rounded-xl bg-zinc-900 px-4 text-base outline-none ring-1 ring-zinc-800 focus:ring-emerald-400" />
-          <button type="button" disabled={busy} onClick={doRegister} className="min-h-[52px] rounded-xl bg-emerald-400 text-base font-bold text-black active:bg-emerald-300 disabled:opacity-50">Start playing</button>
+          <button type="button" disabled={busy} onClick={doRegister} className="min-h-[52px] rounded-xl bg-emerald-400 text-base font-bold text-black active:bg-emerald-300 disabled:opacity-50">Start playing · get $100</button>
         </div>
       ) : (
         <div className="flex flex-col gap-3">
+          {(me.balanceCents ?? 0) < 1000 && (
+            <button type="button" disabled={busy} className="min-h-[44px] rounded-xl text-sm font-semibold text-emerald-400 ring-1 ring-emerald-500/40 disabled:opacity-50"
+              onClick={async () => { setBusy(true); try { await useStore.getState().claimDemoFunds(); flash('$100 in demo funds added', false); } catch (e) { flash(errorCopy(e), true); } finally { setBusy(false); } }}>
+              + $100 demo funds
+            </button>
+          )}
           <div className="flex items-baseline justify-between"><span className="text-sm text-zinc-400">Stake</span><span className="text-2xl font-bold tabular-nums">{formatCents(stake)}</span></div>
           <input type="range" aria-label="Stake" min={MIN_STAKE} max={MAX_SLIDER} step={STAKE_STEP} value={stake} onChange={(e) => setStake(clampStake(Number(e.target.value)))}
             className="h-11 w-full accent-emerald-400" />
