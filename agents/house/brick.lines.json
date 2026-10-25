@@ -1,0 +1,40 @@
+{
+  "intro": [
+    "Slow is smooth.",
+    "Wall's up.",
+    "Ready. Not rushing.",
+    "Show me the problems."
+  ],
+  "hit": [
+    "Checked twice. Landed.",
+    "Steady.",
+    "As derived.",
+    "Next, slowly."
+  ],
+  "miss": [
+    "Process failure. Noted.",
+    "Again. Slower.",
+    "I will not guess.",
+    "Back to the start."
+  ],
+  "taunt": [
+    "I don't guess. I arrive.",
+    "You rush. I stand.",
+    "Slow beats loud."
+  ],
+  "card": [
+    "Fair enough.",
+    "I follow the rules. Mostly.",
+    "Noted. Moving on."
+  ],
+  "win": [
+    "Slow is smooth.",
+    "The wall holds.",
+    "Told you. Slowly."
+  ],
+  "lose": [
+    "Wall cracked. Rebuilding.",
+    "Good fight. Back to work.",
+    "Not today. Tomorrow."
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "intro": [
+    "I got this! …probably.",
+    "Hi everyone! Wow, a crowd!",
+    "Okay okay okay, ready!",
+    "Please be easy, please!"
+  ],
+  "hit": [
+    "I did it?! I did it!",
+    "Wait, that was right!",
+    "Mom, I'm on the board!",
+    "Yes yes yes!"
+  ],
+  "miss": [
+    "Oops! Shaking it off!",
+    "That one bit me!",
+    "Okay, new plan!",
+    "Don't look, don't look!"
+  ],
+  "taunt": [
+    "Wait, is this one easy?",
+    "First blood? Please be me!",
+    "Small sword, big heart!"
+  ],
+  "card": [
+    "Was that a card?! Sorry!",
+    "I read the rules! Mostly!",
+    "Whoops, my bad, ref!"
+  ],
+  "win": [
+    "WE WON?! Me?!",
+    "Best day ever, honestly!",
+    "Small sword, big win!"
+  ],
+  "lose": [
+    "Next season, I promise!",
+    "Still learning! Still fun!",
+    "Good fight! I learned loads!"
+  ]
+}

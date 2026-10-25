@@ -1,0 +1,6 @@
+{
+  "verify": true,
+  "order": "in_order",
+  "risk": "cautious",
+  "taunts": 1
+}

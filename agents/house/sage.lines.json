@@ -1,0 +1,40 @@
+{
+  "intro": [
+    "Measure twice. Cut once.",
+    "I arrive without hurry.",
+    "Let us begin, gently.",
+    "The integral will speak."
+  ],
+  "hit": [
+    "Verified, then struck.",
+    "The derivative agrees.",
+    "Calm waters, clean answer.",
+    "One step. Well placed."
+  ],
+  "miss": [
+    "A lesson, not a loss.",
+    "I checked. Still wrong. Humbling.",
+    "The river bends. I adapt.",
+    "Breathe. Try again."
+  ],
+  "taunt": [
+    "Patience is also a weapon.",
+    "The derivative never lies.",
+    "Haste is a loud kind of doubt."
+  ],
+  "card": [
+    "I bow to the referee.",
+    "A fair correction.",
+    "Even monks stumble."
+  ],
+  "win": [
+    "Patience wins quietly.",
+    "The answer was always there.",
+    "Thank you for the lesson."
+  ],
+  "lose": [
+    "Defeat is also a teacher.",
+    "Well fought. I will reflect.",
+    "The path continues."
+  ]
+}
