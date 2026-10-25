@@ -92,7 +92,8 @@ export function createStage(): Stage {
     const t = new Text({ text: '', style: { fontFamily: 'Lilita One, Impact, sans-serif', fontSize: size, fill } });
     t.anchor.set(anchorX, 0.5); t.position.set(x, y); return t;
   };
-  const label = mk(30, GOLD, JX + 34, JY + 38, 0), clock = mk(64, 0xffffff, JX + JW - 32, JY + JH / 2 + 2, 1), banner = mk(24, GOLD, JX + JW / 2, JY + JH - 26, 0.5);
+  const label = mk(30, GOLD, JX + 34, JY + 38, 0), clock = mk(64, 0xffffff, JX + JW - 32, JY + JH / 2 + 2, 1), banner = mk(24, GOLD, JX + 430, JY + JH / 2 + 2, 0.5);
+  // Banner sits between the last gem (ends JX + 322) and the right-anchored clock, so nothing overlaps.
   label.text = 'MATCH'; banner.text = 'FIGHT CARD';
   jumbo.addChild(frame, gems, label, clock, banner);
 
