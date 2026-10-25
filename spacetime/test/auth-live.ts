@@ -113,6 +113,7 @@ try {
     assert.equal([...runner.db.fighterStats.iter()].length, 0);
     assert.equal(runner.db.match.id.find(id)?.status, 'settled');
     const events = [...runner.db.fightEvent.iter()].filter((e) => e.matchId === id).sort((a, b) => a.seq - b.seq);
+    assert.deepEqual(JSON.parse(events[0]!.data).slots, [1, 2], 'wire byte-array slots must become a JSON array');
     assert.deepEqual(events.map((e) => e.seq), events.map((_e, i) => i + 1));
     assert.deepEqual(events.map((e) => e.type), ['match.created', 'betting.locked', 'match.started', 'match.timeup',
       'match.result', 'match.revealed', 'match.settled']);
@@ -124,6 +125,12 @@ try {
   await runner.reducers.creditTestFunds({ identity, amountCents: 1000n });
   await runner.reducers.createMatch(create(ratedId, 'live', false));
   await player.reducers.placeBet({ marketId: `${ratedId}:winner`, outcome: 'auth_vex', stake: 100n });
+  // A reducer ack on the bettor's connection can precede delivery to the runner's cache.
+  const betDeadline = Date.now() + 5000;
+  while (![...runner.db.bet.iter()].some((b) => b.matchId === ratedId) && Date.now() < betDeadline) {
+    await new Promise((resolve) => setTimeout(resolve, 10));
+  }
+  assert.ok([...runner.db.bet.iter()].some((b) => b.matchId === ratedId), 'runner observed the stake transaction');
   const balanceAfterStake = runner.db.player.identity.find(identity)!.balanceCents;
   await runner.reducers.lockMatch({ matchId: ratedId });
   await runner.reducers.startMatch({ matchId: ratedId });

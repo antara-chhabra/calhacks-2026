@@ -77,7 +77,7 @@ export const create_match = spacetimedb.reducer({ name: 'create_match' }, {
   ctx.db.lockTimer.insert({ scheduledId: 0n, scheduledAt: ScheduleAt.time(closeMicros), matchId: a.id });
 
   appendEvent(ctx, a.id, 'match.created', {
-    category: a.category, mode: a.mode, isDemo: a.isDemo, fighters: a.fighterIds, slots: a.slots,
+    category: a.category, mode: a.mode, isDemo: a.isDemo, fighters: a.fighterIds, slots: Array.from(a.slots),
     problems: a.problems, commitHash: a.commitHash, bettingClosesAt: a.bettingWindowMs, timeLimitMs: a.timeLimitMs,
   });
 });
