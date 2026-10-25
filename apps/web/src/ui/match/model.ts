@@ -1,3 +1,5 @@
+
+
 // Match-screen view models (U-04). Pure helpers: no React, no store access, so they are unit-testable.
 import { HOUSE_ROSTER, type FighterId, type SkinSpec } from '@fc/contracts';
 import { verifyReveal, type FeedLine, type FighterLive, type MatchState } from '@fc/engine';
@@ -159,4 +161,8 @@ export const varOverturns = (s: MatchState): number => (s.standings ?? []).reduc
 export function sourceFor(id: string, conn: string, knownMatches: Record<string, unknown>): 'replay' | 'live' {
   if (conn === 'live' && id in knownMatches) return 'live';
   return 'replay';
+}
+/** A global live board contains many matches; results must stay scoped to the watched match. */
+export function settledMarketsForMatch(markets: import('@/data/store').Store['markets'], matchId: string | null) {
+  return matchId ? Object.values(markets).filter((m) => m.id.startsWith(`${matchId}:`) && (m.status === 'settled' || m.status === 'void')) : [];
 }

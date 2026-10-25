@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import { FighterPortrait } from '@/arena';
 import { cn } from '@/lib/utils';
 import { useStore } from '@/data/store';
-import { checkFairness, type Fairness, matchNumber, nameOf, podium, varOverturns } from './model';
+import { checkFairness, type Fairness, matchNumber, nameOf, podium, varOverturns, settledMarketsForMatch } from './model';
 
 function Tex({ src }: { src: string }) {
   let html = '';
@@ -69,7 +69,7 @@ export function ResultsPanel({ state }: { state: MatchState }) {
   const settled = state.settled;
   const mine = bets.filter((b) => b.mine && b.matchId === state.matchId);
   const myPayout = mine.reduce((n, b) => n + (b.status === 'won' ? b.payout : 0), 0);
-  const mkts = Object.values(markets).filter((m) => m.status === 'settled' || m.status === 'void');
+  const mkts = settledMarketsForMatch(markets, state.matchId);
   if (rows.length === 0) return <div className="rounded-xl border border-zinc-800 p-6 text-sm text-zinc-500">Results appear once the match is settled.</div>;
   return (
     <div className="space-y-4" data-testid="results">

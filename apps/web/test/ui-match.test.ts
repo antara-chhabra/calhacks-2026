@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { verifyReveal } from '@fc/engine';
 import { stopReplay, useStore } from '../src/data/store';
 import { loadFixture } from '../src/data/replay';
-import { checkFairness, clockText, FEED_STYLE, feedTone, matchSourceFor, mmss, plates, podium, problemGems, ResultsRevealGate, sourceFor, varOverturns } from '../src/ui/match/model';
+import { checkFairness, clockText, FEED_STYLE, feedTone, matchSourceFor, mmss, plates, podium, problemGems, ResultsRevealGate, settledMarketsForMatch, sourceFor, varOverturns } from '../src/ui/match/model';
 
 afterEach(() => { stopReplay(); vi.useRealTimers(); });
 
@@ -72,5 +72,15 @@ describe('match view models', () => {
     expect(await checkFairness(s)).toBe('ok');
     expect(await checkFairness({ commitHash: '0'.repeat(64), reveal: s.reveal })).toBe('bad');
     expect(await checkFairness({ commitHash: null, reveal: null })).toBe('none');
+  });
+  it('keeps other matches and unsettled markets out of a result page on a global live board', async () => {
+    const st = await settledState();
+    const first = Object.values(st.markets)[0]!;
+    const foreign = { ...first, id: `${st.watch.state.matchId}_other:winner`, label: 'Foreign result', status: 'settled' as const };
+    const open = { ...first, id: `${st.watch.state.matchId}:pending`, status: 'open' as const };
+    const board = { ...st.markets, [foreign.id]: foreign, [open.id]: open };
+    const selected = settledMarketsForMatch(board, st.watch.state.matchId);
+    expect(selected.map((m) => m.id)).toEqual(Object.values(st.markets).map((m) => m.id));
+    expect(settledMarketsForMatch(board, null)).toEqual([]);
   });
 });
