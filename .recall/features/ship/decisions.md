@@ -10,3 +10,15 @@ Project-wide decisions live in docs/PRD.md §18 (ADR-001…022); record only O7-
 **Date:** 2026-10-25
 **Call:** `submission/figma-stage-log.md` is append-only and records non-Figma tools, rework, plan limits and the stop on Figma for UI.
 **Why:** The Figma track judges "honest about friction" and repeatability; summaries are written from the log at G4.
+
+## Keep submission claims evidence-based
+**Date:** 2026-10-25
+**Call / why:** Drafts must distinguish real/local evidence from pending public deployment and optional sponsor integrations.
+
+## Leave submission and publication pending
+**Date:** 2026-10-25
+**Call / why:** This build prepared reviewable artifacts; it did not submit Devpost or publish the web app.
+
+## Describe the implemented challenge boundaries accurately
+**Date:** 2026-10-25
+**Call / why:** Expose every mode without claiming full chess games, native sandboxing or a public A3 cutover that has not happened.

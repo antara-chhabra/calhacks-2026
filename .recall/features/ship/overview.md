@@ -8,17 +8,26 @@
 Workstream O7 of the Fight Card build. Submission: README with sponsor sections, Devpost text, pitch cards, table checklist, sponsor artifacts. Owns exactly the paths above (PRD §9.3, §17.5); everything else is read-only for this workstream.
 
 ## Current state
-- Targeting Figma's "Idea To Demo" track (Best Figma Workflow / Best Stage Log). `submission/figma-stage-log.md` holds an append-only running log through 02:09, a Figma file register (https://www.figma.com/design/l4pXxI22J9zzAUxfjsdrCz) and the track checklist. Stage summaries are not written yet.
-- Figma for UI was stopped at ~01:55 (founder). The log records the path honestly: Figma v1 → plan limits → teammate account → v2 loop-back → code with KokonutUI.
+
+- A3 README documents all8 categories, QuickJS/HN evaluation boundaries, squad scoring and isolated acceptance commands. PRD1.3 §21 records actual scope.
+- New evidence:624 package tests plus separately passed live SDK integration, all8 explicit MOCK database matches and7 genuine four-Droid category matches, all with actual ledger payout/reveal checks.
+- Chess is a puzzle mode, not a full chess game. Code is actual bounded JS function evaluation; native hostile-code OS containment and real funds movement remain unclaimed.
+- Baseline README/Devpost/pitch/sponsor drafts exist; final submission/media/rehearsal were not completed by this build. Public baseline exists in another workstream, but A3 is not deployed yet.
 
 ## Open threads
-- [ ] Decide if the Figma track is still targeted (Slides deck is required; Figma use stopped)
-- [ ] Write the 4 stage summaries (≤ 200 words each) at G4; share the Figma file as "Anyone"; Edu-verify members; demo video ≤ 3 min
-- [ ] Task cards: D-01 README draft (P3) · D-02–D-04 (P4) · D-05 Fetch video (only if E16) · D-06 publish (P5)
-- [ ] Read first: PRD §1.4, §4, §8, §9.3, §17; then PRD §12, §13, §15.7, §20
+
+- [ ] Refresh Devpost/pitch/media and sponsor claims for the final merged/deployed challenge revision.
+- [ ] Capture final category screenshots/video, finish rehearsals/team metadata, submit Devpost.
+- [ ] Keep deferred x402/CDP, ElevenLabs and Fetch.ai claims honest; determine any applicable Figma track package separately.
 
 ## Key files
-- `docs/PRD.md` §17.6 (O7 task cards) and §17.5 (charter)
+
+- README.md — new challenge behavior and smoke instructions.
+- docs/status/HEAD.md — exact category evidence and remaining deployment work.
+- submission/{devpost,pitch,checklist}.md — drafts still require final update.
 
 ## Recent sessions
+
+- [2026-10-25-challenge-categories](sessions/2026-10-25-challenge-categories.md) — A3 challenge build, real evidence and pre-merge handoff [deep]
+- [2026-10-25-verified-build-handoff](sessions/2026-10-25-verified-build-handoff.md) — verified build, unmerged branch evidence and remaining work [deep]
 - 2026-10-25-figma-stage-log — track spec read, stage log started and kept current
