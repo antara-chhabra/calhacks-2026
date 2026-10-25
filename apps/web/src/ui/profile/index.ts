@@ -1,0 +1,1 @@
+export { FighterProfileScreen } from "./FighterProfileScreen";

@@ -26,29 +26,29 @@ export function PosterWidget({ poster, now, size }: { poster: PosterVM | null; n
           {poster.isOpen ? <>Bets close <span className="font-semibold text-zinc-100">{left}</span></> : <span className="uppercase">{poster.status}</span>}
         </span>
       </div>
-      <ul className="mt-3 grid flex-1 grid-cols-2 gap-2 @[560px]:grid-cols-4">
+      <ul className="mt-2 grid flex-1 grid-cols-2 gap-1.5 @[560px]:mt-3 @[560px]:grid-cols-4 @[560px]:gap-2">
         {poster.fighters.map((f) => (
-          <li className="flex flex-col rounded-xl bg-zinc-950/60 p-3 ring-1 ring-zinc-800" key={f.id} style={{ boxShadow: `inset 0 2px 0 ${f.color}` }}>
+          <li className="flex min-h-0 flex-col rounded-xl bg-zinc-950/60 p-2 ring-1 @[560px]:p-3 ring-zinc-800" key={f.id} style={{ boxShadow: `inset 0 2px 0 ${f.color}` }}>
             <div className="flex items-center gap-2">
-              <AgentAvatar agent={avatarOf(f)} size={size === "s" ? 24 : 30} />
+              <AgentAvatar agent={avatarOf(f)} size={size === "s" ? 22 : 26} />
               <span className="min-w-0 leading-tight">
                 <span className="block truncate font-semibold text-sm text-zinc-50">{f.name}</span>
-                <span className="block truncate text-[11px] text-zinc-500">{f.title}</span>
+                <span className="hidden truncate text-[11px] text-zinc-500 @[560px]:block">{f.title}</span>
               </span>
             </div>
-            <div className="mt-auto flex items-end justify-between pt-3">
-              <span className="font-semibold text-2xl text-zinc-50 tabular-nums">{f.oddsText}<span className="text-sm text-zinc-500">×</span></span>
+            <div className="mt-auto flex items-end justify-between pt-1.5 @[560px]:pt-3">
+              <span className="font-semibold text-xl @[560px]:text-2xl text-zinc-50 tabular-nums">{f.oddsText}<span className="text-sm text-zinc-500">×</span></span>
               <span className="text-[11px] text-zinc-400 tabular-nums">{f.impliedPct === null ? "–" : `${f.impliedPct}%`}</span>
             </div>
           </li>
         ))}
       </ul>
-      <div className="mt-3 flex flex-wrap items-center gap-3">
+      <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 @[400px]:gap-x-3 @[560px]:mt-3">
         <span className="inline-flex items-center gap-1.5 text-[11px] text-zinc-500" title={poster.commitHash}>
-          <Fingerprint className="size-3.5" /> Commit <code className="text-zinc-300">{poster.commitShort || "pending"}</code>
+          <Fingerprint className="size-3.5" /> <span className="hidden @[400px]:inline">Commit</span> <code className="text-zinc-300">{poster.commitShort || "pending"}</code>
         </span>
         <span className="text-[11px] text-zinc-500">Pool {poster.poolText}</span>
-        <Link className="ml-auto inline-flex h-9 items-center gap-1.5 rounded-lg bg-zinc-100 px-4 font-medium text-[13px] text-zinc-950 transition-colors hover:bg-white" data-no-press to={poster.href}>
+        <Link className="ml-auto inline-flex h-9 items-center gap-1.5 rounded-lg bg-zinc-100 px-3 font-medium text-[13px] text-zinc-950 transition-colors hover:bg-white @[400px]:px-4" data-no-press to={poster.href}>
           <Swords className="size-3.5" /> {poster.isOpen ? "Bet now" : "Watch"}
         </Link>
       </div>
