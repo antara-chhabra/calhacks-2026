@@ -4,6 +4,7 @@ import { ArenaCanvas } from "@/arena";
 import { DebugPanel } from "@/data/DebugPanel";
 import { stopReplay, useStore } from "@/data/store";
 import { routes } from "@/ui";
+import { installAudio } from "@/audio";
 
 const prefersReducedMotion = (): boolean =>
   typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches === true;
@@ -32,6 +33,7 @@ function Routes() {
 }
 
 export default function App() {
+  useEffect(() => installAudio(), []);   // O6 SFX on cues$ (muted by default on phones)
   return (
     <BrowserRouter>
       <Routes />
