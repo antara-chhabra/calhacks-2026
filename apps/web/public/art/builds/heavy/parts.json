@@ -1,0 +1,759 @@
+{
+  "schema": 1,
+  "skinKey": "heavy",
+  "build": "heavy",
+  "notes": "Body template (PRD §10.7): VEX's heavy build, moved from fighters/vex in A-03b. Head and expression parts are shared in ../common/.",
+  "stageHeight": 320,
+  "outline": {
+    "color": "#14121F",
+    "width": 4,
+    "join": "round",
+    "detailWidth": 3
+  },
+  "placeholders": {
+    "primary": "#FF00FF",
+    "secondary": "#00FFFF",
+    "accent": "#FFFF00",
+    "skin": "#FFAA88",
+    "replace": "case-sensitive string replace of the whole hex token in the SVG text"
+  },
+  "fixed": {
+    "outline": "#14121F",
+    "white": "#FFFFFF",
+    "steel": "#C9CEDB",
+    "tongue": "#FF6F7D"
+  },
+  "derived": {
+    "shadow": {
+      "fill": "#14121F",
+      "opacity": 0.25,
+      "note": "baked as fill-opacity, palette-independent"
+    },
+    "highlight": {
+      "fill": "#FFFFFF",
+      "opacity": 0.35
+    },
+    "backTint": {
+      "factor": 0.8,
+      "note": "nodes with tint=back: multiply the four substituted palette colors by 0.8 (20% darker)"
+    }
+  },
+  "expressions": {
+    "names": [
+      "neutral",
+      "focus",
+      "smug",
+      "hurt",
+      "ko"
+    ],
+    "parts": [
+      "eyes",
+      "mouth",
+      "brows"
+    ],
+    "pattern": "<part>-<name>.svg",
+    "default": "neutral"
+  },
+  "parts": {
+    "torso": {
+      "src": "torso.svg",
+      "viewBox": [
+        -90,
+        -124,
+        180,
+        142
+      ],
+      "pivot": [
+        0,
+        0
+      ],
+      "anchors": {
+        "emblem": "8,-56",
+        "neck": "8,-108",
+        "shoulder-front": "48,-80",
+        "shoulder-back": "-44,-80",
+        "hip-front": "22,0",
+        "hip-back": "-22,0"
+      }
+    },
+    "head": {
+      "src": "../common/head.svg",
+      "viewBox": [
+        -44,
+        -76,
+        88,
+        96
+      ],
+      "pivot": [
+        0,
+        0
+      ],
+      "anchors": {
+        "neck": "0,0"
+      }
+    },
+    "eyes-neutral": {
+      "src": "../common/eyes-neutral.svg",
+      "viewBox": [
+        -44,
+        -76,
+        88,
+        96
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    "brows-neutral": {
+      "src": "../common/brows-neutral.svg",
+      "viewBox": [
+        -44,
+        -76,
+        88,
+        96
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    "mouth-neutral": {
+      "src": "../common/mouth-neutral.svg",
+      "viewBox": [
+        -44,
+        -76,
+        88,
+        96
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    "eyes-focus": {
+      "src": "../common/eyes-focus.svg",
+      "viewBox": [
+        -44,
+        -76,
+        88,
+        96
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    "brows-focus": {
+      "src": "../common/brows-focus.svg",
+      "viewBox": [
+        -44,
+        -76,
+        88,
+        96
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    "mouth-focus": {
+      "src": "../common/mouth-focus.svg",
+      "viewBox": [
+        -44,
+        -76,
+        88,
+        96
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    "eyes-smug": {
+      "src": "../common/eyes-smug.svg",
+      "viewBox": [
+        -44,
+        -76,
+        88,
+        96
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    "brows-smug": {
+      "src": "../common/brows-smug.svg",
+      "viewBox": [
+        -44,
+        -76,
+        88,
+        96
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    "mouth-smug": {
+      "src": "../common/mouth-smug.svg",
+      "viewBox": [
+        -44,
+        -76,
+        88,
+        96
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    "eyes-hurt": {
+      "src": "../common/eyes-hurt.svg",
+      "viewBox": [
+        -44,
+        -76,
+        88,
+        96
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    "brows-hurt": {
+      "src": "../common/brows-hurt.svg",
+      "viewBox": [
+        -44,
+        -76,
+        88,
+        96
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    "mouth-hurt": {
+      "src": "../common/mouth-hurt.svg",
+      "viewBox": [
+        -44,
+        -76,
+        88,
+        96
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    "eyes-ko": {
+      "src": "../common/eyes-ko.svg",
+      "viewBox": [
+        -44,
+        -76,
+        88,
+        96
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    "brows-ko": {
+      "src": "../common/brows-ko.svg",
+      "viewBox": [
+        -44,
+        -76,
+        88,
+        96
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    "mouth-ko": {
+      "src": "../common/mouth-ko.svg",
+      "viewBox": [
+        -44,
+        -76,
+        88,
+        96
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    "horned_helm": {
+      "src": "../../heads/horned_helm.svg",
+      "viewBox": [
+        -80,
+        -124,
+        160,
+        130
+      ],
+      "pivot": [
+        0,
+        0
+      ],
+      "anchors": {
+        "head": "neck-base",
+        "anchor": "head-pivot"
+      }
+    },
+    "upperArm": {
+      "src": "upperArm.svg",
+      "viewBox": [
+        -36,
+        -48,
+        72,
+        108
+      ],
+      "pivot": [
+        0,
+        0
+      ],
+      "anchors": {
+        "length": 44
+      }
+    },
+    "forearm": {
+      "src": "forearm.svg",
+      "viewBox": [
+        -30,
+        -18,
+        60,
+        68
+      ],
+      "pivot": [
+        0,
+        0
+      ],
+      "anchors": {
+        "length": 46
+      }
+    },
+    "hand": {
+      "src": "hand.svg",
+      "viewBox": [
+        -30,
+        -6,
+        60,
+        60
+      ],
+      "pivot": [
+        0,
+        0
+      ],
+      "anchors": {
+        "socket": "0,22"
+      }
+    },
+    "thigh": {
+      "src": "thigh.svg",
+      "viewBox": [
+        -32,
+        -22,
+        64,
+        82
+      ],
+      "pivot": [
+        0,
+        0
+      ],
+      "anchors": {
+        "length": 52
+      }
+    },
+    "shin": {
+      "src": "shin.svg",
+      "viewBox": [
+        -30,
+        -24,
+        74,
+        76
+      ],
+      "pivot": [
+        0,
+        0
+      ],
+      "anchors": {
+        "length": 46
+      }
+    },
+    "foot": {
+      "src": "foot.svg",
+      "viewBox": [
+        -30,
+        -12,
+        84,
+        38
+      ],
+      "pivot": [
+        0,
+        0
+      ],
+      "anchors": {
+        "sole": 22
+      }
+    },
+    "skull": {
+      "src": "../../emblems/skull.svg",
+      "viewBox": [
+        -30,
+        -32,
+        60,
+        64
+      ],
+      "pivot": [
+        0,
+        0
+      ],
+      "anchors": {
+        "anchor": "torso:emblem"
+      }
+    },
+    "greatsword": {
+      "src": "../../weapons/greatsword.svg",
+      "viewBox": [
+        -50,
+        -412,
+        100,
+        454
+      ],
+      "pivot": [
+        0,
+        0
+      ],
+      "anchors": {
+        "socket": "0,0",
+        "length": 440,
+        "tip": "0,-402",
+        "blade": "up"
+      }
+    }
+  },
+  "nodes": [
+    {
+      "id": "hips",
+      "parent": null,
+      "pos": [
+        0,
+        0
+      ],
+      "note": "root; origin = feet midpoint on the ground"
+    },
+    {
+      "id": "footB",
+      "part": "foot",
+      "parent": "shinB",
+      "pos": [
+        0,
+        46
+      ],
+      "z": 1,
+      "tint": "back"
+    },
+    {
+      "id": "shinB",
+      "part": "shin",
+      "parent": "thighB",
+      "pos": [
+        0,
+        52
+      ],
+      "z": 2,
+      "tint": "back"
+    },
+    {
+      "id": "thighB",
+      "part": "thigh",
+      "parent": "hips",
+      "pos": [
+        -22,
+        -120
+      ],
+      "z": 3,
+      "tint": "back"
+    },
+    {
+      "id": "upperArmB",
+      "part": "upperArm",
+      "parent": "torso",
+      "pos": [
+        -44,
+        -80
+      ],
+      "z": 4,
+      "tint": "back"
+    },
+    {
+      "id": "forearmB",
+      "part": "forearm",
+      "parent": "upperArmB",
+      "pos": [
+        0,
+        44
+      ],
+      "z": 5,
+      "tint": "back"
+    },
+    {
+      "id": "handB",
+      "part": "hand",
+      "parent": "forearmB",
+      "pos": [
+        0,
+        46
+      ],
+      "z": 6,
+      "tint": "back"
+    },
+    {
+      "id": "footF",
+      "part": "foot",
+      "parent": "shinF",
+      "pos": [
+        0,
+        46
+      ],
+      "z": 10
+    },
+    {
+      "id": "shinF",
+      "part": "shin",
+      "parent": "thighF",
+      "pos": [
+        0,
+        52
+      ],
+      "z": 11
+    },
+    {
+      "id": "thighF",
+      "part": "thigh",
+      "parent": "hips",
+      "pos": [
+        22,
+        -120
+      ],
+      "z": 12
+    },
+    {
+      "id": "torso",
+      "part": "torso",
+      "parent": "hips",
+      "pos": [
+        0,
+        -120
+      ],
+      "z": 20
+    },
+    {
+      "id": "emblem",
+      "part": "emblem",
+      "parent": "torso",
+      "pos": [
+        8,
+        -56
+      ],
+      "z": 25
+    },
+    {
+      "id": "head",
+      "part": "head",
+      "parent": "torso",
+      "pos": [
+        8,
+        -108
+      ],
+      "z": 30
+    },
+    {
+      "id": "helm",
+      "part": "helm",
+      "parent": "head",
+      "pos": [
+        0,
+        0
+      ],
+      "z": 31
+    },
+    {
+      "id": "eyes",
+      "part": "eyes",
+      "parent": "head",
+      "pos": [
+        0,
+        0
+      ],
+      "z": 32,
+      "partPattern": "eyes-{expression}.svg"
+    },
+    {
+      "id": "mouth",
+      "part": "mouth",
+      "parent": "head",
+      "pos": [
+        0,
+        0
+      ],
+      "z": 33,
+      "partPattern": "mouth-{expression}.svg"
+    },
+    {
+      "id": "brows",
+      "part": "brows",
+      "parent": "head",
+      "pos": [
+        0,
+        0
+      ],
+      "z": 34,
+      "partPattern": "brows-{expression}.svg"
+    },
+    {
+      "id": "upperArmF",
+      "part": "upperArm",
+      "parent": "torso",
+      "pos": [
+        48,
+        -80
+      ],
+      "z": 40
+    },
+    {
+      "id": "forearmF",
+      "part": "forearm",
+      "parent": "upperArmF",
+      "pos": [
+        0,
+        44
+      ],
+      "z": 41
+    },
+    {
+      "id": "weapon",
+      "part": "weapon",
+      "parent": "handF",
+      "pos": [
+        0,
+        22
+      ],
+      "z": 42
+    },
+    {
+      "id": "handF",
+      "part": "hand",
+      "parent": "forearmF",
+      "pos": [
+        0,
+        46
+      ],
+      "z": 43
+    }
+  ],
+  "slots": {
+    "weapon": {
+      "node": "weapon",
+      "file": "../../weapons/greatsword.svg"
+    },
+    "head": {
+      "node": "helm",
+      "file": "../../heads/horned_helm.svg"
+    },
+    "emblem": {
+      "node": "emblem",
+      "file": "../../emblems/skull.svg"
+    }
+  },
+  "poses": {
+    "idle": {
+      "root": {
+        "x": 0,
+        "y": 0,
+        "rot": 0
+      },
+      "face": "neutral",
+      "grounded": true,
+      "weaponWorld": 36,
+      "rot": {
+        "torso": -2,
+        "head": -3,
+        "upperArmF": -30,
+        "forearmF": -50,
+        "upperArmB": 22,
+        "forearmB": 8,
+        "thighF": -6,
+        "shinF": 10,
+        "footF": -4,
+        "thighB": 8,
+        "shinB": -8,
+        "footB": 0
+      }
+    },
+    "attack": {
+      "root": {
+        "x": 70,
+        "y": 0,
+        "rot": 0
+      },
+      "vb": [
+        -260,
+        -640,
+        1000,
+        760
+      ],
+      "face": "focus",
+      "grounded": true,
+      "weaponWorld": 112,
+      "rot": {
+        "torso": 16,
+        "head": -8,
+        "upperArmF": -96,
+        "forearmF": -10,
+        "upperArmB": 40,
+        "forearmB": 10,
+        "thighF": -38,
+        "shinF": 56,
+        "footF": -18,
+        "thighB": 34,
+        "shinB": 6,
+        "footB": -40
+      }
+    },
+    "ko": {
+      "root": {
+        "x": -60,
+        "y": -230,
+        "rot": -62
+      },
+      "vb": [
+        -560,
+        -640,
+        1000,
+        760
+      ],
+      "face": "ko",
+      "grounded": false,
+      "weaponWorld": -62,
+      "rot": {
+        "torso": -6,
+        "head": -12,
+        "upperArmF": -125,
+        "forearmF": -30,
+        "upperArmB": -60,
+        "forearmB": -25,
+        "thighF": 30,
+        "shinF": 55,
+        "footF": 10,
+        "thighB": -15,
+        "shinB": 35,
+        "footB": 15
+      }
+    }
+  }
+}

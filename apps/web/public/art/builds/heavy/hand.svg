@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -6 60 60" width="60" height="60" data-part="hand" data-pivot="0,0" data-socket="0,22">
+<g stroke="#14121F" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" fill="none">
+<circle cx="0" cy="22" r="24" fill="#FFAA88"/>
+<path d="M 8 10 Q 24 10 24 16 M 8 20 Q 26 20 26 26 M 8 30 Q 24 31 22 36" stroke-width="3"/>
+<path d="M -6 0 Q -4 -8 6 -4" fill="#FFAA88" stroke="none"/>
+<path clip-path="url(#hand-clip)" d="M 8 2 C 22 6 24 28 12 40 L 30 44 L 30 2 Z" fill="#14121F" fill-opacity="0.25" stroke="none" />
+<defs><clipPath id="hand-clip"><path d="M 0 -2 A 24 24 0 1 0 0 46 A 24 24 0 1 0 0 -2 Z"/></clipPath></defs>
+</g>
+</svg>

@@ -78,7 +78,9 @@ Build order and time boxes follow tasks A-01 → A-10 in the PRD. Each component
 
 | Path | Contents |
 |---|---|
-| `apps/web/public/art/fighters/<skinKey>/` | Body part SVGs per build template (`lean`, `standard`, `heavy`) |
+| `apps/web/public/art/builds/<build>/` | Body templates `lean`, `standard`, `heavy` (A-03b): `parts.json` + `torso`, `upperArm`, `forearm`, `hand`, `thigh`, `shin`, `foot`. Skins resolve their body by `skin.build`, never by fighter id. |
+| `apps/web/public/art/builds/common/` | `head.svg` and the 15 expression parts, shared by every build (referenced as `../common/...` in each `parts.json`) |
+| `apps/web/public/art/fighters/vex/` | A-01 original of the heavy template, kept for the reference composites; `builds/heavy` is identical and is what the rig loads |
 | `apps/web/public/art/weapons/`, `heads/`, `emblems/` | Shared libraries, SVG, sockets declared as `data-*` attributes |
 | `apps/web/public/art/stage/` | Layered sky, clouds, ring, crowd, platforms (SVG; backdrop painting may be raster) |
 | `apps/web/public/art/vfx/` | Spark, trail, dust, confetti sprites |

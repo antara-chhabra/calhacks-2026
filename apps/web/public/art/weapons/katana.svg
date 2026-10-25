@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-34 -382 76 430" width="76" height="430" data-part="katana" data-pivot="0,0" data-socket="0,0" data-length="410" data-tip="14,-372" data-blade="up">
+<g stroke="#14121F" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" fill="none">
+<path d="M -9 -40 C -9 -150 -4 -280 14 -372 C 18 -300 14 -150 9 -40 Z" fill="#C9CEDB"/>
+<path d="M 1 -42 L 9 -40 C 14 -150 18 -300 14 -372 C 4 -290 2 -170 1 -42 Z" fill="#14121F" fill-opacity="0.25" stroke="none"/>
+<path d="M -4 -60 C -4 -160 0 -270 11 -340" stroke-width="3"/>
+<path d="M -7 -52 L -4 -52 C -3 -150 1 -250 8 -330 L 4 -318 C -2 -240 -6 -150 -7 -52 Z" fill="#FFFFFF" fill-opacity="0.35" stroke="none"/>
+<path d="M -11 -40 L 11 -40 L 11 -34 L -11 -34 Z" fill="#FFFF00"/>
+<ellipse cx="0" cy="-30" rx="26" ry="9" fill="#FFFF00"/>
+<ellipse cx="0" cy="-30" rx="10" ry="3.5" fill="#14121F" stroke="none" fill-opacity="0.35"/>
+<rect x="-8" y="-24" width="16" height="52" rx="4" fill="#00FFFF"/>
+<path d="M -8 -14 L 0 -6 L 8 -14 M -8 0 L 0 8 L 8 0 M -8 14 L 0 22 L 8 14" stroke-width="3"/>
+<path d="M 2 -24 L 8 -24 L 8 28 L 2 28 Z" fill="#14121F" fill-opacity="0.25" stroke="none"/>
+<path d="M -11 28 L 11 28 L 9 40 L -9 40 Z" fill="#FF00FF"/>
+</g>
+</svg>
