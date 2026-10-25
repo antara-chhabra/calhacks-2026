@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+/* The app is dark-only (Kalshi / Polymarket-style black UI). KokonutUI
+   components style themselves with `dark:` variants, so bind `dark` to the
+   class on <html> instead of the OS setting. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --color-up: #22c55e;
+  --color-down: #f43f5e;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  @apply bg-zinc-950 text-zinc-100 antialiased;
+  font-feature-settings: "cv11", "ss01";
+}

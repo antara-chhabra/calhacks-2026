@@ -12,11 +12,12 @@ Keep dense; this is for orientation, not docs. Source of truth for everything: d
 
 ## Repository
 - GitHub: https://github.com/antara-chhabra/calhacks-2026 (public, owner Antara Chhabra; DV1277 has push). Default branch `main`.
-- Local: `~/Cal-Hacks-2026` tracks `origin/main`. Workstream branches will be `ws/<ws>` (PRD §17.4).
+- Local: `~/calhacks/calhacks-2026` tracks `origin/main`. Workstream branches will be `ws/<ws>` (PRD §17.4).
 
 ## Stack (planned, PRD §9.2)
 - Language: TypeScript strict, Node ≥ 22.9, npm workspaces (`@fc/contracts`, `@fc/engine`, `apps/web`, `apps/runner`, `spacetime`)
 - Web: React 18.3.1 + Vite 5.4 + zustand 4.5; arena PixiJS 8 + GSAP 3.13; KaTeX; react-router 6
+  - **Actual `apps/web` (2026-10-25):** React 19.1, Vite 5.4, Tailwind 4.1 (`@tailwindcss/vite`), react-router 6.30, motion, lucide-react, KokonutUI via the shadcn registry `@kokonutui` (`components.json`). Dark-only (`.dark` on `<html>`). PRD §9.2 amendment pending.
 - Datastore: SpacetimeDB 2.x TypeScript module (system of record + realtime), Maincloud primary, local `spacetime start` fallback
 - Agents: Factory Droid SDK (`@factory/droid-sdk/node`) + `droid` CLI; mathjs verifier in the runner
 - Payments: `@coinbase/cdp-sdk` + `@x402/*` on Base Sepolia (`eip155:84532`), testnet only
@@ -24,6 +25,7 @@ Keep dense; this is for orientation, not docs. Source of truth for everything: d
 
 ## Entry points (planned; created by K-01)
 - Dev: `npm run dev:web`, `npm run runner`, `spacetime start`
+  - Today (no root workspaces yet): `npm --prefix apps/web install` then `npm --prefix apps/web run dev` (port 5173); typecheck `npm --prefix apps/web run typecheck`
 - Tests: `npm run typecheck`, `npm test`, `npm run smoke`
 - Codegen: `npm run gen` (SpacetimeDB bindings, gitignored)
 - Ops: `npm run claim-runner`, `npm run record -- <matchId> <name>`, `npm run scan:secrets`

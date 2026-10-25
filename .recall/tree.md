@@ -10,9 +10,9 @@ Last touched: 2026-10-25
 - **arena** [active] — O1: Pixi SVG-rig sword-fight renderer; not started (P0: A-01, A-02)
   - paths: `apps/web/src/arena/**`, `apps/web/public/art/**`, `docs/art-bible.md`, `docs/{status,requests}/O1.md`
   - last: 2026-10-25 (initial)
-- **platform** [active] — O2: React UI, FIFA cards, Forge, /m mobile; not started (P0: U-01)
-  - paths: `apps/web/src/ui/**`, `apps/web/src/styles/**`, `docs/{status,requests}/O2.md`
-  - last: 2026-10-25 (initial)
+- **platform** [active] — O2: KokonutUI market UI in code (Kalshi/Polymarket black); `/` Flow Field entry + `/markets` dashboard on mock data; no Figma for UI
+  - paths: `apps/web/src/{ui,styles,pages,components,lib}/**`, `apps/web/src/index.css`, `apps/web/{index.html,components.json,vite.config.ts,tsconfig.json,package.json}`, `docs/{status,requests}/O2.md`
+  - last: 2026-10-25 (kokonut-market-ui)
 - **backend** [active] — O3: SpacetimeDB 2.x module (markets, bets, fight log, settlement); not started (P0: B-01)
   - paths: `spacetime/**`, `docs/{status,requests}/O3.md`
   - last: 2026-10-25 (initial)
@@ -25,6 +25,6 @@ Last touched: 2026-10-25
 - **integrations** [active] — O6: x402/CDP wallets, audio + ElevenLabs, Fetch.ai (COULD); not started (P0: I-01 spike)
   - paths: `apps/runner/src/payments/**`, `apps/runner/src/http/public-bookie.ts`, `apps/web/src/audio/**`, `apps/web/public/audio/**`, `services/fetch-agent/**`, `scripts/{gen-barks,try-x402}.ts`, `submission/coinbase.md`, `docs/{status,requests}/O6.md`
   - last: 2026-10-25 (initial)
-- **ship** [active] — O7: README, Devpost, pitch, sponsor artifacts; starts at G3
+- **ship** [active] — O7: README, Devpost, pitch, sponsor artifacts; Figma-track stage log running (`submission/figma-stage-log.md`)
   - paths: `README.md`, `submission/**`, `docs/SPONSORS.md`, `docs/{status,requests}/O7.md`
-  - last: 2026-10-25 (initial)
+  - last: 2026-10-25 (figma-stage-log)
