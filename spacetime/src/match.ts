@@ -5,6 +5,7 @@ import spacetimedb, { lockTimer } from './schema.js';
 import type { Ctx } from './auth.js';
 import { getConfig, requireRunner } from './auth.js';
 import { appendEvent } from './events.js';
+import { applyLedger } from './logic/ledger.js';
 import { MarketSpec, PostedEvent, ProblemMeta, Standing } from './types.js';
 import {
   canTransition, checkPostedBatch, entryId, poolId, poolsSnapshot, seedToCents, standingToEvent, validateCreateMatch,
@@ -76,7 +77,7 @@ export const create_match = spacetimedb.reducer({ name: 'create_match' }, {
   ctx.db.lockTimer.insert({ scheduledId: 0n, scheduledAt: ScheduleAt.time(closeMicros), matchId: a.id });
 
   appendEvent(ctx, a.id, 'match.created', {
-    category: a.category, mode: a.mode, isDemo: a.isDemo, fighters: a.fighterIds, slots: a.slots,
+    category: a.category, mode: a.mode, isDemo: a.isDemo, fighters: a.fighterIds, slots: Array.from(a.slots),
     problems: a.problems, commitHash: a.commitHash, bettingClosesAt: a.bettingWindowMs, timeLimitMs: a.timeLimitMs,
   });
 });
@@ -159,8 +160,7 @@ export const void_match = spacetimedb.reducer({ name: 'void_match' },
       if (b.status !== 'open') continue;
       const p = ctx.db.player.identity.find(b.bettor);
       if (p) {
-        ctx.db.player.identity.update({ ...p, balanceCents: p.balanceCents + b.stake });
-        ctx.db.ledgerTx.insert({ id: 0n, identity: b.bettor, deltaCents: b.stake, reason: 'refund', refId: String(b.id), at: ctx.timestamp });
+        applyLedger(ctx, b.bettor, b.stake, 'refund', String(b.id));
       }
       ctx.db.bet.id.update({ ...b, status: 'refunded', payout: b.stake });
     }

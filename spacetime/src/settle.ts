@@ -66,7 +66,8 @@ export const settle_match = spacetimedb.reducer({ name: 'settle_match' }, {
   // 3. Fighters: elo, matches, lastMatchAt, debutPending, provisional -> active.
   const eloEvt: Record<string, [number, number]> = {};
   const ovrEvt: Record<string, [number, number]> = {};
-  for (const u of elo) {
+  const rated = m.mode === 'live' && !m.isDemo;
+  for (const u of rated ? elo : []) {
     const f = ctx.db.fighter.id.find(u.fighterId);
     if (!f) throw new SenderError('no_fighter');
     const matches = f.matches + 1;
@@ -80,7 +81,7 @@ export const settle_match = spacetimedb.reducer({ name: 'settle_match' }, {
   }
 
   // 4. fighter_stats upsert.
-  for (const s of stats) {
+  for (const s of rated ? stats : []) {
     if (ctx.db.fighterStats.fighterId.find(s.fighterId)) ctx.db.fighterStats.fighterId.update(s);
     else ctx.db.fighterStats.insert(s);
   }
@@ -114,7 +115,9 @@ export const record_purse = spacetimedb.reducer({ name: 'record_purse' }, {
   } else {
     appendEvent(ctx, a.matchId, 'purse.paid', { fighterId: a.fighterId, amountUsdc: a.amountUsdc, txHash: a.txRef, to: a.to });
     const st = ctx.db.fighterStats.fighterId.find(a.fighterId);
-    if (st) ctx.db.fighterStats.fighterId.update({ ...st, earningsUsdc: st.earningsUsdc + a.amountUsdc });
+    if (st && m.mode === 'live' && !m.isDemo) {
+      ctx.db.fighterStats.fighterId.update({ ...st, earningsUsdc: st.earningsUsdc + a.amountUsdc });
+    }
   }
 });
 
