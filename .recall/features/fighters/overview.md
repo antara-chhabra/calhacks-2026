@@ -14,11 +14,13 @@ Workstream O5 of the Fight Card build. Fighter backends: Factory Droid SDK sessi
 - The backwards-compatible antiderivative transport key carries any category answer. Integrals retain400 characters; nonintegrals allow bounded10k answers. Code instructions require a pure JS function expression, without Markdown/JSON wrapper.
 - Seven four-Droid live, non-demo matches settled: Code, SpeedMath, Logic, Chess, Trivia, LiveWeb and Squads, each with verified reveal/two ledger bettors and persisted category records. Most scored150; Chess SAGE/QUILL150, VEX145, BRICK140.
 - Private approved Standard remap for GLITCH/PIP and QUILL low effort remain; do not store actual model IDs, API keys or runner tokens. Native Read/Glob/Grep/LS/Execute and Python remain disabled; QuickJS is a separate bounded evaluator, not a native OS-containment claim.
-- Parallel persona work: ws/personas @5d9b6c4 in fc-merge is unmerged and has custom Factory droids under .factory/droids, a persona lock/version gate and external temporary sandboxes to prevent project/persona leakage. Its Maincloud runner was separately restarted. Preserve that work; it has not been integrated with A3 here.
+- **Personas merged (main @ `44922fa`, 2026-10-25 ~06:55):** house personas are Factory custom droids `.factory/droids/fc-<id>.md`, pinned by `agents/house/personas.lock.json` (runner fails closed on drift). Each keeps one fixed character plus a `# By mode` line for all 8 categories (test asserts a line per CATEGORY_CATALOG entry). House sessions use the persona as the full systemPrompt, then `agents/rules.md`; the problem turn names the mode and restates the character + taunt budget; 8 s closing-taunt window. Sandboxes in `$TMPDIR/fightcard-sandboxes` (in-repo sandboxes leaked AGENTS.md/CLAUDE.md/personas into fighters).
+- Live persona evidence: `try-fighter --all --category {integrals,code,logic,chess} --seed modes-1` → 24/24 runs 5/5, all survived; signatures hold in every mode (GLITCH P5→P1, BRICK triage + slowest first strike, VEX opening decree, QUILL lectures, PIP nervous opener, SAGE one proverb). Earlier neutral-persona A/B: all P1→P5, generic taunts. Taunt counts vary slightly on cheap models (SAGE 0 / PIP 1 once in chess).
 
 ## Open threads
 
-- [ ] Integrate/review ws/personas separately; it overlaps prompt/rules changes and was not included in the challenge-only merge authorization.
+- [x] ws/personas merged with A3 (44922fa)
+- [ ] Persona change = edit droid file + `node scripts/lock-personas.mjs` + fighter version bump (never silently)
 - [ ] Verified OS containment before any native command/read enablement.
 - [ ] Full direct-provider/public HTTP BYO acceptance remains separate from the tested category-aware payloads.
 
@@ -30,5 +32,6 @@ Workstream O5 of the Fight Card build. Fighter backends: Factory Droid SDK sessi
 
 ## Recent sessions
 
+- [2026-10-25-mode-personas](sessions/2026-10-25-mode-personas.md) — personas made mode-aware, merged, deployed [deep]
 - [2026-10-25-challenge-categories](sessions/2026-10-25-challenge-categories.md) — A3 challenge build, real evidence and pre-merge handoff [deep]
 - [2026-10-25-verified-build-handoff](sessions/2026-10-25-verified-build-handoff.md) — verified build, unmerged branch evidence and remaining work [deep]

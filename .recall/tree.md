@@ -13,15 +13,15 @@ Last touched: 2026-10-25
 - **platform** [active] — All8 category tabs/leaderboards/Director active and filtered; shuffled squad slots/results and post-reveal prompts verified; merged main6f90ac8
   - paths: `apps/web/src/{ui,styles,pages,components,lib}/**`, `apps/web/src/index.css`, `apps/web/{index.html,components.json,vite.config.ts,tsconfig.json,package.json}`, `docs/{status,requests}/O2.md`
   - last: 2026-10-25 (challenge-categories)
-- **backend** [active] — Additive category stats/history verified locally on fightcard-challenges; baseline Maincloud live; A3 public schema/cutover pending
+- **backend** [active] — A3 module live on Maincloud `fightcard` (additive migration, runner claim intact); demo smoke PASS on Maincloud
   - paths: `spacetime/**`, `docs/{status,requests}/O3.md`
   - last: 2026-10-25 (challenge-categories)
 - **runtime** [active] — Category-aware generation/live/final checks, actual bounded JS functions, fresh web snapshots and squad team markets; merged main6f90ac8
   - paths: `apps/runner/src/{match,problems,season}/**`, `apps/runner/src/http/{admin,byo}.ts`, `scripts/{smoke,smoke-challenges,record,recompute,try-problems}.ts`, `docs/{status,requests}/O4.md`
   - last: 2026-10-25 (challenge-categories)
-- **fighters** [active] — Category-aware Droid/direct/HTTP;7 real new-category matches settled; native tools disabled; independent ws/personas remains unmerged
+- **fighters** [active] — Mode-aware locked Factory-droid personas merged (main 44922fa); 24/24 live persona runs across 4 modes; sandboxes outside repo; native tools disabled
   - paths: `apps/runner/src/fighters/**`, `apps/runner/bin/**`, `agents/**`, `scripts/{try-fighter,list-models}.ts`, `docs/{status,requests}/O5.md`
-  - last: 2026-10-25 (challenge-categories)
+  - last: 2026-10-25 (mode-personas)
 - **integrations** [active] — O6: x402/CDP wallets, audio + ElevenLabs, Fetch.ai (COULD); not started (P0: I-01 spike)
   - paths: `apps/runner/src/payments/**`, `apps/runner/src/http/public-bookie.ts`, `apps/web/src/audio/**`, `apps/web/public/audio/**`, `services/fetch-agent/**`, `scripts/{gen-barks,try-x402}.ts`, `submission/coinbase.md`, `docs/{status,requests}/O6.md`
   - last: 2026-10-25 (initial)
@@ -31,4 +31,4 @@ Last touched: 2026-10-25
 
 ## Resume warning
 
-Main includes A3 merge6f90ac8 (challenge branch6a3b1d2) after recall commit1e5913b. Merged revision passes624 tests/typecheck/build. The original challenge session is a pre-merge snapshot; current L1/L2 records completion. ws/personas is separate/unmerged. Arena/integrations summaries remain older than Antara’s merged A-01…A-09/I-03 work.
+main = origin/main = `44922fa` (A3 categories + mode-aware personas). Live deploy runs from `.arena/worktrees/fc-merge`: runner :8797/:8798 on Maincloud `fightcard`, web https://ist-colleagues-twisted-variations.trycloudflare.com (quick tunnel; changes on restart). Arena/integrations summaries are older than Antara's merged A-01…A-09/I-03 work.

@@ -25,3 +25,7 @@ Project-wide decisions live in docs/PRD.md §18 (ADR-001…022); record only O5-
 ## Retain the transport key
 **Date:** 2026-10-25
 **Call / why:** Existing clients and tool schemas can submit other category answers without a breaking endpoint rename.
+
+## One locked character, per-mode lines inside it
+**Date:** 2026-10-25
+**Call / why:** Bettors price a fighter's behavior; A3 added 8 modes. Each persona file carries a fixed `By mode` line per category so behavior in every mode is pinned by the same hash lock, instead of drifting per mode or via separate files.
