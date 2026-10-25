@@ -74,6 +74,9 @@ const ss = (): Store | null => { try { return window.sessionStorage; } catch { r
 export function loadToken(hash: string, store: Store | null = ss()): string | null {
   const fromHash = parseTokenFromHash(hash);
   if (fromHash) { try { store?.setItem(KEY, fromHash); } catch { /* ignore */ } return fromHash; }
-  try { return store?.getItem(KEY) ?? null; } catch { return null; }
+  try { const kept = store?.getItem(KEY); if (kept) return kept; } catch { /* ignore */ }
+  // Local presenter laptop only: a gitignored .env.local may supply the token so the arena's presenter controls work
+  // without a #token link. Never set this for a deployed build.
+  return import.meta.env.VITE_DIRECTOR_TOKEN || null;
 }
 export function forgetToken(store: Store | null = ss()): void { try { store?.removeItem(KEY); } catch { /* ignore */ } }

@@ -192,6 +192,7 @@ export function MatchScreen({ id }: { id: string | null }) {
       <h1 className="text-2xl font-bold text-white">{conn === 'connecting' ? 'Connecting to the arena…' : conn === 'offline' ? 'Arena connection unavailable' : 'No fight is live right now'}</h1>
       <p className="mt-3 text-sm text-zinc-400">{conn === 'offline' ? 'Check that the match backend is running. This page reconnects automatically.' : 'This page joins the next fight automatically.'}</p>
       <Link className="mt-6 inline-flex min-h-11 items-center rounded-lg bg-white px-5 text-sm font-semibold text-black" to="/markets">Browse markets</Link>
+      <div className="mx-auto mt-6 max-w-xs text-left"><PresenterControls /></div>
     </section></AppShell>
   );
   return (
