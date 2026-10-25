@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { verifyReveal } from '@fc/engine';
 import { stopReplay, useStore } from '../src/data/store';
 import { loadFixture } from '../src/data/replay';
-import { checkFairness, clockText, FEED_STYLE, feedTone, mmss, plates, podium, problemGems, sourceFor, varOverturns } from '../src/ui/match/model';
+import { checkFairness, clockText, FEED_STYLE, feedTone, matchSourceFor, mmss, plates, podium, problemGems, resultIsInstant, sourceFor, varOverturns } from '../src/ui/match/model';
 
 afterEach(() => { stopReplay(); vi.useRealTimers(); });
 
@@ -24,6 +24,18 @@ describe('match view models', () => {
     expect(sourceFor('mock-basic', 'offline', {})).toBe('replay');
     expect(sourceFor('m1', 'live', { m1: {} })).toBe('live');
     expect(sourceFor('mock-basic', 'live', {})).toBe('replay');
+  });
+  it('waits for live match hydration and only replays bundled fixtures', () => {
+    expect(matchSourceFor({ target: 'db-match', conn: 'connecting', matches: {}, fixtures: ['mock-basic'] })).toBe('wait');
+    expect(matchSourceFor({ target: 'db-match', conn: 'live', matches: { 'db-match': {} }, fixtures: ['mock-basic'] })).toBe('live');
+    expect(matchSourceFor({ target: 'missing', conn: 'offline', matches: {}, fixtures: ['mock-basic'] })).toBe('none');
+    expect(matchSourceFor({ target: 'mock-basic', conn: 'offline', matches: {}, fixtures: ['mock-basic'] })).toBe('replay');
+  });
+  it('reveals results immediately for reduced motion, hidden arena and settled snapshots', () => {
+    expect(resultIsInstant({ reducedMotion: true, hudOnly: false, initiallySettled: false })).toBe(true);
+    expect(resultIsInstant({ reducedMotion: false, hudOnly: true, initiallySettled: false })).toBe(true);
+    expect(resultIsInstant({ reducedMotion: false, hudOnly: false, initiallySettled: true })).toBe(true);
+    expect(resultIsInstant({ reducedMotion: false, hudOnly: false, initiallySettled: false })).toBe(false);
   });
   it('builds plates, podium, gems and verifies fairness from the settled fixture', async () => {
     const st = await settledState();

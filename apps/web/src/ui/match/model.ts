@@ -30,6 +30,21 @@ export const STATUS_BADGE: Record<MatchState['status'], string> = {
   scheduled: 'UPCOMING', open: 'BETS OPEN', locked: 'LOCKED', live: 'LIVE', review: 'VAR REVIEW', settled: 'FINAL', void: 'VOID',
 };
 
+export type MatchSource = 'live' | 'replay' | 'wait' | 'none';
+/** Choose only after the connection has settled; replay names must exist in the bundled fixture set. */
+export function matchSourceFor(input: {
+  target: string | null; conn: 'connecting' | 'live' | 'offline' | 'replay'; matches: Record<string, unknown>; fixtures: string[];
+}): MatchSource {
+  if (input.conn === 'connecting') return 'wait';
+  if (!input.target) return 'none';
+  if (input.conn === 'live' && input.matches[input.target]) return 'live';
+  return input.fixtures.includes(input.target) ? 'replay' : 'none';
+}
+
+export function resultIsInstant(input: { reducedMotion: boolean; hudOnly: boolean; initiallySettled: boolean }): boolean {
+  return input.reducedMotion || input.hudOnly || input.initiallySettled;
+}
+
 export type Gem = { idx: number; points: number; state: 'open' | 'held' | 'pending' | 'overturned' };
 /** Five problem gems: filled once any fighter has a surviving (or pending) hit. */
 export function problemGems(s: MatchState): Gem[] {

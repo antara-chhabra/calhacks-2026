@@ -7,21 +7,30 @@ import { ArenaCanvas, FighterPortrait } from '@/arena';
 import { bridge } from '@/bridge';
 import { config } from '@/config';
 import { useStore } from '@/data/store';
+import { fixtureNames } from '@/data/replay';
 import { cn } from '@/lib/utils';
+import { getPodium, subscribePodium } from '@/arena/sequences/podium';
 import { AppShell } from '@/ui/shell';
 import { BetSlip } from '@/ui/betslip';
-import { clockText, FEED_STYLE, feedStamp, matchNumber, plates, problemGems, STATUS_BADGE } from './model';
+import { clockText, FEED_STYLE, feedStamp, matchNumber, matchSourceFor, plates, problemGems, resultIsInstant, STATUS_BADGE } from './model';
 import { ResultsPanel } from './results';
 
-/** Open the data source for a route param once per id. Fixture names (or any non-live connection) replay. */
+/** Wait through connection hydration, then attach to a known DB match or bundled fixture. */
 export function useMatchSource(id: string | null, speed?: number): void {
+  const conn = useStore((s) => s.conn);
+  const matches = useStore((s) => s.matches);
+  const liveMatchId = useStore((s) => s.liveMatchId);
   useEffect(() => {
     const st = useStore.getState();
-    const target = id ?? st.liveMatchId ?? 'mock-basic';
-    if (st.watch.matchId === target || st.openMatchId === target || st.watch.state.matchId === target) return;
-    if (st.conn === 'live' && target in st.matches) st.watchMatch(target);
-    else st.openReplay(target, speed ?? 1);
-  }, [id, speed]);
+    const target = id ?? liveMatchId ?? (conn === 'connecting' ? null : st.openMatchId ?? 'mock-basic');
+    const source = matchSourceFor({ target, conn, matches, fixtures: fixtureNames() });
+    if (!target || source === 'wait' || source === 'none') return;
+    if (source === 'live') {
+      if (st.watch.matchId !== target || st.watch.mode !== 'live') st.watchMatch(target);
+      return;
+    }
+    if (st.watch.matchId !== target || st.watch.mode !== 'replay' || st.openMatchId !== target) st.openReplay(target, speed ?? 1);
+  }, [id, speed, conn, matches, liveMatchId]);
 }
 
 export const prefersReducedMotion = (): boolean => typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
@@ -119,6 +128,36 @@ function Qr({ matchId }: { matchId: string | null }) {
   );
 }
 
+function ResultsHandoff({ state, hudOnly }: { state: import('@fc/engine').MatchState; hudOnly: boolean }) {
+  const revision = useStore((s) => s.watch.playbackRevision);
+  const [revealed, setRevealed] = useState(false);
+  const lastRevision = useRef(revision);
+  const initiallySettled = useRef(state.status === 'settled');
+  useEffect(() => {
+    if (state.status !== 'settled') {
+      lastRevision.current = revision;
+      setRevealed(false);
+      return;
+    }
+    if (resultIsInstant({ reducedMotion: prefersReducedMotion(), hudOnly, initiallySettled: initiallySettled.current || revision !== lastRevision.current })) {
+      lastRevision.current = revision;
+      setRevealed(true);
+      return;
+    }
+
+    let done = false;
+    const reveal = () => { if (!done) { done = true; setRevealed(true); } };
+    const accept = (podium: ReturnType<typeof getPodium>) => {
+      if (podium.revealed && podium.matchId === state.matchId) reveal();
+    };
+    const unsubscribe = subscribePodium(accept);
+    accept(getPodium());
+    const fallback = window.setTimeout(reveal, 3500);
+    return () => { done = true; unsubscribe(); window.clearTimeout(fallback); };
+  }, [state.matchId, state.status, revision, hudOnly]);
+  return revealed ? <ResultsPanel state={state} /> : null;
+}
+
 function ReplayControls() {
   const { mode, speed, playing } = useStore((s) => s.watch);
   const setSpeed = useStore((s) => s.setSpeed);
@@ -163,7 +202,7 @@ export function MatchScreen({ id }: { id: string | null }) {
           </main>
           <aside className="order-3 flex h-[320px] flex-col lg:h-auto lg:max-h-[calc(56dvh+200px)] border-zinc-800 lg:border-l"><Feed /></aside>
         </div>
-        {settled && <div className="border-t border-zinc-800 p-4"><ResultsPanel state={state} /></div>}
+        {settled && <div className="border-t border-zinc-800 p-4"><ResultsHandoff hudOnly={hudOnly} state={state} /></div>}
       </div>
     </AppShell>
   );

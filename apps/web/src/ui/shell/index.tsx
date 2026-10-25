@@ -5,6 +5,7 @@ import { MorphicNavbar } from "@/components/kokonutui/morphic-navbar";
 import { LiveDot, Money, Toaster } from "@/components/fightcard/primitives";
 import { useStore } from "@/data/store";
 import { cn } from "@/lib/utils";
+import { MuteToggle } from "@/audio";
 
 export const MONEY_DISCLOSURE = "Ledger mode · no funds moved";
 
@@ -97,6 +98,7 @@ export function AppShell(props: { children: ReactNode; title?: string; wide?: bo
             <MorphicNavbar className="[&_a]:whitespace-nowrap" items={NAV} />
           </nav>
           <div className="ml-auto flex items-center gap-2">
+            <MuteToggle className="rounded-md p-1.5 text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-zinc-400/60" />
             <ModeBadge className="hidden sm:inline-flex" />
             <BalancePill />
           </div>
