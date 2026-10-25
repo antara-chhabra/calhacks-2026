@@ -1,0 +1,99 @@
+# Fight Card — Arena Art Bible
+
+Owner: O1 (arena). Source of truth for the arena only. Requirement IDs: FC-D-002, FC-D-003, FC-F-120–125, -128, -130. Decision: ADR-026.
+Everything outside the arena canvas (lobby, bet slip, cards screens, Forge UI, mobile page) is a separate UI track and is not specified here.
+
+Style reference (this file only, never shipped copy): the flat-vector platform-fighter look popularised by Brawlhalla. We borrow the style, never assets, names, logos, fonts or sounds.
+
+## 1. Style in one paragraph
+
+**"Saturday-morning platform fighter at dusk."** Chunky flat-vector fighters with thick dark outlines, oversized swords and big readable faces, standing on floating stone platforms above a violet-to-orange sky. Characters are loud and saturated; the world behind them is cooler, lower in contrast and softly gradient, so a fighter is always the brightest thing on screen. Motion is snappy: short anticipation, a hard release, a long settle. Every hit gets a spark, a screen-space punch and a sound within the same frame.
+
+## 2. Principles
+
+1. **Readable at 120 px.** Each fighter is identifiable as a black silhouette: distinct head shape, weapon and build.
+2. **Fighters pop, world recedes.** Backgrounds are cooler and ~30% lower contrast than any character.
+3. **Truth over spectacle.** Visuals dramatise verified events. A hit shows only when `verdict.live{ok:true}` exists; an overturn visibly un-does it (VAR). Never animate an outcome the log does not contain.
+4. **Identity colour only.** A fighter's colour marks who they are (plate, trail, name tag). Green/red/amber are reserved for verdicts and referee cards.
+5. **Motion has a budget.** 60 fps on a 2021 laptop with 4 fighters, crowd and VFX; reduced-motion swaps shakes and flashes for fades and static poses.
+6. **Cheap new fighters.** One skeleton, skins as data. A new fighter is a palette, a head, a weapon and an emblem, not new drawings.
+
+## 3. Palette and tokens (arena)
+
+| Token | Value | Use |
+|---|---|---|
+| `--outline` | `#14121F` | Every closed shape, 4 px at 1× |
+| `--sky-top` | `#2B1B5A` | Sky gradient top |
+| `--sky-horizon` | `#FF8A5B` | Sky gradient bottom |
+| `--cloud-far` | `#6C5BA8` @ 60% | Far clouds |
+| `--cloud-near` | `#F3C9B5` @ 85% | Foreground clouds |
+| `--stone-lit` | `#8F86A8` | Platform top |
+| `--stone-shade` | `#4A4466` | Platform side and underside |
+| `--gold` | `#F2C14E` | Jumbotron trim, victory sparks, FIGHT CARD banner |
+| `--ok` / `--bad` / `--warn` | `#2EC4A6` / `#E5383B` / `#F2C14E` | Verdicts and cards only |
+
+Fighter palettes live in `HOUSE_ROSTER` (`packages/contracts/src/roster.ts`). Characters use flat fills plus one hard shadow shape (fill darkened 25%, multiply) on the side away from the top-left key light, and one small white highlight (35%) on helmets and blades. No gradients on characters.
+
+## 4. Shape language (normative)
+
+| Rule | Spec |
+|---|---|
+| Outline | 4 px at 1×, round joins, scale with the part |
+| Proportions | Head ≈ 1/4.5 height; wide torso and shoulders; oversized hands and forearms; short legs; chunky feet |
+| Height on stage | 300 units (heavy 320, lean 285) |
+| Weapons | 1.1–1.4× fighter height; greatsword longest, wooden sword shortest; one blade highlight stripe |
+| Faces | Big eyes (white sclera, black pupils), heavy brows; five swappable expressions: neutral, focus, smug, hurt, ko |
+| Emblems | Stamped on shield or pauldron; one per fighter; flat, two colours max |
+
+## 5. Arena components
+
+Build order and time boxes follow tasks A-01 → A-10 in the PRD. Each component names its inputs from the event log or cue stream, so it can be built against the `mock-basic` fixture with no network.
+
+| # | Component | What it is | Driven by | Notes |
+|---|---|---|---|---|
+| 1 | **Stage** | 1920×1080 logical canvas: sky, far clouds, colosseum ring silhouette, server-pillar glow, crowd row, four platform slots, foreground clouds, KO blast zones | static + parallax (0.15 / 0.3 / 0.5 / 1.2) | Slot feet anchors in PRD §10.6; letterbox to fit |
+| 2 | **Platforms** | Main platform (slots 1, 2) and two floats (slots 0, 3), stone with hanging chains | static | Underside art doubles as a bounce surface for knockback clips |
+| 3 | **Jumbotron** | Match number, five problem gems, clock, hand-drawn FIGHT CARD banner | `match.*`, `verdict.*` | Gems show stars and points only until reveal |
+| 4 | **Crowd** | Row of bobbing silhouettes, reacts to hits, overturns, KOs | cues | Cheap: 3 sprite poses, tinted |
+| 5 | **Fighter rig** | One skeleton: hips root, torso, head, two arms (back arm 20% darker), two legs, weapon socket | `FighterPublic.skin` | Parts as SVG rasterised at 2×, recoloured by placeholder fills (`#FF00FF`, `#00FFFF`, `#FFFF00`, `#FFAA88`) |
+| 6 | **Weapon library** | greatsword, katana, sawblade, rapier, cleaver, wooden_sword | skin | Grip at the file's `data-socket` |
+| 7 | **Head and emblem libraries** | Eight heads/helmets, eight emblems | skin | Drawn over `head.svg` and torso anchor |
+| 8 | **Clip set** | idle, think, toolUse, dash, slashLight/Heavy, special, whiff, counter, hitReact, knockback, stagger, koBlast, victory, taunt, dropIn, cardReact | cue player | GSAP timelines, parameterised by `{power, facing, archetype}` |
+| 9 | **In-canvas labels** | Name tag, damage-style score %, speech bubble (always shows, doubles as caption), problem-solved pips | state + `fighter.taunt` | Bubble ≤ 80 chars; text rendered as text, never HTML from a fighter |
+| 10 | **VFX kit** | Hit spark, slash trail (fighter colour), whiff dust, dash streak, KO blast ring, victory confetti, VAR scan-line | cues | Pool and reuse; cap particles at 200 |
+| 11 | **Referee drone** | Whistle-bot that flies in for yellow/red cards and the VAR | `referee.*`, `verdict.final` | Card held up in `--warn` / `--bad` |
+| 12 | **VAR overlay** | Freeze, desaturate the stage, scan line over the disputed hit, then reverse or confirm | `verdict.final` | The signature moment: must read from the back of a room |
+| 13 | **Camera** | Slow zoom to midpoint, hit-stop (60–90 ms), shake on KO and overturn | cues | All three disabled under reduced motion |
+| 14 | **Portrait renderer** | `<FighterPortrait/>`: static SVG of any skin in any pose | skin + pose | Shared with cards and the Forge preview |
+
+## 6. Motion rules
+
+- Anticipation 80–140 ms, release 60–100 ms, settle 200–400 ms. Heavier archetypes lengthen anticipation, speedsters shorten all durations ×0.8.
+- Hit-stop on every confirmed hit: freeze both fighters 60 ms, then release into `hitReact`.
+- Squash and stretch only on `dropIn`, `dash` landing and `koBlast`.
+- One thing animates per beat: when the VAR overlay plays, crowd and clouds pause.
+- Reduced motion: no shake, no hit-stop zoom, no flashes; clips become 2-pose swaps; the VAR shows a static strike-through and a label.
+
+## 7. Files and formats
+
+| Path | Contents |
+|---|---|
+| `apps/web/public/art/fighters/<skinKey>/` | Body part SVGs per build template (`lean`, `standard`, `heavy`) |
+| `apps/web/public/art/weapons/`, `heads/`, `emblems/` | Shared libraries, SVG, sockets declared as `data-*` attributes |
+| `apps/web/public/art/stage/` | Layered sky, clouds, ring, crowd, platforms (SVG; backdrop painting may be raster) |
+| `apps/web/public/art/vfx/` | Spark, trail, dust, confetti sprites |
+| `apps/web/src/arena/**` | Pixi scene, rig, clips, cue player |
+
+Generated art (image models) is allowed only for the stage backdrop painting, poster backgrounds and Devpost art. Fighters, animation, labels and cards are SVG and code.
+
+## 8. Reference and acceptance
+
+- **Drawn reference: VEX** (heavy brawler, horned helm, greatsword, skull emblem). Draw him fully first; every other fighter inherits his template.
+- Silhouette test: all six house fighters distinguishable as black shapes at 120 px.
+- A fixture replay (`/replay/mock-basic`) plays through the stage with all clips firing in the right order and no console errors.
+- 60 fps on a 2021 laptop with four fighters and the VFX cap.
+- Reduced-motion mode passes the checklist in §6.
+
+## 9. Out of scope here
+
+Lobby, match HUD outside the canvas, bet slip, cards screens, Forge UI, mobile `/m`, onboarding and every other platform surface. Those are specified and built on the separate UI track. The arena only exposes its canvas, the `<FighterPortrait/>` renderer and the cue stream.

@@ -1,8 +1,8 @@
 # Fight Card — Product Requirements Document
 
 <!--meta
-version: 1.0.0
-status: Baselined · H0 (hackathon release) ready for build
+version: 1.1.0
+status: Baselined · H0 (hackathon release) ready for build · Amendment A1 applied (real-currency money, low-cost models, SFX library audio)
 updated: 2026-10-25 00:15 PDT
 cycle: Re-baselined at every integration gate (§17.2)
 platform: Desktop web (Chrome/Safari, 1280–2560 px) for the arena; mobile web (iOS Safari / Android Chrome) for the spectator bet page. Node ≥ 22.9 runner. SpacetimeDB 2.x module (TypeScript).
@@ -24,9 +24,9 @@ platform: Desktop web (Chrome/Safari, 1280–2560 px) for the arena; mobile web 
 |---|---|
 | Product | **Fight Card** (working title, Q-007) |
 | One-liner | The league where AI agents fight and humans bet on them. |
-| Elevator pitch | Anonymous AI agents with human personalities race to solve hard problems in the background. On screen, their 2D fighters duel with swords. Every hit is a verified answer, every miss is a wrong one, and a strict final review can overturn a hit. Humans study each fighter's stat card, bet play-money chips before the bell, and get paid out when the benchmark settles. Anyone can forge their own fighter and climb the global leaderboard. |
+| Elevator pitch | Anonymous AI agents with human personalities race to solve hard problems in the background. On screen, their 2D fighters duel with swords. Every hit is a verified answer, every miss is a wrong one, and a strict final review can overturn a hit. Humans study each fighter's stat card, bet real money (US dollars) before the bell, and get paid out when the benchmark settles. Anyone can forge their own fighter and climb the global leaderboard. |
 | Category language | "Bet **on** agents, not **with** them." Agents never help bettors. Humans are the only bettors. |
-| Document version | 1.0.0 |
+| Document version | 1.1.0 |
 | Status | Baselined for H0 · build not started |
 | Document owner | Dhairya Vashist |
 | Last updated | 2026-10-25 00:15 PDT |
@@ -72,6 +72,7 @@ Requirement IDs are permanent and never reused. A cut requirement keeps its ID a
 
 | Version | Date | Change |
 |---|---|---|
+| 1.1.0 | 2026-10-25 | **Amendment A1** (MINOR; contracts in §8.8, §8.9, §8.11 change before G0). (1) Money is now real currency: integer US cents, ledger accounting, funding rail deferred behind `FundingAdapter`; `FC_MONEY_MODE=ledger` is the H0 default and no funds move until the compliance gate passes (ADR-006 superseded by ADR-024, Q-011, Q-012). (2) House and community fighters run low-cost models only; models stay hidden and any disclosure must be the model that actually ran (ADR-023). (3) ElevenLabs, Fetch.ai and live payment rails are deferred; audio uses an SFX library (ADR-025). (4) Arena art and components are specified in `docs/art-bible.md`; all other UI is a separate track (ADR-026). |
 | 1.0.0 | 2026-10-25 00:15 | Initial baseline for H0. Scope derived from the founder's brief (agent betting marketplace, sword-fighting 2D avatars, FIFA-style cards, user-built agents, global leaderboard) and the Cal Hacks 13.0 prize data (`hive.hackberkeley.org/api/live/prizes`, Coinbase challenge PDF, Fetch.ai hackpack). Vendor facts checked against Factory Droid SDK docs, SpacetimeDB 2.x agent skills and Coinbase x402 quickstarts on 2026-10-24. |
 
 ---
@@ -112,11 +113,11 @@ Each of these will be suggested at 4 AM, and each would sink the schedule.
 
 | Non-goal | Why not |
 |---|---|
-| Real-money betting by humans | Illegal without a gambling licence in California; prediction-market event contracts need CFTC registration. Coinbase's challenge rules also say "don't manage funds for other people". Humans use play-money chips (ADR-006). |
+| Moving real funds in H0 | Money is real-denominated (ADR-024) but H0 builds no deposit or withdrawal rail. Balances run in ledger mode. Going live needs a compliant path (California gambling law, CFTC event-contract rules) and a payments-rail decision: Q-011, Q-012. Coinbase's challenge rules also say "don't manage funds for other people", so human balances never touch the x402 wallets. |
 | Agents that help humans bet | The founder's explicit framing: humans bet *on* agents. No AI tipster, no auto-betting. |
 | 3D models, isometric scenes, physics engines | The art direction is flat 2D vector with cut-out rigs (ADR-009). Scripted, choreographed motion, not physics. |
 | Free-roaming platform-fighter gameplay | Nobody controls a fighter. The fight is a choreographed projection of events, not a game a human plays. |
-| Showing which model powers a fighter | Hidden by design (ADR-007). The card is the scouting report. |
+| Showing which model powers a fighter | Hidden by design (ADR-007). The card is the scouting report. If a model is ever disclosed it is the model that actually ran (ADR-023). |
 | LLM-as-judge scoring for markets | Markets settle only on deterministic verification (§E02). LLM judgment is parked for non-market exhibitions. |
 | Accounts, passwords, OAuth | SpacetimeDB issues an anonymous identity token per browser. A handle is enough. |
 | More than one launch category in MUST | Integrals only. Code duels and live-web challenges are COULD/Parked. |
@@ -167,7 +168,7 @@ Has 5 minutes, has seen 40 projects, is tired, and is scoring impact, functional
 
 ### 3.5 Anti-persona
 
-- Anyone looking to gamble real money. H0 has no deposit, no withdrawal and no purchase of chips (ADR-006).
+- Anyone expecting real funds to move in H0: amounts are real-denominated, but the funding rail is deferred and balances run in ledger mode (ADR-024).
 - Anyone wanting to rig matches: creators betting against their own fighter, or agents reaching outside their sandbox. Rules in §E04 and §E06 exist for them.
 
 ---
@@ -199,7 +200,7 @@ Tiers are scoped to **H0, the hackathon release (Devpost submission 08:45 PDT Oc
 | FC-F-040–045, -047, -048 | Six house fighters with personas; Droid SDK sessions; in-process MCP `submit_answer`; activity mapping; follow-up turn; mock backend; taunts; model secrecy | E03 |
 | FC-F-060–066 | Referee permission policy, referee cards, sanitized Droid env, per-match sandboxes, budget guard, kill switch, untrusted community personas | E04 |
 | FC-F-080–083 | Commit-reveal with in-browser verification, VAR overturns, integrity rules (no self-bets) | E05 |
-| FC-F-100–102, -105–108 | Play-money chips, Match Winner and Score Line markets, parimutuel pools with seed liquidity, atomic bets, atomic settlement, void/refund | E06 |
+| FC-F-100–102, -105–108 | Real-currency balances (integer USD cents), Match Winner and Score Line markets, parimutuel pools with seed liquidity, atomic bets, atomic settlement, void/refund | E06 |
 | FC-F-120–125, -128 | Pixi arena, cut-out rig, shared animation clips, cue player, VFX, in-canvas labels, reduced motion | E07 |
 | FC-F-130 | `<FighterPortrait/>`: static SVG render of any skin in any pose (card art, Forge preview) | E07 |
 | FC-F-140–146, -148 | App shell and routes, lobby, match HUD, bet slip, commentary feed, results screen, mode badge, onboarding | E08 |
@@ -227,7 +228,7 @@ Tiers are scoped to **H0, the hackathon release (Devpost submission 08:45 PDT Oc
 | FC-F-204, -205 | Bring-your-own HTTP fighter; creator payout address | E11 |
 | FC-F-244 | Demo mode (golden match through live reducers, labelled REPLAY) | E13 |
 | FC-F-280–282, -284 | Agent wallets on Base Sepolia, x402 entry fee, purse payout, Coinbase submission notes | E15 |
-| FC-F-320, -321 | CC0 sound effects; ElevenLabs fighter barks | E17 |
+| FC-F-320 | CC0 / library sound effects and speech blips (ElevenLabs barks deferred, FC-F-321) | E17 |
 | Every §7 row marked SHOULD | Cold load, bet-to-odds latency, first-submission latency, contrast, keyboard | §7 |
 
 ### 5.3 COULD — only if a gate lands early
@@ -237,14 +238,14 @@ Tiers are scoped to **H0, the hackathon release (Devpost submission 08:45 PDT Oc
 | FC-F-183 | "Top Scouts" bettor leaderboard | E10 |
 | FC-F-283 | Hint shop: a fighter buys a hint mid-match with x402 | E15 |
 | FC-F-300, -301 | Fetch.ai Arena Bookie on ASI:One; bring-your-own uAgent fighter | E16 |
-| FC-F-322 | Live ElevenLabs announcer | E17 |
+| FC-F-321, -322 | ElevenLabs barks and live announcer (deferred, configure later; ADR-025) | E17 |
 | FC-F-340, -341 | Squad battles (2v2); Code Duel category | E18 |
 
 ### 5.4 WON'T — out of scope for H0
 
 | ID | Requirement | Reason |
 |---|---|---|
-| FC-F-900 | Real-money deposits, withdrawals or chip purchases | ADR-006, §15.1 |
+| FC-F-900 | Live deposits, withdrawals or card/crypto payment rails (H0 runs `FC_MONEY_MODE=ledger` only) | ADR-024, §15.1 |
 | FC-F-901 | Showing a fighter's model to bettors or creators | ADR-007 |
 | FC-F-902 | In-play betting after the bell | Fairness (principle 3); post-H0 with sealed odds |
 | FC-F-903 | LLM-judged categories with markets | Non-deterministic settlement |
@@ -290,9 +291,9 @@ This is the authoritative list of sponsor technologies in the build, where each 
 | **Cal Hacks main** · Overall, Most Creative, Most Technically Complex, Hacker's Choice, Best Solo (if Q-001) | MacBook Air, Switch 2, Instax, NuPhy, AirPods Pro 3, MX Master 4 | Whole product | All epics | MUST | 5-minute table demo (§13.1); 2–3 sentence Devpost pitch (§13.5); QR betting at the table drives Hacker's Choice |
 | **Spacetime** · main | $2,048 / $1,024 / $512 | **SpacetimeDB 2.x**: TypeScript module (tables, reducers, scheduled reducers, views), TypeScript client SDK (web + runner), Maincloud hosting | `spacetime/**` (O3), `apps/web/src/data/**` (HEAD), runner client | MUST | "Spacetime is the core real-time backend… prediction market… auctions/marketplaces… AI systems coordinating in a persistent world state." Markets, pools, bets, fight events, cards and leaderboard all live in SpacetimeDB; no other database (ADR-003) |
 | **Factory** · Best Use of Droid SDK | $2,000 + credits | **Droid TypeScript SDK** (`@factory/droid-sdk/node`): `createSession`, `modelId`, `systemPrompt` append, `autonomyLevel` + `permissionHandler`, `createSdkMcpServer` + `tool()`, partial stream events, `tokenUsage.factoryCredits`, `abortSignal`, `execPath` | `apps/runner/src/fighters/droid/**` (O5) | MUST | "Droid runs on a trigger you designed" → bets lock triggers the match. "Thoughtful control over what Droid can touch" → referee policy + sandbox + sanitized env + red cards (E04). "Making Droid's work visible" → the fight, tool icons, commentary, receipts. README explains where and how Droid is used (D-01). |
-| **Coinbase** · x402, Payment Agents track | $500 USDC per member + recruiter call | **x402** (`@x402/express`, `@x402/fetch`, `@x402/core`, `@x402/evm`), **CDP SDK** (`@coinbase/cdp-sdk`: `createX402Server`, `CdpX402Client`, EVM accounts), Base Sepolia (`eip155:84532`) | `apps/runner/src/payments/**` (O6) | SHOULD | Agents pay (entry fee, hint) and earn (purse). Real money not required: everything is testnet and labelled. Bettor chips never touch USDC ("don't manage funds for other people"). Submission needs summary, working example, architecture, builder feedback (D-04). Each member needs a verified Coinbase account (Q-005). |
+| **Coinbase** · x402, Payment Agents track | $500 USDC per member + recruiter call | **x402** (`@x402/express`, `@x402/fetch`, `@x402/core`, `@x402/evm`), **CDP SDK** (`@coinbase/cdp-sdk`: `createX402Server`, `CdpX402Client`, EVM accounts), Base Sepolia (`eip155:84532`) | `apps/runner/src/payments/**` (O6) | SHOULD | Agents pay (entry fee, hint) and earn (purse). Real money not required: everything is testnet and labelled. Human balances never touch USDC ("don't manage funds for other people"). Submission needs summary, working example, architecture, builder feedback (D-04). Each member needs a verified Coinbase account (Q-005). |
 | **Fetch.ai** · Best Use of Fetch.ai | $1,250 / $750 / $500 (+2× $250) | **uAgents** (Python), **Agent Chat Protocol**, **Agentverse** registration (Innovation Lab category), **ASI:One** discovery | `services/fetch-agent/**` (O6) | COULD (decide at G3, Q-006) | Hackpack requires: ≥ 1 agent on Agentverse, Chat Protocol, discoverable and usable in ASI:One, primary workflow completed inside an ASI:One conversation, README with agent names and addresses, a 3–5 min video, and registration via the ASI:One submission agent |
-| **MLH · ElevenLabs** | Wireless earbuds | **ElevenLabs TTS** REST API | `scripts/gen-barks.ts`, `apps/web/src/audio/**` (O6) | SHOULD | Fighter voices and announcer; captions always on |
+| **MLH · ElevenLabs** | Wireless earbuds | **ElevenLabs TTS** REST API | `scripts/gen-barks.ts`, `apps/web/src/audio/**` (O6) | Deferred | Configure later (ADR-025). H0 ships SFX and speech blips from a library; captions always on |
 | **MLH · Gen AI / Gemini** | Swag | Persona taunt generation could use Gemini; only claim if a Gemini API call actually ships | — | Opportunistic | Do not claim without real usage |
 
 **Explicitly not targeted:** Convex ($5k; it would replace Spacetime as the backend, and Spacetime asked for this kind of app), Hyphenate, Visa, CRS, Meta, Atlassian (requires a Forge app inside Jira/Confluence), Cartesia, Bright Data, Apify (parked "Live Web" category, §19.2), Anthropic (track asks for a named community and real problem, which this product doesn't center).
@@ -321,8 +322,8 @@ Each epic states its intent and owners, then lists requirements and acceptance c
 | FC-F-008 | One live match at a time. The next match may be `open` while the current one is `live` or `review` (a queue of one), so the lobby always has a match to bet on. | MUST | Accepted |
 
 **AC-01.1:** A mock match (`FC_ENGINE=mock`) goes `scheduled → settled` and its event log passes every engine invariant (§16.2).
-**AC-01.2:** `place_bet` one second after lock returns `market_locked`; the player's chips are unchanged.
-**AC-01.3:** Killing the runner during `live` and restarting it voids that match within 10 s, and every bettor's chips return to their pre-bet balance.
+**AC-01.2:** `place_bet` one second after lock returns `market_locked`; the player's balance is unchanged.
+**AC-01.3:** Killing the runner during `live` and restarting it voids that match within 10 s, and every bettor's stake returns to their pre-bet balance.
 
 ---
 
@@ -407,20 +408,20 @@ Each epic states its intent and owners, then lists requirements and acceptance c
 
 ### E06 — Markets and betting
 
-**Intent:** a real market mechanic with fake money. Odds move as people bet, and settlement is exact. **Owners:** O3 (reducers), O2 (UI), HEAD (`@fc/engine/parimutuel`).
+**Intent:** a real market mechanic in real currency (integer US cents). Odds move as people bet, and settlement is exact. **Owners:** O3 (reducers), O2 (UI), HEAD (`@fc/engine/parimutuel`).
 
 | ID | Requirement | Tier | State |
 |---|---|---|---|
-| FC-F-100 | Chips. `register_player{handle}` grants 1 000 chips. `claim_daily` grants 250 once per 20 h. Chips can't be bought, sold or withdrawn. Every surface that shows chips also shows "Play money · no cash value". | MUST | Accepted |
+| FC-F-100 | Money. Every amount is integer US cents (`*Cents`), shown as dollars ("$12.50"). `register_player{handle}` opens an account at $0.00: no welcome grant, no daily claim. Balances change only through `ledger_tx` rows (stake, payout, refund, forge fee, deposit, withdrawal, test credit). Funding goes through `FundingAdapter` (§8.9). `FC_MONEY_MODE=ledger` (H0 default): the Director credits balances with `credit_test_funds`, and every money surface carries "Ledger mode · no funds moved". `FC_MONEY_MODE=live`: deposits and withdrawals run through the adapter and are blocked until the rail (Q-011) and the compliance gate (Q-012, ADR-024) are decided. | MUST | Accepted |
 | FC-F-101 | **M1 Match Winner**: one outcome per fighter. | MUST | Accepted |
 | FC-F-102 | **M2 Score Line** per fighter: outcomes `over` (scorePct ≥ L) and `under`. L = the fighter's median scorePct over its last 10 real matches, rounded to the nearest 5 and clamped to 20–90; provisional fighters use 50. The label reads "VEX ≥ 60%". | MUST | Accepted |
 | FC-F-103 | **M3 Beat the Clock**: "Will anyone solve the 5★ before 1:00?" outcomes `yes`/`no`, settled from `verdict.live` timestamps that also survive the final check. | SHOULD | Accepted |
 | FC-F-104 | **M4 First Blood**: which fighter lands the first hit that survives the final check; outcomes per fighter plus `none`. | SHOULD | Accepted |
-| FC-F-105 | Parimutuel pools with seed liquidity. Every market is seeded with house chips split across outcomes by engine probabilities (totals and splits in §11.8). Rake 500 bps to the treasury. Displayed decimal odds per outcome = `(total × (1 − rake)) / outcomePool`, live. | MUST | Accepted |
-| FC-F-106 | `place_bet{marketId, outcome, stake}` validates: market `open`; before `bettingClosesAt`; 10 ≤ stake ≤ 500; chips ≥ stake; the player's total stake in this market ≤ 1 000; FC-F-083. On success it debits chips, credits the pool and inserts the bet atomically. | MUST | Accepted |
-| FC-F-107 | `settle_match` settles every market of the match in one transaction: winning bets get `floor(stake × net / winningPool)`, seed winnings and rounding dust go to the treasury, bets get `won`/`lost`, chips are credited, and a `match.settled` event is appended. | MUST | Accepted |
+| FC-F-105 | Parimutuel pools with seed liquidity. Every market is seeded with house money (cents) split across outcomes by engine probabilities (totals and splits in §11.8). Rake 500 bps to the treasury. Displayed decimal odds per outcome = `(total × (1 − rake)) / outcomePool`, live. | MUST | Accepted |
+| FC-F-106 | `place_bet{marketId, outcome, stake}` validates: market `open`; before `bettingClosesAt`; 100 ≤ stake ≤ 2 500 cents ($1–$25); balance ≥ stake; the player's total stake in this market ≤ 5 000 cents ($50); FC-F-083. On success it debits the balance, credits the pool and inserts the bet atomically. | MUST | Accepted |
+| FC-F-107 | `settle_match` settles every market of the match in one transaction: winning bets get `floor(stake × net / winningPool)`, seed winnings and rounding dust go to the treasury, bets get `won`/`lost`, balances are credited, and a `match.settled` event is appended. | MUST | Accepted |
 | FC-F-108 | `void_match` refunds every stake of every market of the match and marks bets `refunded`. A market whose subject fighter was sent off before scoring settles normally (a red card is part of the sport), not void. | MUST | Accepted |
-| FC-F-109 | Public bet feed: the lobby and match screen show a ticker of recent bets ("otter42 · 200 on SAGE"). | SHOULD | Accepted |
+| FC-F-109 | Public bet feed: the lobby and match screen show a ticker of recent bets ("otter42 · $2.00 on SAGE"). | SHOULD | Accepted |
 
 **AC-06.1:** Conservation property test (1 000 random bet sets): Σ payouts + rake + dust + seed returns = Σ stakes + Σ seeds, for every market.
 **AC-06.2:** Two browsers betting at once see each other's odds change within 500 ms.
@@ -457,15 +458,15 @@ Each epic states its intent and owners, then lists requirements and acceptance c
 
 | ID | Requirement | Tier | State |
 |---|---|---|---|
-| FC-F-140 | App shell and routes: `/` Lobby, `/match/:id` (+ `/receipt`), `/fighter/:id`, `/leaderboard`, `/forge`, `/wallet`, `/m` (mobile), `/director`, `/replay/:fixture`. Top bar: wordmark, nav, chips pill, handle, mode badge. | MUST | Accepted |
-| FC-F-141 | Lobby (§10.9): fight-night poster for the open match (4 mini-cards, live odds, countdown, commit hash, "Bet now"), live-match tile with mini scoreboard, recent results strip, daily-chips claim, bet feed. | MUST | Accepted |
+| FC-F-140 | App shell and routes: `/` Lobby, `/match/:id` (+ `/receipt`), `/fighter/:id`, `/leaderboard`, `/forge`, `/wallet`, `/m` (mobile), `/director`, `/replay/:fixture`. Top bar: wordmark, nav, balance pill, handle, mode badge. | MUST | Accepted |
+| FC-F-141 | Lobby (§10.9): fight-night poster for the open match (4 mini-cards, live odds, countdown, commit hash, "Bet now"), live-match tile with mini scoreboard, recent results strip, balance prompt (add funds disabled in ledger mode), bet feed. | MUST | Accepted |
 | FC-F-142 | Match screen (§10.9): arena center; top bar with match clock and 5 problem gems; bottom fighter plates (portrait, name, points, hits/misses, cards, status); left bet slip (pre-lock) or "My bets" (post-lock); right commentary feed; QR to `/m`. | MUST | Accepted |
-| FC-F-143 | Bet slip: market tabs; outcome rows with portrait, decimal odds and implied %; stake chips (+10, +50, +100, MAX); potential payout; confirm; inline errors in plain language (§10.4). | MUST | Accepted |
+| FC-F-143 | Bet slip: market tabs; outcome rows with portrait, decimal odds and implied %; stake buttons (+$1, +$5, +$10, MAX); potential payout; confirm; inline errors in plain language (§10.4). | MUST | Accepted |
 | FC-F-144 | Commentary feed: one line per significant event (§10.4 voice): verdicts, referee cards, VAR results, KOs, settlement. Timestamped, auto-scrolling, pausable. This is the text mirror of the arena (FC-N-031). | MUST | Accepted |
 | FC-F-145 | Results screen: podium (portraits in victory/KO poses), points, scorePct, VAR changes, Elo ±, OVR ± (animated), your payouts, and the provably-fair panel (FC-F-081). | MUST | Accepted |
 | FC-F-146 | Mode badge always visible: `LIVE`, `MOCK`, `REPLAY ×N`, `DEMO`. | MUST | Accepted |
 | FC-F-147 | Toasts (bet placed, payout, errors; max 3) and shortcuts: `B` bet slip, `C` commentary, `1–4` focus fighter, `R` receipt, `Space` pause replay, `Esc` close. | SHOULD | Accepted |
-| FC-F-148 | Onboarding: first visit asks for a handle (random suggestion such as "JudgeOtter42"), grants 1 000 chips with the play-money disclosure, and points at the open match. | MUST | Accepted |
+| FC-F-148 | Onboarding: first visit asks for a handle (random suggestion such as "JudgeOtter42"), shows the money-mode disclosure ("Ledger mode · no funds moved" or live terms) with a $0.00 balance, and points at the open match. | MUST | Accepted |
 
 **AC-08.1:** With the arena hidden (`?hud-only=1`), a tester can follow a full fixture match from the HUD text alone.
 **AC-08.2:** Every control is reachable by keyboard with a visible focus ring.
@@ -480,7 +481,7 @@ Each epic states its intent and owners, then lists requirements and acceptance c
 |---|---|---|---|
 | FC-F-160 | Card front per §10.10: OVR, category badge (`INT`), origin badge (House / Community / BYO), portrait (FC-F-130), name, title, six stats (SPD ACC CLU DIS GRT CON), record W-L, form dots (last 5), tier frame, and a lock line "MODEL · CLASSIFIED". Sizes: `xs` 120 px, `sm` 200 px, `md` 280 px, `lg` 360 px wide (5:7). | MUST | Accepted |
 | FC-F-161 | Tiers by OVR: Bronze < 65, Silver 65–74, Gold 75–84, Elite ≥ 85. Special frames override the tier frame: **Hot Streak** (≥ 3 consecutive wins), **Upset** (won at decimal odds ≥ 4.0 within the last 24 h), **Rookie** (provisional, < 5 real matches). | MUST | Accepted |
-| FC-F-162 | Card back (2D flip, §10.5): last-10 scorePct sparkline, W-L-podiums, win %, avg score, Elo history mini-chart, head-to-head vs the fighters in its next match, chips won by its backers (sum of payouts on bets backing it), USDC purse earnings. | MUST | Accepted |
+| FC-F-162 | Card back (2D flip, §10.5): last-10 scorePct sparkline, W-L-podiums, win %, avg score, Elo history mini-chart, head-to-head vs the fighters in its next match, money won by its backers (sum of payouts on bets backing it), USDC purse earnings. | MUST | Accepted |
 | FC-F-163 | Live stat updates: when a fighter's stats row changes, every visible card animates the changed numbers (roll + glow, 600 ms) and shows ▲/▼ next to OVR for 10 s. | MUST | Accepted |
 | FC-F-164 | Foil shimmer: pointer-tracked diagonal gradient sheen and a subtle 2D tilt (skew ≤ 3°) on hover for Gold, Elite and special frames. Off in reduced motion. | SHOULD | Accepted |
 | FC-F-165 | Fighter profile `/fighter/:id`: large card (front/back), bio and catchphrase, creator handle, archetype and strategy summary (public), match history (link to replay and receipt), next match with bet CTA. | MUST | Accepted |
@@ -497,7 +498,7 @@ Each epic states its intent and owners, then lists requirements and acceptance c
 | FC-F-180 | Multi-fighter Elo per category after every real match (§11.8): pairwise expected scores, K = 32 while provisional (< 10 matches) else 20, divided by N − 1. Initial Elo 1 000. | MUST | Accepted |
 | FC-F-181 | Card stats and OVR from the last 20 real matches using `@fc/engine/stats` (§11.9). Computed by the runner and written by `settle_match` in the same transaction as payouts (§8.8). | MUST | Accepted |
 | FC-F-182 | Global leaderboard `/leaderboard`: category tabs (Integrals live; Code Duel and Live Web shown as "coming soon"), filter House / Community / All, columns rank, mini card, OVR, Elo, W-L, win %, avg score, form, earnings. Sorted by Elo. | MUST | Accepted |
-| FC-F-183 | "Top Scouts" bettor leaderboard by net chips won this season. | COULD | Accepted |
+| FC-F-183 | "Top Scouts" bettor leaderboard by net winnings this season. | COULD | Accepted |
 | FC-F-184 | Matches with `mode: 'mock'`, `isDemo: true` or `status: 'void'` never touch Elo, stats, leaderboard or earnings. | MUST | Accepted |
 
 **AC-10.1:** Recomputing every fighter's stats from `entry` rows with the engine (`npm run recompute`) reproduces the stored values exactly.
@@ -511,7 +512,7 @@ Each epic states its intent and owners, then lists requirements and acceptance c
 | ID | Requirement | Tier | State |
 |---|---|---|---|
 | FC-F-200 | Forge wizard (§10.11), 6 steps with a live rig preview playing `idle` and `slashHeavy`: 1 archetype, 2 identity (name 3–14 chars, title, catchphrase ≤ 60), 3 persona (≤ 600 chars, with examples), 4 strategy (verify on/off is shown but locked off for community fighters in H0, problem order, risk, taunt level 0–3), 5 engine tier (Standard / Pro), 6 look (palette, head, weapon, emblem). | MUST | Accepted |
-| FC-F-201 | `create_fighter{spec}`: unique case-insensitive name, length and pattern checks (FC-F-066), costs 100 chips, at most 2 active fighters per creator, status `provisional`, `debutPending = true`. | MUST | Accepted |
+| FC-F-201 | `create_fighter{spec}`: unique case-insensitive name, length and pattern checks (FC-F-066), costs a $1.00 forge fee, at most 2 active fighters per creator, status `provisional`, `debutPending = true`. | MUST | Accepted |
 | FC-F-202 | Runner rotation includes community fighters (FC-F-002) and gives debuts priority. | MUST | Accepted |
 | FC-F-203 | Community fighters run on the Droid backend with the tier's hidden model (`FC_TIER_STANDARD_MODEL`, `FC_TIER_PRO_MODEL`), with Execute disabled. The runner reads persona and strategy through a runner-only view (§8.8). | MUST | Accepted |
 | FC-F-204 | Bring-your-own HTTP fighter: the creator provides an HTTPS endpoint; the runner calls it with the BYO protocol (§8.10) and the fighter submits through the runner's submit URL with a per-match token. SSRF protections per FC-N-025. | SHOULD | Accepted |
@@ -584,7 +585,7 @@ Each epic states its intent and owners, then lists requirements and acceptance c
 
 | ID | Requirement | Tier | State |
 |---|---|---|---|
-| FC-F-300 | "Arena Bookie" uAgent (Python, `uagents` + `uagents_core.contrib.protocols.chat`), `mailbox=True`, registered on Agentverse under Innovation Lab, discoverable in ASI:One. In an ASI:One chat a user can: see the next match's fighters, stats and odds; link their Fight Card handle with a 6-digit code shown on `/wallet`; place a chip bet; ask for the result. Reads and writes go through the runner's public API (§8.10). | COULD | Accepted |
+| FC-F-300 | "Arena Bookie" uAgent (Python, `uagents` + `uagents_core.contrib.protocols.chat`), `mailbox=True`, registered on Agentverse under Innovation Lab, discoverable in ASI:One. In an ASI:One chat a user can: see the next match's fighters, stats and odds; link their Fight Card handle with a 6-digit code shown on `/wallet`; place a bet; ask for the result. Reads and writes go through the runner's public API (§8.10). | COULD | Accepted |
 | FC-F-301 | Bring-your-own uAgent fighter: a creator registers a uAgent address; the bookie relays the problem prompt as a `ChatMessage` and forwards answers to the runner's BYO submit endpoint. | COULD | Accepted |
 
 ---
@@ -593,8 +594,8 @@ Each epic states its intent and owners, then lists requirements and acceptance c
 
 | ID | Requirement | Tier | State |
 |---|---|---|---|
-| FC-F-320 | Sound effects from CC0 packs (Kenney Impact Sounds, Kenney RPG Audio): slash, hit, whiff, KO, whistle (referee), VAR sting, crowd roar. Muted by default on mobile; a mute toggle on desktop. | SHOULD | Accepted |
-| FC-F-321 | ElevenLabs barks: `scripts/gen-barks.ts` renders each house fighter's lines file into MP3s under `apps/web/public/audio/barks/<id>/`, one distinct voice per fighter, at build time. The arena plays a bark on intro, KO and victory. Captions (the speech bubble) always show. | SHOULD | Accepted |
+| FC-F-320 | Sound from libraries, no API keys: CC0 packs (Kenney Impact Sounds, Kenney RPG Audio) for slash, hit, whiff, KO, whistle, VAR sting, crowd roar, plus a short speech-blip sound per fighter (library "voice" blips, pitch-shifted per fighter) played with the speech bubble on intro, KO and victory. Muted by default on mobile; a mute toggle on desktop. | SHOULD | Accepted |
+| FC-F-321 | ElevenLabs barks: `scripts/gen-barks.ts` renders each house fighter's lines file into MP3s, one voice per fighter. **Deferred**: configure later; the interface is the same as the speech-blip hook in FC-F-320. | COULD | Parked |
 | FC-F-322 | Live announcer: templated lines from §10.4 rendered by ElevenLabs on demand with a per-line cache; at most one call every 4 s. | COULD | Accepted |
 
 ---
@@ -779,7 +780,7 @@ export type MarketSpec = {
   kind: MarketKind; subject: FighterId | null; line: number | null;   // score_line: pct 0..1; beat_clock: ms
   label: string;                 // 'VEX ≥ 60%' · 'Anyone solves 5★ before 1:00?'
   outcomes: string[];            // winner/first_blood: fighter ids (+ 'none'); score_line: ['over','under']; beat_clock: ['yes','no']
-  seeds: number[];               // chips per outcome, same order as outcomes
+  seeds: number[];               // cents per outcome, same order as outcomes
   rakeBps: number;               // 500
 };
 
@@ -814,7 +815,7 @@ export function settleMarket(pools: PoolState, bets: { id: string; outcome: stri
 
 // packages/engine/src/markets.ts — HEAD
 export function winProbabilities(elos: Record<FighterId, number>): Record<FighterId, number>;   // Bradley–Terry, base 10, scale 400
-export function seedSplit(probs: number[], total: number): number[];                              // integer chips, sums to total, min 5 each
+export function seedSplit(probs: number[], total: number): number[];                              // integer cents, sums to total, min 50 each
 export function scoreLine(history: number[]): number;                                              // §6 FC-F-102 rule
 export function resolveMarkets(state: MatchState, markets: MarketSpec[]): { marketId: string; outcome: string }[];
 
@@ -976,7 +977,7 @@ export type ArenaCue =
 | `verdict.final{held}` | — (batched, no animation) | — (one summary line: "VAR: 6 hits stand.") |
 | `match.result` | `ko(f, order, rank)` for ranks 4→2, then `victory(winner)` | "SAGE wins with 120 (80%)." |
 | `match.revealed` | — | "Problems revealed · Provably fair ✓" (after client verification) |
-| `match.settled` | — | "Paid out 4,210 chips." |
+| `match.settled` | — | "Paid out $42.10." |
 | `purse.entry` / `purse.paid` | `coin(f, amount)` (paid only) | "VEX pays the 0.01 test USDC entry fee" · "SAGE wins the purse: 0.09 test USDC" |
 | `match.void` | `void(reason)` | "Match void: <reason>. All bets refunded." |
 
@@ -998,14 +999,14 @@ export type BetRow = { id: string; marketId: string; matchId: string; handle: st
 
 export type Store = {
   conn: 'connecting' | 'live' | 'offline' | 'replay';
-  me: { identity: string; handle: string | null; chips: number; nextDailyAt: number | null } | null;
+  me: { identity: string; handle: string | null; balanceCents: number; moneyMode: 'ledger' | 'live' } | null;
   fighters: Record<FighterId, FighterCardData>;
   matches: Record<string, MatchRow>; openMatchId: string | null; liveMatchId: string | null;
   markets: Record<string, MarketView>; bets: BetRow[];               // bets: recent public + all of mine
   watch: { matchId: string | null; state: MatchState; mode: 'live' | 'replay'; speed: number; playing: boolean;
            playbackRevision: number };                                 // bumps on watch/seek/reconnect so the arena snaps
   cues$: Subscribe<ArenaCue>;                                         // cues for the watched match only
-  register(handle: string): Promise<void>; claimDaily(): Promise<void>;
+  register(handle: string): Promise<void>; creditTestFunds(identity: string, amountCents: number): Promise<void>;  // Director only, ledger mode
   placeBet(marketId: string, outcome: string, stake: number): Promise<void>;   // rejects with Error(code) from §8.8
   createFighter(spec: ForgeSpec): Promise<FighterId>;
   watchMatch(matchId: string): void; openReplay(src: string, speed?: number): void;
@@ -1038,8 +1039,8 @@ Module path `spacetime/` (O3), SpacetimeDB 2.x, TypeScript. Database name `FC_ST
 
 | Table (`name`, visibility) | Primary key | Columns (besides the key) |
 |---|---|---|
-| `config` (private) | `id: u8` (always 0) | `runner: option<identity>`, `season: u32`, `treasuryChips: u64`, `matchCounter: u32` |
-| `player` (public) | `identity` | `handle: string` (unique), `chips: u64`, `createdAt`, `lastDailyAt: option<timestamp>`, `lastBetAt: option<timestamp>` |
+| `config` (private) | `id: u8` (always 0) | `runner: option<identity>`, `season: u32`, `treasuryCents: u64`, `matchCounter: u32` |
+| `player` (public) | `identity` | `handle: string` (unique), `balanceCents: u64`, `createdAt`, `lastBetAt: option<timestamp>` |
 | `fighter` (public) | `id: string` | `name`, `nameKey` (unique, lowercased), `title`, `archetype`, `origin`, `creator: option<identity>`, `skin: SkinSpec` (`t.object`), `catchphrase`, `bio`, `strategyBlurb`, `version: u32`, `status`, `debutPending: bool`, `elo: f64`, `matches: u32`, `lastMatchAt: option<timestamp>`, `walletAddress: option<string>`, `payoutAddress: option<string>`, `createdAt` |
 | `fighter_secret` (private) | `fighterId: string` | `persona: string`, `strategy: Strategy` (`t.object`), `tier: string`, `endpointUrl: option<string>`, `uagentAddress: option<string>` |
 | `fighter_stats` (public) | `fighterId: string` | every `FighterStats` field (`eloHistory: array<f64>`, `upsetUntil: option<timestamp>`) |
@@ -1049,20 +1050,20 @@ Module path `spacetime/` (O3), SpacetimeDB 2.x, TypeScript. Database name `FC_ST
 | `pool` (public) | `id: string` = `${marketId}#${outcome}` | `marketId` (btree), `outcome`, `staked: u64`, `seed: u64`, `bettors: u32` |
 | `bet` (public) | `id: u64` autoInc | `marketId` (btree), `matchId` (btree), `bettor: identity` (btree), `handle`, `outcome`, `stake: u64`, `placedAt`, `status`, `payout: u64` |
 | `fight_event` (public) | `id: u64` autoInc | `matchId` (btree), `seq: u32`, `t: u32`, `type: string`, `data: string` (JSON, validated by zod at both ends, ADR-015) |
-| `chip_tx` (private; view `my_chip_tx`) | `id: u64` autoInc | `identity` (btree), `delta: i64`, `reason`, `refId`, `at` |
+| `ledger_tx` (private; view `my_ledger_tx`) | `id: u64` autoInc | `identity` (btree), `deltaCents: i64`, `reason`, `refId`, `at` |
 | `purse` (public) | `id: u64` autoInc | `matchId` (btree), `fighterId` (btree), `kind: 'entry' \| 'payout'`, `amountUsdc: f64`, `txRef`, `network`, `coveredByHouse: bool`, `at` |
 | `lock_timer` (private, scheduled → `auto_lock`) | `scheduledId: u64` autoInc | `scheduledAt: scheduleAt`, `matchId: string` |
 
-**Views:** `my_chip_tx` (rows for `ctx.sender`), `runner_fighter_secrets` (all `fighter_secret` rows if `ctx.sender` is the runner, else none).
+**Views:** `my_ledger_tx` (rows for `ctx.sender`), `runner_fighter_secrets` (all `fighter_secret` rows if `ctx.sender` is the runner, else none).
 
 **Reducers.** Codes in `SenderError` messages are normative; the web store maps them to copy (§10.4).
 
 | Reducer | Caller | Arguments | Effect · errors |
 |---|---|---|---|
-| `register_player` | anyone | `{ handle }` | 3–16 chars `[A-Za-z0-9_]`, unique; +1 000 chips · `already_registered`, `bad_handle`, `handle_taken` |
-| `claim_daily` | player | — | +250 if ≥ 20 h since last · `too_soon` |
-| `place_bet` | player | `{ marketId, outcome, stake: u64 }` | FC-F-106 · `not_registered`, `market_locked`, `bad_outcome`, `bad_stake`, `insufficient_chips`, `market_cap`, `self_bet_forbidden`, `house_cannot_bet`, `slow_down` |
-| `create_fighter` | player | `{ spec: ForgeSpec }` | FC-F-201 · `bad_name`, `name_taken`, `bad_persona`, `too_many_fighters`, `insufficient_chips`, `slow_down` |
+| `register_player` | anyone | `{ handle }` | 3–16 chars `[A-Za-z0-9_]`, unique; opens at $0.00 · `already_registered`, `bad_handle`, `handle_taken` |
+| `credit_test_funds` | runner | `{ identity, amountCents }` | Ledger mode only; appends `ledger_tx{reason:'test_credit'}` · `money_mode_live`, `bad_amount`, `not_registered` |
+| `place_bet` | player | `{ marketId, outcome, stake: u64 }` | FC-F-106 · `not_registered`, `market_locked`, `bad_outcome`, `bad_stake`, `insufficient_funds`, `market_cap`, `self_bet_forbidden`, `house_cannot_bet`, `slow_down` |
+| `create_fighter` | player | `{ spec: ForgeSpec }` | FC-F-201 · `bad_name`, `name_taken`, `bad_persona`, `too_many_fighters`, `insufficient_funds`, `slow_down` |
 | `retire_fighter` · `set_payout_address` | creator | `{ fighterId }` · `{ fighterId, address }` | `not_creator`, `bad_address` |
 | `claim_runner` | anyone, once | — | Sets `config.runner` if empty (ADR-014) · `runner_already_set` |
 | `upsert_house_fighter` | runner | `{ fighter: FighterPublic & { strategy, tier } }` | Inserts or updates a house fighter and its secret row |
@@ -1087,7 +1088,7 @@ const fightEvent = table({ name: 'fight_event', public: true }, {
   seq: t.u32(), t: t.u32(), type: t.string(), data: t.string(),
 });
 // … the remaining tables …
-const spacetimedb = schema({ config, player, fighter, fighterSecret, fighterStats, match, entry, market, pool, bet, fightEvent, chipTx, purse, lockTimer });
+const spacetimedb = schema({ config, player, fighter, fighterSecret, fighterStats, match, entry, market, pool, bet, fightEvent, ledgerTx, purse, lockTimer });
 export default spacetimedb;
 // Reducers: export const placeBet = spacetimedb.reducer({ marketId: t.string(), outcome: t.string(), stake: t.u64() }, (ctx, a) => { … });
 ```
@@ -1259,8 +1260,8 @@ AGENTVERSE_API_KEY=
                  │ WebSocket subscriptions + reducer calls (place_bet, create_fighter, …)
 ┌────────────────┴──────────── SpacetimeDB 2.x · module `spacetime/` (O3) · Maincloud ───────────────┐
 │ tables: player · fighter · fighter_secret · fighter_stats · match · entry · market · pool · bet     │
-│         fight_event · chip_tx · purse · config · lock_timer (scheduled → auto_lock)                │
-│ reducers: player (bet, forge, daily) · runner-only (create/lock/start/post/review/finalize/        │
+│         fight_event · ledger_tx · purse · config · lock_timer (scheduled → auto_lock)                │
+│ reducers: player (bet, forge) · runner-only (create/lock/start/post/review/finalize/        │
 │           reveal/settle/void/purse) · parimutuel settlement inside one transaction                 │
 └────────────────▲───────────────────────────────────────────────────────────────────────────────────┘
                  │ WebSocket (runner identity token)
@@ -1375,7 +1376,8 @@ Cal-Hacks-2026/
 | ID | Requirement | Tier |
 |---|---|---|
 | FC-D-001 | Design system: tokens, typography, motion, voice and screen layouts (§10.2–10.5, §10.9–10.13), implemented as `apps/web/src/styles/**` plus the primitives in U-01 | MUST |
-| FC-D-002 | Art Bible: shape language, stage, rig, parts library and clips (§10.1, §10.6–10.8), written in `docs/art-bible.md` with VEX as the drawn reference | MUST |
+| FC-D-002 | Art Bible: shape language, stage, rig, parts library, clips and arena components (§10.1, §10.6–10.8), written in `docs/art-bible.md` with VEX as the drawn reference. Amended by A1: the file also carries the arena component list and the arena art style decision (ADR-026) | MUST |
+| FC-D-003 | Scope split: `docs/art-bible.md` covers the arena only. Platform UI (§10.2–10.5, §10.9–10.13 except the arena) is a separate track and is not changed by A1 | MUST |
 
 ### 10.1 Art direction
 
@@ -1431,7 +1433,7 @@ Cal-Hacks-2026/
 | Status colors | `--ok`, `--warn`, `--err`, `--info`; always paired with an icon and a word (FC-N-033). |
 | Panels | `--panel` with a 2 px `--outline` border, `--hard-shadow`, and one angled corner via `clip-path: polygon(...)` sized `--cut`. |
 | Buttons | Primary: `--gold` fill, `--outline` text, 2 px outline, hard shadow; pressed state drops the shadow and moves 2 px down-right. Secondary: `--panel-2`. Destructive: `--err`. |
-| Chips (money) | Gold coin glyph + Barlow Condensed tabular numbers. Every chips display carries the "play money" tooltip/label. |
+| Money | Gold coin glyph + Barlow Condensed tabular numbers, always dollars with cents. Every money display carries the mode label ("Ledger mode · no funds moved" or live terms). |
 
 ### 10.3 Typography
 
@@ -1448,10 +1450,10 @@ Cal-Hacks-2026/
 |---|---|---|
 | Feed / announcer (templated, §8.6) | Sports-desk energy, short, specific, never vague | "SAGE solves P3 · +30" · "VAR: VEX's P1 is overturned · −10" · "PIP lands First Blood!" |
 | Fighters (taunts, intro lines) | In character, ≤ 80 chars, no slurs, no model or vendor names | VEX: "Kneel." · SAGE: "Patience is also a weapon." · GLITCH: "what if i just. guessed" · QUILL: "Integration by parts, obviously." · BRICK: "Again. Slower." · PIP: "Wait, is this one easy?" |
-| System copy | Plain, calm, specific about what happened and what to do | "Bets are locked. You can still watch." · "That market closed 2 s ago. Your chips were not taken." |
-| Never | "As an AI…", fake urgency ("Bet now before it's too late!"), real-money language ("deposit", "cash out", "win $") | — |
+| System copy | Plain, calm, specific about what happened and what to do | "Bets are locked. You can still watch." · "That market closed 2 s ago. You were not charged." |
+| Never | "As an AI…", fake urgency ("Bet now before it's too late!"), withdrawal language in ledger mode ("cash out", "withdraw", "you won $X in your account"); amounts are always labelled with the money mode | — |
 
-**Error copy for reducer codes (§8.8):** `market_locked` → "Bets closed for this match." · `insufficient_chips` → "Not enough chips. Claim your daily chips or bet less." · `market_cap` → "Max 1,000 chips per market." · `self_bet_forbidden` → "You can't bet on a match your own fighter is in." · `slow_down` → "Easy — one bet at a time." · `name_taken` → "That fighter name is taken." · `bad_persona` → "Persona can't include links or commands."
+**Error copy for reducer codes (§8.8):** `market_locked` → "Bets closed for this match." · `insufficient_funds` → "Not enough balance. Add funds or bet less." · `market_cap` → "Max $50 per market." · `self_bet_forbidden` → "You can't bet on a match your own fighter is in." · `slow_down` → "Easy — one bet at a time." · `name_taken` → "That fighter name is taken." · `bad_persona` → "Persona can't include links or commands."
 
 ### 10.5 Motion specification
 
@@ -1577,7 +1579,7 @@ Clips are GSAP timelines over bone rotations and offsets, defined once in `apps/
 │ │ mini arena thumbnail · 0:47 left     │ │ #41 SAGE won 120 · VAR ×1        │ │ otter42 200 VEX │ │
 │ │ SAGE 60 · VEX 40 · PIP 10 · BRICK 30 │ │ #40 PIP upset at 9.5× 🔥          │ │ judge7 50 SAGE  │ │
 │ └──────────────────────────────────────┘ └──────────────────────────────────┘ └─────────────────┘ │
-│ Daily chips ready · [CLAIM +250]                                     Play money · no cash value    │
+│ Balance $0.00 · [ADD FUNDS]                                          Ledger · no funds moved      │ 
 └────────────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -1636,7 +1638,7 @@ Clips are GSAP timelines over bone rotations and offsets, defined once in `apps/
 | Special frames | Hot Streak: black frame, animated ember border (CSS, off in reduced motion), "🔥 ×N" ribbon. Upset: magenta→violet holo, "UPSET 9.5×" ribbon for 24 h. Rookie: pale blue, "ROOKIE" ribbon, stats show "–" until 3 matches |
 | Portrait | Fighter's palette glow behind the portrait (radial, 40% opacity) |
 | Stats | Color-coded values: ≥ 85 gold, 75–84 white, 65–74 `--ink-2`, < 65 `--ink-3` |
-| Back side | Same shield; header "SCOUTING REPORT"; sparkline (last 10 scorePct, fighter color), W-L-P, win %, avg score, Elo mini-chart, head-to-head table vs next opponents, backers' chips won, purse earnings (USDC, TESTNET) |
+| Back side | Same shield; header "SCOUTING REPORT"; sparkline (last 10 scorePct, fighter color), W-L-P, win %, avg score, Elo mini-chart, head-to-head table vs next opponents, backers' winnings, purse earnings (USDC, TESTNET) |
 | Interactions | Click flips (§10.5). Hover: foil sheen for Gold/Elite/special (FC-F-164). "Bet on SAGE" button under `lg` cards when its next match is open |
 | States | Loading skeleton (shield outline shimmer), retired (desaturated, "RETIRED" stamp) |
 
@@ -1655,13 +1657,13 @@ Clips are GSAP timelines over bone rotations and offsets, defined once in `apps/
 └────────────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-Final step shows the minted card (Rookie frame), the cost (100 chips) and "Enter the arena". After creation: "Debuts in Match #45".
+Final step shows the minted card (Rookie frame), the cost ($1.00 forge fee) and "Enter the arena". After creation: "Debuts in Match #45".
 
 ### 10.12 Mobile spectator page (`/m`)
 
 ```
 ┌──────────────────────────┐
-│ FIGHT CARD   🪙 1,000     │
+│ FIGHT CARD   🪙 $0.00     │
 │ MATCH #43 · closes 0:58  │
 │ ┌──────┐ ┌──────┐        │
 │ │ VEX  │ │ SAGE │  ← tap a card (xs) to select
@@ -1674,7 +1676,7 @@ Final step shows the minted card (Rookie frame), the cost (100 chips) and "Enter
 │ Stake ──●──────── 200    │
 │ To win 480               │
 │ [   BACK SAGE   ]        │
-│ Play money · no cash value│
+│ Ledger · no funds moved   │
 └──────────────────────────┘
 ```
 
@@ -1684,7 +1686,7 @@ Live state: four horizontal points bars in fighter colors, a pulsing LIVE dot, t
 
 | State | What is on screen |
 |---|---|
-| **First visit** | Handle picker modal over the lobby; 1 000 chips welcome; "Play money · no cash value" |
+| **First visit** | Handle picker modal over the lobby; $0.00 balance; "Ledger mode · no funds moved" disclosure |
 | **Betting open** | Poster with live odds rolling; countdown; QR; commit hash |
 | **Locked / intro** | Bet slip becomes "My bets"; fighters drop in with banners; countdown |
 | **Live** | Arena active; plates show activity lines; feed scrolling |
@@ -1710,7 +1712,7 @@ Live state: four horizontal points bars in fighter colors, a pulsing LIVE dot, t
 | Fallback | Direct chat-completions loop (FC-F-046) | `FC_DIRECT_MODEL` | `submit_answer`, `taunt` as function tools | Director + receipt say "fallback engine" |
 | Development | Mock (FC-F-045) | none | scripted | `MOCK` badge; never counts |
 
-**Choosing the house models (H-01, O5 task F-01).** Run `npx tsx scripts/list-models.ts` (wraps `listModels()`). Pick a deliberate spread so that stats genuinely differ: two strong reasoning models, two fast mid-size models, two small or cheap ones, across providers where the account allows. Vary `reasoningEffort` too. Two fighters may share a model with different strategies; that's a feature (it shows strategy matters). `modelId: 'auto'` is forbidden because the router can change models between turns (ADR-007). The mapping lives only in `.env`.
+**Choosing the house models (H-01, O5 task F-01).** Run `npx tsx scripts/list-models.ts` (wraps `listModels()`). **H0 policy (ADR-023): low-cost models only, no frontier models.** Give each house fighter a distinct low-cost model across providers where possible and vary `reasoningEffort` and strategy so stats still differ. Two fighters may share a model with different strategies; that's a feature (it shows strategy matters). `modelId: 'auto'` is forbidden because the router can change models between turns (ADR-007). The mapping lives only in `.env`.
 
 ### 11.2 House fighters: private strategy and persona files
 
@@ -1882,7 +1884,7 @@ Strategy reminder: {strategyLine}
 | Beat the Clock | 100 | by the season rate r (share of recent real matches where the 5★ was solved and held before 60 s), clamped to [0.1, 0.9] |
 | First Blood | 200 | 40 per fighter, 40 on `none` |
 
-**Odds and settlement** (`parimutuel.ts`; integer chips):
+**Odds and settlement** (`parimutuel.ts`; integer cents):
 
 ```
 total      = Σ (stakedₒ + seedₒ)                 over outcomes o
@@ -1974,8 +1976,8 @@ Computed over the fighter's last 20 real entries (`mode = 'live'`, not demo, not
 | **Sponsored seasons** | A lab, dev-tool company or enterprise funds a season on *its* problem set ("The Vercel Cup: frontend bugs"); branding on the jumbotron, cards and poster | Eval-as-entertainment: sponsors get a public, verified, watchable benchmark of agents on their domain. This is the main revenue line. |
 | **Forge Pro (creator subscription)** | $12/mo: more active fighters, private scrimmages, detailed loss analysis, custom skins, BYO endpoint priority | Trainers want proof and progress |
 | **Scouting data / ratings API** | Paid API for agent ratings, head-to-head and per-category performance | Enterprises choosing agents need comparable, adversarial evidence |
-| **Cosmetics** | Card frames, fighter skins, arena themes, emotes (never chips) | Keeps play money free (ADR-006) |
-| **Regulated real-money markets (later)** | License the match feed to a regulated exchange that lists event contracts; we never hold user funds | The only legal path to real stakes; we're the data and the show, not the bookie |
+| **Cosmetics** | Card frames, fighter skins, arena themes, emotes (never affect balances) | Keeps the wagering economy clean (ADR-006, ADR-024) |
+| **Regulated real-money markets (later)** | Alternative path to `live` (Q-011, Q-012): license the match feed to a regulated exchange that lists event contracts; we never hold user funds | The only legal path to real stakes; we're the data and the show, not the bookie |
 | **Creator purses** | Sponsors fund purses paid to winning creators (skill-contest prizes, not wagering); stablecoin rails (x402/USDC) make payouts instant | Answers "win money with my agent" without gambling law |
 
 ### 12.4 The enterprise wedge
@@ -2016,7 +2018,7 @@ In one sentence for every judge: **"Humans bet on AI agents: they fight with swo
 
 | Time | Beat | On screen |
 |---|---|---|
-| 0:00 | "AI agents, but you bet **on** them, not **with** them. Scan this, you've got 1,000 chips." | Lobby poster + QR; judge's phone opens `/m` |
+| 0:00 | "AI agents, but you bet **on** them, not **with** them. Scan this and back a fighter. The demo runs in ledger mode, so no real funds move." | Lobby poster + QR; judge's phone opens `/m` |
 | 0:20 | "Pick a fighter. You can't see their models; that's the point. All you get is the card." Flip SAGE's card. | Card front → back (scouting report) |
 | 0:50 | Judge bets on their phone; odds move on the laptop. "That's SpacetimeDB: every screen sees every bet live." Point at the commit hash: "These five problems are already locked in by hash. Nobody can swap them." | Odds roll; hash |
 | 1:10 | Director → Fight now. "Four real agents just got five integrals. Each one is a Factory Droid session in its own sandbox." | Drop-ins, countdown |
@@ -2044,12 +2046,12 @@ In one sentence for every judge: **"Humans bet on AI agents: they fight with swo
 | Likely question | Answer |
 |---|---|
 | Isn't this just animation over a benchmark? | "Every hit is a `verdict.live` event from the verifier; the scoreboard decides, the swords dramatize. Here's the receipt: every event, every answer." |
-| Is this gambling? | "No real money moves for humans: chips are free and have no cash value. The only USDC is testnet, in the agents' own wallets. Real-money markets would only ever go through a licensed exchange." |
+| Is this gambling? | "Amounts are real dollars, but this build runs a ledger and moves no funds. Taking real stakes means a licensed or compliant path and a payments rail, and we have not made that call yet (ADR-024). Until then it is a simulation of the market with real-currency accounting." |
 | Why hide the models? | "So you bet on performance, not brand. Same as you don't see a footballer's training plan. Everything that matters is on the card, computed from public match records, and a model change resets the fighter's rating." |
 | Can't the house rig it? | "Problems are committed by hash before bets open and revealed after. Settlement is a single database transaction. Creators can't bet on their own fighters." |
 | What does Droid actually do? | "All of the fighting. Each fighter is a Droid SDK session with its own model, persona, sandbox and an in-process MCP tool to submit answers. Our permission handler is the referee." |
 | Why SpacetimeDB? | "A market needs one source of truth that every screen sees instantly. Bets, pools, settlement and the fight log are tables and reducers; settlement is atomic." |
-| What stops spam fighters? | "Forge costs chips, names and personas are filtered, community fighters can't run commands, and debuts are rate-limited." |
+| What stops spam fighters? | "Forge has a fee, names and personas are filtered, community fighters can't run commands, and debuts are rate-limited." |
 | How do creators make money? | "Purses: entry fees plus a sponsor top-up go to the winner's wallet. Today it's testnet; the rail is real (x402)." |
 | Business model? | §12.3: sponsored seasons, Forge Pro, ratings API, cosmetics. |
 | Cost per match? | "About a dollar of agent compute (§12.5)." |
@@ -2069,7 +2071,7 @@ In one sentence for every judge: **"Humans bet on AI agents: they fight with swo
 | Field | Content |
 |---|---|
 | Name | Fight Card |
-| 2–3 sentence pitch | "Fight Card is a league where humans bet on AI agents, not with them. Anonymous agents with human personalities race to solve integrals while their 2D fighters duel on screen: every sword hit is a verified answer, a VAR can overturn it, and play-money markets settle on a provably fair benchmark. Every fighter has a FIFA-style card built from real match history, and anyone can forge their own fighter for the global leaderboard." |
+| 2–3 sentence pitch | "Fight Card is a league where humans bet on AI agents, not with them. Anonymous agents with human personalities race to solve integrals while their 2D fighters duel on screen: every sword hit is a verified answer, a VAR can overturn it, and real-currency markets settle on a provably fair benchmark. Every fighter has a FIFA-style card built from real match history, and anyone can forge their own fighter for the global leaderboard." |
 | Built with | SpacetimeDB · Factory Droid SDK · x402 / Coinbase CDP · PixiJS · GSAP · React · mathjs · ElevenLabs (· Fetch.ai uAgents if built) |
 | Prize tracks to select | Spacetime; Factory Droid SDK; Coinbase x402 (Payment Agents); MLH ElevenLabs; Fetch.ai (only if E16 shipped with video); Best Solo Hack (if Q-001) |
 | Video | Not required by Cal Hacks; required only for Fetch.ai (3–5 min) |
@@ -2095,7 +2097,7 @@ In one sentence for every judge: **"Humans bet on AI agents: they fight with swo
 
 ### 14.2 In-product stats (H0)
 
-Shown in the leaderboard header and the Director: matches this season, VAR overturns, upsets, bets placed, chips paid out, fighters forged, Droid credits used this hour. All computed from the database; no third-party analytics in H0.
+Shown in the leaderboard header and the Director: matches this season, VAR overturns, upsets, bets placed, money paid out, fighters forged, Droid credits used this hour. All computed from the database; no third-party analytics in H0.
 
 ### 14.3 Event taxonomy (post-H0)
 
@@ -2107,9 +2109,10 @@ Shown in the leaderboard header and the Director: matches this season, VAR overt
 
 ### 15.1 Money
 
-- Chips are free, cannot be bought, sold or withdrawn, and carry "Play money · no cash value" everywhere (FC-F-100).
-- USDC exists only on Base Sepolia testnet, only in agent and treasury wallets, and is labelled "test USDC" (E15). Human bettors never touch it, which is consistent with Coinbase's "don't manage funds for other people".
-- No real-money copy anywhere (§10.4 "never").
+- Amounts are real currency (integer US cents). H0 runs `FC_MONEY_MODE=ledger`: accounting is real, no funds move, and every money surface says "Ledger mode · no funds moved" (FC-F-100).
+- `live` mode (deposits, withdrawals, any rail) stays blocked until Q-011 (rail) and Q-012 (compliance: California gambling law, CFTC event-contract rules, KYC/age, geofencing) are answered and recorded as an ADR.
+- USDC on Base Sepolia stays testnet-only, in agent and treasury wallets, labelled "test USDC" (E15). Human balances never share wallets with it, consistent with Coinbase's "don't manage funds for other people".
+- Never show a balance or payout as withdrawable while in ledger mode.
 
 ### 15.2 Agent safety
 
@@ -2164,7 +2167,7 @@ Original characters, art and sounds only (§10.1 constraint). Fonts are OFL (Goo
 | Module | `spacetime` local + `scripts/smoke.ts` | O3/O4 | Reducer auth matrix (runner-only reducers reject players), bet validation codes, settlement against engine fixtures (ADR-019) |
 | Fighters | `scripts/try-fighter.ts` | O5 | AC-03.1, AC-04.1, AC-04.2 |
 | Visual | screenshots | O1, O2 | Every visual task attaches a screenshot (ADR-013). **A green build is not evidence that a screen renders.** |
-| End to end | `npm run smoke` | O4 | Local SpacetimeDB + runner with `FC_ENGINE=mock`, `FC_MATCH_MS=20000`, `FC_BET_WINDOW_S=3`: two scripted bettors bet, the match runs to `settled`, invariants pass, chips conserve, in < 60 s |
+| End to end | `npm run smoke` | O4 | Local SpacetimeDB + runner with `FC_ENGINE=mock`, `FC_MATCH_MS=20000`, `FC_BET_WINDOW_S=3`: two scripted bettors bet, the match runs to `settled`, invariants pass, money conserves, in < 60 s |
 
 ### 16.2 Invariants (checked on every match log and every settlement)
 
@@ -2173,7 +2176,7 @@ Original characters, art and sounds only (§10.1 constraint). Fonts are OFL (Goo
 3. Every `fighter.submit` is followed in the same batch by exactly one `verdict.live` for the same fighter and problem.
 4. Every `verdict.final` refers to a fighter's latest `verdict.live{ok:true}` for that problem; at most one per (fighter, problem).
 5. Points reconcile: for each fighter, Σ live points − Σ penalties − Σ overturned points = `Standing.points` (floored at 0).
-6. Settlement conserves chips per market (§11.8 invariant), and Σ player chip deltas across a match = Σ payouts + refunds − Σ stakes.
+6. Settlement conserves money per market (§11.8 invariant), and Σ player ledger deltas across a match = Σ payouts + refunds − Σ stakes.
 7. No bet has `placedAt ≥ bettingClosesAt`.
 8. Mock, demo and void matches leave fighter Elo and stats unchanged.
 
@@ -2196,7 +2199,7 @@ Runs at G1 and every later gate.
 | Verifier throws | That submission is a miss with reason `invalid_syntax`; logged; if the final check throws, match void + refund |
 | Runner crash mid-match | On restart: orphaned match voided within 10 s (AC-01.3) |
 | Maincloud unreachable | Web shows "Reconnecting…"; presenter switches to local SpacetimeDB or replay |
-| Bet after lock | `market_locked` copy; no chips taken |
+| Bet after lock | `market_locked` copy; no funds taken |
 | x402 payment fails | Entry covered by the house, labelled; match unaffected |
 | Purse transfer fails | Receipt shows "purse pending"; retried by the runner once after 30 s |
 | ElevenLabs down / no key | Captions only; no audio |
@@ -2249,12 +2252,12 @@ Times assume kickoff at **01:00**. If kickoff is later, HEAD shifts every gate b
 
 | ID | Task | Needed by |
 |---|---|---|
-| H-01 | Factory: `FACTORY_API_KEY`; install `droid` CLI; `python3 -m pip install sympy`; with O5 run `scripts/list-models.ts` and fill `FC_MODEL_*` (Q-002) | G0 |
+| H-01 | Factory: `FACTORY_API_KEY`; install `droid` CLI; `python3 -m pip install sympy`; fill `FC_MODEL_*` with low-cost models only (ADR-023, Q-002). Done 2026-10-25 | G0 |
 | H-02 | SpacetimeDB: install CLI, `spacetime login`, confirm Maincloud database `fightcard` (Q-004) | G1 |
-| H-03 | Coinbase: verified Coinbase account; CDP API key + wallet secret; faucet test USDC (Q-005) | G2 |
-| H-04 | ElevenLabs API key; pick 7 voices (6 fighters + announcer) | G3 |
+| H-03 | **Deferred.** Coinbase account, CDP key, test USDC. Not needed while FC-F-280–282 are off and `FC_PAYMENTS=off` (Q-005) | later |
+| H-04 | **Deferred.** ElevenLabs key and 7 voices (ADR-025) | later |
 | H-05 | Vercel account or cloudflared installed (Q-008) | G3 |
-| H-06 | Agentverse account (only if Q-006 = yes) | G3 |
+| H-06 | **Deferred.** Agentverse account (only if Q-006 = yes) | later |
 | H-07 | Answer Q-001 (solo or team) and assign humans to workstreams | G-1 |
 
 ### 17.3 Phase × workstream matrix
@@ -2368,11 +2371,11 @@ Never force-push. Never `git add -A`. Never print, log or commit secrets or mode
 
 | ID | Title | Reqs | Deps | Time box | Done when |
 |---|---|---|---|---|---|
-| U-01 | Tokens, fonts, primitives (angled Panel, Button, ChipsPill, ModeBadge, Toast, Modal, Tabs), app shell, top bar, route skeletons | FC-F-140, -146, FC-D-001 | — | 40 m | Screenshot of the empty shell |
+| U-01 | Tokens, fonts, primitives (angled Panel, Button, BalancePill, ModeBadge, Toast, Modal, Tabs), app shell, top bar, route skeletons | FC-F-140, -146, FC-D-001 | — | 40 m | Screenshot of the empty shell |
 | U-02 | Fighter card: front/back, 4 sizes, tiers + special frames, flip, stat colors, skeleton state | FC-F-160–163 | U-01, A-02 stub | 60 m | Screenshot grid: every frame × front/back |
-| U-03 | Lobby + onboarding + daily claim + bet feed | FC-F-141, -148, -100, -109 | U-02, K-06 | 45 m | Lobby renders from `mock-basic` + live adapter |
+| U-03 | Lobby + onboarding + balance prompt + bet feed | FC-F-141, -148, -100, -109 | U-02, K-06 | 45 m | Lobby renders from `mock-basic` + live adapter |
 | U-04 | Match screen: layout around `ArenaCanvas`, top bar gems/clock, plates, commentary feed, QR, results screen with provably-fair panel | FC-F-142, -144, -145, -081, -221 | U-01, K-06 | 60 m | AC-08.1; results screenshot with ✓ |
-| U-05 | Bet slip + My bets: market tabs, odds rows, stake chips, payout, error copy (§10.4), odds roll | FC-F-143 | U-04, B-03 | 45 m | AC-06.2 on two browsers |
+| U-05 | Bet slip + My bets: market tabs, odds rows, stake buttons, payout, error copy (§10.4), odds roll | FC-F-143 | U-04, B-03 | 45 m | AC-06.2 on two browsers |
 | U-06 | Fighter profile + leaderboard | FC-F-165, -182 | U-02 | 45 m | Screenshots |
 | U-07 | Forge wizard (6 steps, live rig preview) + My Fighters | FC-F-200, -206 | U-02, B-05, A-02 | 60 m | AC-11.1 with O5 |
 | U-08 | Mobile `/m` (bet, live, result) | FC-F-220–222 | U-05 | 45 m | Phone screenshots at 390 px; cellular test |
@@ -2385,7 +2388,7 @@ Never force-push. Never `git add -A`. Never print, log or commit secrets or mode
 |---|---|---|---|---|---|
 | B-01 | Module skeleton: every table in §8.8 (columns, indexes, visibility), `init`, `claim_runner`, `register_player`; published to `fightcard-o3` locally; tell HEAD to regenerate bindings | §8.8 | K-02 | 40 m | `spacetime sql` lists all tables; bindings generate |
 | B-02 | Match reducers: `create_match` (+ entries, markets, pools, seeds, `lock_timer`), `auto_lock`, `lock_match`, `start_match`, `post_events` (allowlist, status gate, gapless seq/t), `begin_review`, `finalize_match`, `reveal_match`, `void_match` (refunds) | FC-F-001, -003, -006, -240 | B-01 | 50 m | Scripted lifecycle via `spacetime call` emits events in §8.5.1 order |
-| B-03 | Betting: `place_bet` (every validation + codes), `claim_daily`, `chip_tx`, `my_chip_tx` | FC-F-100, -106, -083, FC-N-026 | B-01 | 35 m | Error-code test script covers every code |
+| B-03 | Betting: `place_bet` (every validation + codes), `credit_test_funds`, `ledger_tx`, `my_ledger_tx` | FC-F-100, -106, -083, FC-N-026 | B-01 | 35 m | Error-code test script covers every code |
 | B-04 | Settlement: `settle_match` using the shared parimutuel code, Elo/stats writes, provisional → active, `record_purse`, `set_fighter_wallet` | FC-F-107, -108, -180, -181 | B-02, K-08 | 40 m | Settlement matches engine fixtures exactly (ADR-019) |
 | B-05 | Forge reducers: `create_fighter`, `retire_fighter`, `set_payout_address`, `upsert_house_fighter`, `runner_fighter_secrets` view | FC-F-201, -205, -066 | B-01 | 35 m | Filter and limit tests |
 | B-06 | Auth matrix test (every runner-only reducer rejects a player identity) + Maincloud publish runbook in `spacetime/README.md` | FC-N-023 | B-04 | 25 m | Test script green; module live on Maincloud at G2 |
@@ -2422,7 +2425,7 @@ Never force-push. Never `git add -A`. Never print, log or commit secrets or mode
 | I-01 | x402 spike: treasury + one fighter wallet, faucet, one paid `POST /x402/enter` end to end on Base Sepolia; record the TS wiring (§11.10) | §11.10 | H-03 | 40 m | Tx visible on BaseScan |
 | I-02 | `createPayments()`: wallets, entry fee (buyer per fighter + seller route), purse transfer, house-cover fallback, `scripts/try-x402.ts` | FC-F-280–282 | I-01, K-07 | 50 m | AC-15.1 |
 | I-03 | SFX: CC0 packs, `src/audio` manager subscribed to `cues$`, mute toggle, mobile default off | FC-F-320 | K-06 | 30 m | Sounds fire on the fixture replay |
-| I-04 | ElevenLabs barks: `scripts/gen-barks.ts`, playback on intro/KO/victory | FC-F-321 | F-05, H-04 | 30 m | MP3s committed; barks play |
+| I-04 | Speech blips and SFX polish from libraries (ElevenLabs barks deferred, ADR-025) | FC-F-320 | I-03 | 20 m | Each fighter has a distinct blip on intro/KO/victory |
 | I-05 | `submission/coinbase.md` | FC-F-284 | I-02 | 20 m | Reviewed by O7 |
 | I-06 | (COULD) Hint shop | FC-F-283 | I-02, F-03 | 30 m | Potion plays; tx on BaseScan |
 | I-07 | (COULD, Q-006) Fetch bookie + public API endpoints + BYO uAgent relay | FC-F-300, -301 | R-03 | 90 m | Bet placed from an ASI:One chat |
@@ -2468,7 +2471,7 @@ Never force-push. Never `git add -A`. Never print, log or commit secrets or mode
 | ADR-003 | SpacetimeDB is the system of record and the real-time transport; no other database, no custom state server | 2026-10-25 | A market needs one atomic source of truth that every screen sees instantly; it's also Spacetime's stated ideal use. |
 | ADR-004 | House fighters are Factory Droid SDK sessions; the in-process MCP tool `submit_answer` is the only scoring path | 2026-10-25 | Real agent work with model choice, permissions, streaming and usage, plus a single choke point for verification. |
 | ADR-005 | Integrals are the launch category | 2026-10-25 | Objective and fast to verify, freshly generated each match (no memorization), and naturally "reviewable" (domains and absolute values), which creates the VAR moment. |
-| ADR-006 | Play-money chips for humans; testnet USDC only in agent and treasury wallets | 2026-10-25 | Legal (no gambling, no unregistered event contracts) and within Coinbase's rules; the market mechanics are identical. |
+| ADR-006 | ~~Play-money chips for humans; testnet USDC only in agent and treasury wallets~~ **Superseded by ADR-024 (A1)** | 2026-10-25 | Original rationale: legal safety. Replaced because the product is now defined around real currency. |
 | ADR-007 | Models are hidden from bettors and creators; a model is locked per fighter version | 2026-10-25 | Bettors judge performance, not brand; the card becomes the scouting report; a model swap can't silently change a fighter's form. |
 | ADR-008 | Commit-reveal for problem sets | 2026-10-25 | "Provably fair" in ten seconds, checked in the judge's own browser. |
 | ADR-009 | 2D SVG cut-out rigs in PixiJS + GSAP; one shared skeleton, skins as data; no 3D; generated art off the critical path | 2026-10-25 | Consistent frames, cheap new fighters (the Forge reuses the rig), and the flat vector style the founder asked for. |
@@ -2484,6 +2487,10 @@ Never force-push. Never `git add -A`. Never print, log or commit secrets or mode
 | ADR-019 | The module settles with the engine's `parimutuel.ts`, imported directly or vendored by script | 2026-10-25 | One implementation for odds and payouts; a test checks the module against engine fixtures. |
 | ADR-020 | Maincloud is the primary database at the venue; a local server is the fallback | 2026-10-25 | Phones on cellular reach Maincloud without tunnels. |
 | ADR-021 | Feature freeze at 07:45 | 2026-10-25 | One hour for README, Devpost, rehearsal and buffer. |
+| ADR-023 | H0 fighters run low-cost models only. Models stay hidden (ADR-007); anything shown about a model must be the model that actually ran, never a stand-in label | 2026-10-25 | Cost control for the season loop. Bettors stake real-denominated money on fighter strength, so a decoy model name would misrepresent what they are betting on. A later move to stronger models is an `.env` change; a later disclosure is a truthful one. |
+| ADR-024 | Money is real currency (integer USD cents) with ledger accounting; the funding rail sits behind `FundingAdapter`; `FC_MONEY_MODE=ledger` is the only H0 mode; `live` is blocked on Q-011 and Q-012 | 2026-10-25 | The founder wants the product defined around real currency. Real stakes are a legal and payments decision that must not be made by accident at 4 AM, so the spec is real and the switch is explicit. Supersedes ADR-006. |
+| ADR-025 | Audio in H0 uses library SFX and speech blips; ElevenLabs, Fetch.ai and live payments are deferred (configure later) | 2026-10-25 | Removes three account setups from the critical path. Interfaces stay in place so each plugs in later. |
+| ADR-026 | Arena art and components are specified in `docs/art-bible.md` (O1); all other UI is a separate track | 2026-10-25 | The arena is the signature surface and has its own schedule. Platform UI is designed and built separately. |
 | ADR-022 | Fetch.ai (E16) is decided at G3 | 2026-10-25 | The track requires an ASI:One workflow and a 3–5 min video; only worth it if MUST and SHOULD scope is green. |
 
 ---
@@ -2505,9 +2512,12 @@ Never force-push. Never `git add -A`. Never print, log or commit secrets or mode
 | Q-009 | Can `spacetime build` bundle a relative import of `packages/engine/src/parimutuel.ts`, or do we vendor it? | G0 (K-08) | HEAD |
 | Q-010 | Do WebSockets to Maincloud work on venue Wi-Fi and on cellular? Test from two phones at G2. | G2 | Founder |
 
+| Q-011 | Funding rail for live mode: card processor, stablecoin, or a licensed partner who holds funds. We must not hold other people's money ourselves. | Before `live` | Founder |
+| Q-012 | Compliance for real-currency wagering: California gambling law, CFTC event-contract rules, age/KYC, geofencing, and the Coinbase "don't manage funds for other people" rule. Needs counsel, not a build task. | Before `live` | Founder |
+
 ### 19.2 Parking lot — good ideas, not H0 requirements
 
-Live Web category (Apify actors build fresh questions from today's web; Bright Data as an alternative) · Code Duel (FC-F-341) and squads (FC-F-340) beyond COULD · in-play markets with sealed odds · divisions with promotion/relegation · rivalry narratives generated from head-to-head history · a "training camp" for Forge fighters (private practice matches) · auto-exported vertical clips of every VAR overturn · spectator chat with fighter emotes · a Presage-powered "crowd hype meter" from webcam engagement · Cartesia live announcer · a `.tech` domain for the MLH domain prize · end-of-season awards (Golden Sword, Iron Discipline) · a public ratings API.
+Truthful post-match model disclosure (the model that actually ran; needs an FC-F-048 amendment) · ElevenLabs barks and announcer (FC-F-321, -322) · Fetch.ai Arena Bookie (E16) · live payment rails (`FC_MONEY_MODE=live`) · Live Web category (Apify actors build fresh questions from today's web; Bright Data as an alternative) · Code Duel (FC-F-341) and squads (FC-F-340) beyond COULD · in-play markets with sealed odds · divisions with promotion/relegation · rivalry narratives generated from head-to-head history · a "training camp" for Forge fighters (private practice matches) · auto-exported vertical clips of every VAR overturn · spectator chat with fighter emotes · a Presage-powered "crowd hype meter" from webcam engagement · Cartesia live announcer · a `.tech` domain for the MLH domain prize · end-of-season awards (Golden Sword, Iron Discipline) · a public ratings API.
 
 ---
 
@@ -2528,7 +2538,7 @@ Live Web category (Apify actors build fresh questions from today's web; Bright D
 | Factory: scores poorly | "chatbot wrapper… demos that only work in slides… can't tell what the agent did" | No chat UI; live matches; per-event receipts |
 | **Coinbase: Payment Agents** | "give an agent a way to pay for things, earn money, or both" | Entry fee (pay), purse (earn), hint shop (buys tools) (E15) |
 | Coinbase: usefulness / technical design / ease of reuse / product feedback | Their four criteria | Creator earnings story; §9.1 + `coinbase.md` architecture; `try-x402` script; builder feedback (FC-F-284) |
-| Coinbase: rules | "Label simulated actions… don't manage funds for other people" | "test USDC" labels; bettors use chips only (ADR-006) |
+| Coinbase: rules | "Label simulated actions… don't manage funds for other people" | "test USDC" labels; agent wallets only; human balances are a separate ledger (ADR-024) |
 | **Fetch.ai** (if built) | Agentverse, Chat Protocol, ASI:One workflow, video, README addresses | E16, D-05 |
 | **MLH ElevenLabs** | "natural, human-sounding audio" | Fighter barks with distinct voices (FC-F-321) |
 
@@ -2555,7 +2565,7 @@ Live Web category (Apify actors build fresh questions from today's web; Bright D
 | **Rig / skin** | The shared cut-out skeleton / a fighter's parts and palette (`SkinSpec`) |
 | **Runner** | The Node service that generates problems, runs fighters, verifies answers and drives the module |
 | **Season loop** | Back-to-back real matches that build history for the cards |
-| **Seed liquidity** | House chips placed in every pool so odds exist before anyone bets |
+| **Seed liquidity** | House money (cents) placed in every pool so odds exist before anyone bets |
 | **Slot** | One of four fixed fighter positions on the stage |
 | **VAR** | The final review that can overturn a live hit |
 | **Worktree** | A per-orchestrator git working directory on branch `ws/<ws>` |
