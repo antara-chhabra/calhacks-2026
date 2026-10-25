@@ -5,6 +5,8 @@ import { HOUSE_ROSTER, type FighterId, type SkinSpec } from '@fc/contracts';
 import { useStore } from '@/data/store';
 import { VEX_SKIN } from './assets';
 import { buildRig, type Rig } from './rig';
+import { createPoseDriver } from './clips';
+import { CuePlayer, type FighterHandle } from './cues';
 import { createStage, SLOTS, STAGE_H as SH, STAGE_W as SW } from './stage';
 
 /** Logical stage (PRD §10.6). A-04 owns the real backdrop; A-02 only places rigs in the four slots. */
@@ -23,6 +25,23 @@ export function ArenaCanvas(props: { reducedMotion: boolean }): JSX.Element {
     const stage = createStage();
     const world = stage.world;
     const rigs = new Map<string, { sig: string; rig: Rig }>();   // by fighter id
+    const player = new CuePlayer({
+      speed: () => useStore.getState().watch.speed || 1,
+      playing: () => useStore.getState().watch.playing,
+      fighterState: (id) => useStore.getState().watch.state?.fighters[id],
+      reduced: () => props.reducedMotion,
+    });
+    const handles = new Map<string, FighterHandle>();
+    const handleFor = (id: string, rig: Rig, i: number): FighterHandle => {
+      const old = handles.get(id), sl = SLOTS[i]!;
+      if (old && old.driver && (old as FighterHandle & { rig?: Rig }).rig === rig && old.slot.x === sl.x) return old;
+      const f = useStore.getState().fighters[id];
+      const h: FighterHandle & { rig: Rig } = { id, rig, driver: createPoseDriver(rig), slot: { x: sl.x, y: sl.y, facing: sl.facing },
+        archetype: f?.archetype ?? (HOUSE_ROSTER as Record<string, { archetype?: FighterHandle['archetype'] }>)[id]?.archetype,
+        place: (x, y) => { rig.root.position.set(x, y); } };
+      handles.set(id, h);
+      return h;
+    };
     let token = 0;
 
     const fit = (): void => {
@@ -50,9 +69,11 @@ export function ArenaCanvas(props: { reducedMotion: boolean }): JSX.Element {
         const sl = SLOTS[i]!;
         b.rig.root.position.set(sl.x, sl.y);
         b.rig.setFacing(sl.facing);
-        if (snap || !b.rig.root.parent) b.rig.setPose('idle');
         if (!b.rig.root.parent) stage.fighters.addChild(b.rig.root);
       });
+      for (const id of handles.keys()) if (!rigs.has(id)) handles.delete(id);
+      player.setFighters(built.map((b, i) => handleFor(b.id, b.rig, i)));
+      if (snap) player.snap();   // catch-up rule (PRD §8.7): kill timelines, clear queues, state-derived pose
     };
 
     const ready = app.init({ resizeTo: el, background: 0x000000, antialias: true, autoDensity: true, resolution: Math.min(window.devicePixelRatio || 1, 2) }).then(() => {
@@ -61,7 +82,7 @@ export function ArenaCanvas(props: { reducedMotion: boolean }): JSX.Element {
       app.canvas.style.display = 'block';
       app.stage.addChild(world, stage.bars);
       stage.setReducedMotion(props.reducedMotion);
-      app.ticker.add((t) => { stage.tick(t.deltaMS); });
+      app.ticker.add((t) => { stage.tick(t.deltaMS); player.tick(t.deltaMS); });
       fit();
       app.renderer.on('resize', fit);
       void sync(true);
@@ -71,10 +92,20 @@ export function ArenaCanvas(props: { reducedMotion: boolean }): JSX.Element {
       if (s.watch.state?.order !== prev.watch.state?.order || s.fighters !== prev.fighters) void sync(false);
       if (s.watch.playbackRevision !== prev.watch.playbackRevision) void sync(true);   // snap rule (PRD §8.7)
     });
-    const unsubCues = useStore.getState().cues$((c) => { console.debug('[arena] cue', c); });   // clips arrive in A-03+
+    let report: ReturnType<typeof setTimeout> | undefined;
+    const unsubCues = useStore.getState().cues$((c) => {
+      player.handle(c);
+      if (import.meta.env.DEV) {   // per-kind cue counts, logged 2 s after the last cue (AC-07.1 evidence)
+        (window as unknown as { __arenaCues?: unknown; __arenaPlayer?: unknown }).__arenaCues = player.stats;
+        (window as unknown as { __arenaPlayer?: unknown }).__arenaPlayer = player;
+        clearTimeout(report);
+        report = setTimeout(() => { console.info('[arena] cue counts', player.summary()); }, 2000);
+      }
+    });
 
     return () => {
       disposed = true;
+      clearTimeout(report); player.setFighters([]);
       stage.destroy();
       unsubOrder(); unsubCues();
       void ready.then(() => { app.destroy(true, { children: true }); }).catch(() => undefined);

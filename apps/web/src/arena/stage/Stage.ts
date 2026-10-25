@@ -98,8 +98,9 @@ export function createStage(): Stage {
 
   let sig = '', lastClock = '', reduced = false, farX = 0, nearX = 0;
   const redraw = (): void => {
-    const s = useStore.getState().watch.state;
-    const gs = gemStates(s), ck = formatClock(matchClockMs(s.timeLimitMs, s.startedT, s.t)), lb = matchLabel(s.matchId);
+    const st0 = useStore.getState(), s = st0.watch.state;
+    const num = (st0.matches[st0.watch.matchId ?? ''] ?? st0.matches[s.matchId ?? ''])?.number;
+    const gs = gemStates(s), ck = formatClock(matchClockMs(s.timeLimitMs, s.startedT, s.t)), lb = num !== undefined ? `MATCH #${num}` : matchLabel(s.matchId);
     const nsig = gs.map((g) => g.state[0]).join('') + lb;
     if (nsig !== sig) {
       sig = nsig; label.text = lb; gems.clear();
@@ -110,7 +111,7 @@ export function createStage(): Stage {
     }
     if (ck !== lastClock) { lastClock = ck; clock.text = ck; }
   };
-  const unsub = useStore.subscribe((st, prev) => { if (st.watch.state !== prev.watch.state) redraw(); });
+  const unsub = useStore.subscribe((st, prev) => { if (st.watch.state !== prev.watch.state || st.matches !== prev.matches || st.watch.matchId !== prev.watch.matchId) redraw(); });
   redraw();
 
   const bars = new Graphics();
