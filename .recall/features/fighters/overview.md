@@ -9,6 +9,7 @@ Workstream O5 of the Fight Card build. Fighter backends: Factory Droid SDK sessi
 
 ## Current state
 
+- A3 challenge implementation is now merged into main at6f90ac8; merged-main typecheck,624 tests and production build pass. The pre-merge session remains historical evidence.
 - A3 Droid/direct/HTTP prompts and payloads are category-aware. Public problem fields are explicitly whitelisted; reference answers/evaluator test cases stay private until reveal.
 - The backwards-compatible antiderivative transport key carries any category answer. Integrals retain400 characters; nonintegrals allow bounded10k answers. Code instructions require a pure JS function expression, without Markdown/JSON wrapper.
 - Seven four-Droid live, non-demo matches settled: Code, SpeedMath, Logic, Chess, Trivia, LiveWeb and Squads, each with verified reveal/two ledger bettors and persisted category records. Most scored150; Chess SAGE/QUILL150, VEX145, BRICK140.

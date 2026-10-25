@@ -9,16 +9,18 @@ The PRD and the HEAD orchestrator (O0) domain: product scope, contracts, the pur
 
 ## Current state
 
-- A3 challenge build is committed and pushed as ws/challenges @ 6a3b1d2, based on main/origin/main 638e598. User now explicitly requested “Do a recall dump and then, merge.” Dump precedes the authorized challenge merge; see the latest L1/current overview for completion status.
+- Recall dump committed as 1e5913b, then ws/challenges6a3b1d2 merged cleanly into main at6f90ac8, as explicitly requested. Source branches remain available; independent ws/personas was not merged.
 - PRD v1.3.0 §21 and shared contracts expose integrals, code, speed-math, logic, chess puzzles, trivia, web and squads on the existing lifecycle/event/ledger backend. All catalog tabs are active; Director selects a category and season scheduling cycles them.
-- Full challenge revision typecheck and production web build pass; 624 package tests pass (contracts36, engine83, web249, runner179, module77). Separate opt-in two-client real SDK integration passes. Later streaming fetch hardening and pre-create schema validation also passed focused tests and full typecheck.
+- Actual merged-main revision typecheck and production web build pass; regenerated ignored bindings;624 package tests pass (contracts36, engine83, web249, runner179, module77). Separate opt-in two-client real SDK integration passes. Later streaming fetch hardening and pre-create schema validation also passed focused tests and full typecheck.
 - Dedicated local fightcard-challenges module was published without data deletion. All8 explicit MOCK reference-backend matches passed actual two-bettor ledger/reveal checks. Seven genuine four-Droid new-category matches also settled with persisted histories verified after reconnect.
 - Baseline Maincloud/public deployment was completed in another thread on the earlier revision; the A3 revision has only local deployment evidence. Public runner/web/module cutover must use one matching revision.
 - Parallel ws/personas work exists in fc-merge and is unmerged. Do not merge it under the challenge-only instruction or overwrite its worktree/environment.
 
+- Post-merge all8-category actual-database ledger smoke also passed on main6f90ac8 with two independent bettors. The stopped local service was restored using its existing data; no data deletion/production changes.
+
 ## Open threads
 
-- [ ] Perform the now-authorized ws/challenges merge and verify/push main; capture exact merge revision in L1/L2.
+- [x] Recall dump then clean challenge merge at6f90ac8; merged-main typecheck,624 tests and production build pass. See HEAD rollup for the final local ledger smoke and publication.
 - [ ] Deploy the additive module and matching A3 runner/web together when carrying out deployment work; never delete production data.
 - [ ] Community candidate/debut/rotation loading still needs work. Category Elo/settlement history reload is now implemented, so do not report that entire old persistence gap as untouched.
 - [ ] Golden VAR/upset/red-card recordings, sustained season/restart acceptance, recompute --apply, live Forge preview, arena name-tag overlap, phone-cellular acceptance and final submission remain separate tasks.

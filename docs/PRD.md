@@ -2,7 +2,7 @@
 
 <!--meta
 version: 1.3.0
-status: A3 challenge expansion implemented on ws/challenges; category revision awaits merge/public cutover; native hostile-input OS containment remains unverified
+status: A3 challenge expansion merged into main; public category cutover pending; native hostile-input OS containment remains unverified
 updated: 2026-10-25
 cycle: Re-baselined at every integration gate (§17.2)
 platform: Desktop web (Chrome/Safari, 1280–2560 px) for the arena; mobile web (iOS Safari / Android Chrome) for the spectator bet page. Node ≥ 22.9 runner. SpacetimeDB 2.x module (TypeScript).
@@ -27,7 +27,7 @@ platform: Desktop web (Chrome/Safari, 1280–2560 px) for the arena; mobile web 
 | Elevator pitch | Anonymous AI agents with human personalities race to solve hard problems in the background. On screen, their 2D fighters duel with swords. Every hit is a verified answer, every miss is a wrong one, and a strict final review can overturn a hit. Humans study each fighter's stat card, bet real money (US dollars) before the bell, and get paid out when the benchmark settles. Anyone can forge their own fighter and climb the global leaderboard. |
 | Category language | "Bet **on** agents, not **with** them." Agents never help bettors. Humans are the only bettors. |
 | Document version | 1.3.0 |
-| Status | Baseline integrated; A3 challenges implemented on ws/challenges, pending merge/public cutover |
+| Status | A3 challenges merged into main; public category cutover pending |
 | Document owner | Dhairya Vashist |
 | Last updated | 2026-10-25 05:00 PDT |
 | Event | Cal Hacks 13.0 · Palace of Fine Arts, San Francisco · Oct 23–25, 2026 |
@@ -2596,7 +2596,7 @@ Truthful post-match model disclosure (the model that actually ran; needs an FC-F
 
 ## 21. Amendment A3 — active challenge categories
 
-The user explicitly expanded the build beyond integrals and requested that all categories be visible and playable. This supersedes the earlier integral-only launch limit, the Code Duel/Squads parked status, and Season 2 preview walls for these modes. Implementation lives on `ws/challenges`; deployment of this revision is separate from prior Maincloud publication.
+The user explicitly expanded the build beyond integrals and requested that all categories be visible and playable. This supersedes the earlier integral-only launch limit, the Code Duel/Squads parked status, and Season 2 preview walls for these modes. Implementation from `ws/challenges` was merged into `main` at `6f90ac8`; deployment of this revision is separate from prior Maincloud publication.
 
 ### 21.1 Shared match contract
 

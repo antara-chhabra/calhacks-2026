@@ -9,6 +9,7 @@ Workstream O2 of the Fight Card build. React UI: lobby, match HUD, bet slip, res
 
 ## Current state
 
+- A3 challenge implementation is now merged into main at6f90ac8; merged-main typecheck,624 tests and production build pass. The pre-merge session remains historical evidence.
 - A3 on ws/challenges @ 6a3b1d2 enables all eight catalog routes/leaderboard tabs and Director category selection. Season2 walls and nonintegral integral-preview substitution are removed.
 - Lobby poster, odds, results and bet feed filter by category; empty categories show honest mechanics/activity copy. Category-specific leaderboard rows use category stats or an unrated1000 baseline; their card data matches the selected category.
 - Squad labels use recorded slots (0/1 TeamA, 2/3 TeamB), not shuffled candidate order. Results show the authoritative settled team_winner result and combined score; individual standings remain visible.
@@ -17,7 +18,7 @@ Workstream O2 of the Fight Card build. React UI: lobby, match HUD, bet slip, res
 
 ## Open threads
 
-- [ ] Merge/publish matching A3 revision and validate public/mobile category flows after cutover.
+- [ ] Publish matching A3 module/runner/web revision and validate public/mobile category flows; code merge is complete.
 - [ ] Resolve existing arena floating-name overlap and live Forge preview separately.
 
 ## Key files

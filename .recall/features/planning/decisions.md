@@ -91,3 +91,7 @@ The full ADR log is docs/PRD.md §18; these are the headline calls with their re
 ## Use a dedicated local acceptance database
 **Date:** 2026-10-25
 **Call / why:** fightcard-challenges isolates seeded/mock and genuine-model verification from existing local/Maincloud data.
+
+## Merge challenge work after saving recall
+**Date:** 2026-10-25
+**Call / why:** The user explicitly requested recall dump then merge; saved memory1e5913b before clean challenge merge6f90ac8. The separate persona/deployment workstream remains untouched.

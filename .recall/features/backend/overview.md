@@ -9,6 +9,7 @@ Workstream O3 of the Fight Card build. SpacetimeDB 2.x TypeScript module: tables
 
 ## Current state
 
+- A3 challenge implementation is now merged into main at6f90ac8; merged-main typecheck,624 tests and production build pass. The pre-merge session remains historical evidence.
 - A3 adds public fighter_category_stats keyed by fighter/category with per-category Elo and stats. Legacy fighter_stats and fighter.elo remain the integral card/rating for compatibility. New categories start at1000.
 - Settlement writes competitive category rows only for live non-demo results. Create-match entries use the chosen category rating; runner reads persisted entries/stats after reconnect. Slots serialize explicitly; squad entries record teamId from actual slots.
 - Local fightcard-challenges was newly published with --delete-data=never. All8 MOCK and7 genuine new-category Droid matches passed actual two-bettor ledger payout/reveal checks; real per-category entries were found after a fresh connection.

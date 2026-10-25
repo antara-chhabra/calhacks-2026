@@ -12,7 +12,7 @@ Keep dense; this is for orientation, not docs. Source of truth for everything: d
 
 ## Repository
 - GitHub: https://github.com/antara-chhabra/calhacks-2026 (public, owner Antara Chhabra; DV1277 has push). Default branch `main`.
-- Local: `/Users/DV/Cal-Hacks-2026`. main = origin/main = `638e598`; all eight workstream branches merged 2026-10-25. Worktrees under ignored `.arena/worktrees/` (`fc-merge` has installed deps + bindings); `.arena/combined` is obsolete.
+- Local: `/Users/DV/Cal-Hacks-2026`. main includes A3 challenge merge `6f90ac8` after recall snapshot `1e5913b`; implementation branch `ws/challenges` is `6a3b1d2`. Earlier eight workstreams merged at638e598. Worktrees under ignored `.arena/worktrees/` (`fc-merge` has installed deps + bindings); `.arena/combined` is obsolete.
 
 ## Stack (implemented branches; PRD §9.2)
 
@@ -25,7 +25,7 @@ Keep dense; this is for orientation, not docs. Source of truth for everything: d
 
 ## Entry points
 
-- Run against the intended revision; `.arena/combined` is obsolete. User authorized merging ws/challenges after this dump. Independent ws/personas remains separate.
+- Run against the intended revision; `.arena/combined` is obsolete. ws/challenges is merged into main6f90ac8; merged revision has installed deps and regenerated ignored bindings. Independent ws/personas remains separate.
 - Dev: `npm run dev:web`, `npm run runner`, `spacetime start`.
 - Checks: `npm run typecheck`, `npm test`, web production build, `npm run smoke`.
 - Bindings: `npm run gen` (ignored output); module auth acceptance: `spacetime/test/auth-live.ts`.

@@ -9,6 +9,7 @@ Workstream O4 of the Fight Card build. Runner match runtime: integral generator 
 
 ## Current state
 
+- A3 challenge implementation is now merged into main at6f90ac8; merged-main typecheck,624 tests and production build pass. The pre-merge session remains historical evidence.
 - A3 dispatches generation, live checks and final checks by category while preserving the existing integral verifier and match lifecycle.
 - Seeded exact challenges cover arithmetic, logic, movement/capture chess puzzles, trivia and squad reasoning. Code submits actual pure JavaScript functions; three live checks versus12 hidden final cases can cause VAR overturns.
 - QuickJS WebAssembly runs each code case in a fresh VM (8MiB heap,512KiB stack,100ms interrupt) with no host bindings. Tests reject hangs, memory pressure, process/require/fetch attempts, async/non-JSON output, serializer tampering and excessive nesting. Native Droid execution remains disabled.

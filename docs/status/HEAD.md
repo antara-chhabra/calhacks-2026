@@ -130,3 +130,10 @@ Verification:
 Local review setup (check liveness on resume): web `http://127.0.0.1:5182/markets`; challenge runner admin/public `127.0.0.1:8791/8792`, automatic season OFF; database fightcard-challenges on local port3000. Private test identity/start wrapper/results live under ignored `.arena/` in this worktree. Existing public deployment remains on the earlier baseline.
 
 Next integration step when authorized: merge `ws/challenges`, publish the additive schema without data deletion, regenerate bindings, and deploy the matching runner/web revision together. Prior independent gaps (community candidate loading/debut, actual golden recordings, recompute --apply, live Forge preview and arena label overlap) are outside this category expansion. Chess is a puzzle category, not a full chess game; native executors and real money rails remain deferred.
+
+
+## A3 merge complete — 2026-10-25
+
+User requested recall dump then merge. Shared split recall committed first as `1e5913b`; `ws/challenges` (`6a3b1d2`) then merged cleanly into `main` as `6f90ac8`. Installed the merged lockfile and regenerated ignored web/runner bindings. Typecheck, all624 package tests (36/83/249/179/77), and production web build pass on actual merged main. The opt-in SDK integration had passed separately on the identical challenge source. Merged-main all8-category actual-database smoke PASS: two independent bettors,45 events per match,4 markets per individual mode/5 for squads, verified reveals and reconciled ledger payouts. Local service had stopped; restarted its existing persistent data directory before the successful rerun. No republish or data deletion was needed.
+
+No Maincloud publish or public process cutover occurred. Independent `ws/personas` remains unmerged and its worktree/serving environment were not modified. Do not use the earlier pre-merge “remaining integration” paragraph as the current code state.

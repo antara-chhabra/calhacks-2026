@@ -9,6 +9,7 @@ Workstream O7 of the Fight Card build. Submission: README with sponsor sections,
 
 ## Current state
 
+- A3 challenge implementation is now merged into main at6f90ac8; merged-main typecheck,624 tests and production build pass. The pre-merge session remains historical evidence.
 - A3 README documents all8 categories, QuickJS/HN evaluation boundaries, squad scoring and isolated acceptance commands. PRD1.3 §21 records actual scope.
 - New evidence:624 package tests plus separately passed live SDK integration, all8 explicit MOCK database matches and7 genuine four-Droid category matches, all with actual ledger payout/reveal checks.
 - Chess is a puzzle mode, not a full chess game. Code is actual bounded JS function evaluation; native hostile-code OS containment and real funds movement remain unclaimed.

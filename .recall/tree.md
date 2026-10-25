@@ -4,19 +4,19 @@ Last touched: 2026-10-25
 
 ## Features
 
-- **planning** [active] — A3 all8 categories verified on ws/challenges6a3b1d2; user authorized merge after dump;624 tests + live SDK acceptance,7 genuine new-category matches
+- **planning** [active] — A3 all8 categories merged into main6f90ac8 after recall1e5913b;624 tests/typecheck/build pass on merged revision; public A3 cutover pending
   - paths: `docs/PRD.md`, `docs/status/HEAD.md`, `docs/requests/HEAD.md`, `packages/**`, `fixtures/**`, `apps/web/src/data/**`, `apps/web/src/{main,App,config}.tsx`, `apps/web/src/bridge.ts`, `apps/runner/src/{index,env,stdb,wiring,candidates}.ts`, `apps/runner/src/control/**`, `apps/runner/src/http/app.ts`, `apps/runner/src/fighters/{types,registry}.ts`, `scripts/*.mjs`, `scripts/{claim-runner.ts,scan-secrets.sh}`, `package.json`, `tsconfig*.json`, `.env.example`, `CLAUDE.md`, `AGENTS.md`
   - last: 2026-10-25 (challenge-categories)
 - **arena** [active] — O1: Pixi SVG-rig sword-fight renderer; art bible written, code not started (P0: A-01, A-02)
   - paths: `apps/web/src/arena/**`, `apps/web/public/art/**`, `docs/art-bible.md`, `docs/{status,requests}/O1.md`
   - last: 2026-10-25 (arena-art-bible)
-- **platform** [active] — All8 category tabs/leaderboards/Director active and filtered; shuffled squad slots/results and post-reveal prompts verified; A3 merge authorized
+- **platform** [active] — All8 category tabs/leaderboards/Director active and filtered; shuffled squad slots/results and post-reveal prompts verified; merged main6f90ac8
   - paths: `apps/web/src/{ui,styles,pages,components,lib}/**`, `apps/web/src/index.css`, `apps/web/{index.html,components.json,vite.config.ts,tsconfig.json,package.json}`, `docs/{status,requests}/O2.md`
   - last: 2026-10-25 (challenge-categories)
 - **backend** [active] — Additive category stats/history verified locally on fightcard-challenges; baseline Maincloud live; A3 public schema/cutover pending
   - paths: `spacetime/**`, `docs/{status,requests}/O3.md`
   - last: 2026-10-25 (challenge-categories)
-- **runtime** [active] — Category-aware generation/live/final checks, actual bounded JS functions, fresh web snapshots and squad team markets; A3 merge authorized
+- **runtime** [active] — Category-aware generation/live/final checks, actual bounded JS functions, fresh web snapshots and squad team markets; merged main6f90ac8
   - paths: `apps/runner/src/{match,problems,season}/**`, `apps/runner/src/http/{admin,byo}.ts`, `scripts/{smoke,smoke-challenges,record,recompute,try-problems}.ts`, `docs/{status,requests}/O4.md`
   - last: 2026-10-25 (challenge-categories)
 - **fighters** [active] — Category-aware Droid/direct/HTTP;7 real new-category matches settled; native tools disabled; independent ws/personas remains unmerged
@@ -31,4 +31,4 @@ Last touched: 2026-10-25
 
 ## Resume warning
 
-Main/origin-main baseline638e598; challenge branch6a3b1d2 is pushed and user authorized merging after this dump. Consult current planning overview for merge completion. ws/personas is separate/unmerged. Arena/integrations summaries remain older than Antara’s merged A-01…A-09/I-03 work.
+Main includes A3 merge6f90ac8 (challenge branch6a3b1d2) after recall commit1e5913b. Merged revision passes624 tests/typecheck/build. The original challenge session is a pre-merge snapshot; current L1/L2 records completion. ws/personas is separate/unmerged. Arena/integrations summaries remain older than Antara’s merged A-01…A-09/I-03 work.

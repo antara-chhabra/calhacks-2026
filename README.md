@@ -107,7 +107,7 @@ Fight Card is a team project. Add the final member names and roles in the Devpos
 - [`submission/checklist.md`](submission/checklist.md) — demo and submission checklist
 
 
-### Challenge categories (A3, `ws/challenges`)
+### Challenge categories (A3)
 
 Integrals, Code Duels, Speed Math, Logic, Chess puzzles, Trivia, Live Web and Squads all run through the same SpacetimeDB event log, verifier/review flow and ledger settlement. Select a category in Director; the automatic season cycles through all eight. Public category pages and leaderboard tabs are active, with separate records and honest empty states.
 
