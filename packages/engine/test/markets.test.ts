@@ -98,4 +98,10 @@ describe('resolveMarkets', () => {
     const f3 = [live('a', 0, 1, {}), live('b', 1, 2, {})];
     expect(resolveMarkets(state(f3, [standing('a', 1, 0), standing('b', 2, 0)]), [mk('fb', 'first_blood', {})])).toEqual([{ marketId: 'fb', outcome: 'none' }]);
   });
+  it('beat_clock counts from the bell, not from match.created', () => {
+    // atMs is envelope t: bell at 9 s, 5★ at t = 64 s → 55 s after the bell → yes
+    const f = [live('a', 0, 1, { 5: { atMs: 64000, target: 'b', points: 50, final: 'held' } }), live('b', 1, 2, {})];
+    const s = { ...state(f, [standing('a', 1, 0.5), standing('b', 2, 0)]), startedT: 9000 };
+    expect(resolveMarkets(s, [mk('bc', 'beat_clock', { line: 60000 })])).toEqual([{ marketId: 'bc', outcome: 'yes' }]);
+  });
 });

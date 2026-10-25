@@ -68,7 +68,9 @@ export function resolveMarkets(state: MatchState, markets: MarketSpec[]): { mark
         const line = m.line ?? 60000;
         const five = new Set(state.problems.filter((p) => p.difficulty === 5).map((p) => p.idx));
         if (five.size === 0) five.add(5);
-        outcome = hits.some((h) => five.has(h.idx as 5) && h.s.atMs < line) ? 'yes' : 'no';
+        // solved[p].atMs is envelope t (ms since match.created); the clock line counts from the bell.
+        const bell = state.startedT ?? 0;
+        outcome = hits.some((h) => five.has(h.idx as 5) && h.s.atMs - bell < line) ? 'yes' : 'no';
         break;
       }
       case 'first_blood': outcome = hits.length ? hits[0].fighter.id : 'none'; break;
