@@ -16,7 +16,7 @@ The full ADR log is docs/PRD.md §18; these are the headline calls with their re
 **Why:** Objective, fast, contamination-proof, and it creates the on-screen "VAR overturn" moment.
 **Tradeoff:** Only one category in MUST; code and live-web categories are COULD or parked.
 
-## Play money for humans; testnet USDC only for agents
+## Play money for humans; testnet USDC only for agents (SUPERSEDED by A1 / ADR-024)
 **Date:** 2026-10-25
 **Call:** Free chips with no cash value; x402/USDC only in agent and treasury wallets on Base Sepolia.
 **Why:** Real-money betting needs a gambling licence or CFTC registration; Coinbase's rules forbid managing funds for others.
@@ -40,3 +40,18 @@ The full ADR log is docs/PRD.md §18; these are the headline calls with their re
 **Date:** 2026-10-25
 **Call:** Spacetime + Factory MUST; Coinbase x402 + ElevenLabs SHOULD; Fetch.ai COULD (decide at G3).
 **Why:** Fit to the product × cost. Fetch.ai needs an ASI:One workflow and a 3–5 min video.
+
+## Real-currency ledger, live mode gated (A1)
+**Date:** 2026-10-25
+**Call:** Money is integer USD cents with ledger accounting; funding sits behind `FundingAdapter`; only `FC_MONEY_MODE=ledger` runs in H0.
+**Why:** The founder wants the product centered on real currency. Real stakes are a legal and payments decision (Q-011, Q-012) and must be an explicit switch, not an accident.
+
+## Low-cost models; truthful disclosure only (A1)
+**Date:** 2026-10-25
+**Call:** House and community fighters run low-cost models. Models stay hidden; anything shown must be the model that actually ran. A decoy "frontier" list was declined.
+**Why:** Cost control; bettors stake real-denominated money on fighter strength, so a false model label would mislead them.
+
+## Defer ElevenLabs, Fetch.ai, live payments (A1)
+**Date:** 2026-10-25
+**Call:** Library SFX and speech blips now; same hook for ElevenLabs later.
+**Why:** Removes three account setups from the critical path.

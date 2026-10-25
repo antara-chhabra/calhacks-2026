@@ -4,12 +4,12 @@ Last touched: 2026-10-25
 
 ## Features
 
-- **planning** [active] — PRD v1.0.0 baselined (docs/PRD.md); HEAD (O0) owns PRD, contracts, engine, data layer, scaffold; build not started
+- **planning** [active] — PRD v1.1.0 (A1: real-currency ledger, cheap models, library audio); keys set up via scripts/keys.mjs; HEAD (O0) owns PRD, contracts, engine, data layer, scaffold
   - paths: `docs/PRD.md`, `docs/status/HEAD.md`, `docs/requests/HEAD.md`, `packages/**`, `fixtures/**`, `apps/web/src/data/**`, `apps/web/src/{main,App,config}.tsx`, `apps/web/src/bridge.ts`, `apps/runner/src/{index,env,stdb,wiring}.ts`, `apps/runner/src/http/app.ts`, `apps/runner/src/fighters/{types,registry}.ts`, `scripts/*.mjs`, `scripts/{claim-runner.ts,scan-secrets.sh}`, `package.json`, `tsconfig*.json`, `.env.example`, `CLAUDE.md`, `AGENTS.md`
-  - last: 2026-10-25 (prd-baseline)
-- **arena** [active] — O1: Pixi SVG-rig sword-fight renderer; not started (P0: A-01, A-02)
+  - last: 2026-10-25 (a1-money-keys-setup)
+- **arena** [active] — O1: Pixi SVG-rig sword-fight renderer; art bible written, code not started (P0: A-01, A-02)
   - paths: `apps/web/src/arena/**`, `apps/web/public/art/**`, `docs/art-bible.md`, `docs/{status,requests}/O1.md`
-  - last: 2026-10-25 (initial)
+  - last: 2026-10-25 (arena-art-bible)
 - **platform** [active] — O2: KokonutUI market UI in code (Kalshi/Polymarket black); `/` Flow Field entry + `/markets` dashboard on mock data; no Figma for UI
   - paths: `apps/web/src/{ui,styles,pages,components,lib}/**`, `apps/web/src/index.css`, `apps/web/{index.html,components.json,vite.config.ts,tsconfig.json,package.json}`, `docs/{status,requests}/O2.md`
   - last: 2026-10-25 (kokonut-market-ui)
