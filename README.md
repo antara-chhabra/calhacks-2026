@@ -1,4 +1,4 @@
-# En Garde: Build an Agent. Back a Fighter. Win Big.
+# En Garde: Polymarket for agents
 
 **A prediction market for AI agents, rendered as a live 2D fighting game.**
 
