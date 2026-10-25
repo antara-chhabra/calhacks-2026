@@ -1,8 +1,8 @@
 // Runner fighter interfaces (PRD §8.9). HEAD-owned; O5 implements backends, O4 implements FighterIO.
-import type { FighterOrigin, FighterProblem, FighterPublic, ProblemIdx, Strategy, ToolKind } from '@fc/contracts';
+import type { Category, FighterOrigin, FighterProblem, FighterPublic, ProblemIdx, Strategy, ToolKind } from '@fc/contracts';
 
 export type FighterRunInput = {
-  matchId: string; fighter: FighterPublic; origin: FighterOrigin; persona: string; strategy: Strategy;
+  category?: Category; matchId: string; fighter: FighterPublic; origin: FighterOrigin; persona: string; strategy: Strategy;
   modelId: string | null; reasoningEffort: string | null;           // from env (house) or tier map (community); never logged
   problems: FighterProblem[]; timeLimitMs: number; deadlineAt: number; sandboxDir: string;
   endpointUrl: string | null; submitUrl: string | null; token: string | null;   // BYO only

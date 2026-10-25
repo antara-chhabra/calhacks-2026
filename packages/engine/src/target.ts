@@ -10,6 +10,7 @@ export function pickTarget(s: MatchState, attacker: FighterId): FighterId {
       if (id === attacker) continue;
       const f = s.fighters[id];
       if (!f || (skipOut && f.status === 'out')) continue;
+      if (s.category === 'squads' && s.fighters[attacker] && Math.floor(f.slot / 2) === Math.floor(s.fighters[attacker].slot / 2)) continue;
       const b = best ? s.fighters[best] : null;
       if (!b || f.points > b.points || (f.points === b.points && f.slot < b.slot)) best = id;
     }

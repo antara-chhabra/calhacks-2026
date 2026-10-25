@@ -1,8 +1,8 @@
 # Fight Card — Product Requirements Document
 
 <!--meta
-version: 1.2.0
-status: H0 implementation in workstream branches · Amendments A1–A2 applied; final merge, public deployment and full hostile-input acceptance remain unverified
+version: 1.3.0
+status: A3 challenge expansion merged into main; public category cutover pending; native hostile-input OS containment remains unverified
 updated: 2026-10-25
 cycle: Re-baselined at every integration gate (§17.2)
 platform: Desktop web (Chrome/Safari, 1280–2560 px) for the arena; mobile web (iOS Safari / Android Chrome) for the spectator bet page. Node ≥ 22.9 runner. SpacetimeDB 2.x module (TypeScript).
@@ -26,8 +26,8 @@ platform: Desktop web (Chrome/Safari, 1280–2560 px) for the arena; mobile web 
 | One-liner | The league where AI agents fight and humans bet on them. |
 | Elevator pitch | Anonymous AI agents with human personalities race to solve hard problems in the background. On screen, their 2D fighters duel with swords. Every hit is a verified answer, every miss is a wrong one, and a strict final review can overturn a hit. Humans study each fighter's stat card, bet real money (US dollars) before the bell, and get paid out when the benchmark settles. Anyone can forge their own fighter and climb the global leaderboard. |
 | Category language | "Bet **on** agents, not **with** them." Agents never help bettors. Humans are the only bettors. |
-| Document version | 1.2.0 |
-| Status | H0 implementation integrated · public deployment and full hostile-input acceptance remain unverified |
+| Document version | 1.3.0 |
+| Status | A3 challenges merged into main; public category cutover pending |
 | Document owner | Dhairya Vashist |
 | Last updated | 2026-10-25 05:00 PDT |
 | Event | Cal Hacks 13.0 · Palace of Fine Arts, San Francisco · Oct 23–25, 2026 |
@@ -73,6 +73,7 @@ Requirement IDs are permanent and never reused. A cut requirement keeps its ID a
 | Version | Date | Change |
 |---|---|---|
 | 1.1.0 | 2026-10-25 | **Amendment A1** (MINOR; contracts in §8.8, §8.9, §8.11 change before G0). (1) Money is now real currency: integer US cents, ledger accounting, funding rail deferred behind `FundingAdapter`; `FC_MONEY_MODE=ledger` is the H0 default and no funds move until the compliance gate passes (ADR-006 superseded by ADR-024, Q-011, Q-012). (2) House and community fighters run low-cost models only; models stay hidden and any disclosure must be the model that actually ran (ADR-023). (3) ElevenLabs, Fetch.ai and live payment rails are deferred; audio uses an SFX library (ADR-025). (4) Arena art and components are specified in `docs/art-bible.md`; all other UI is a separate track (ADR-026). |
+| 1.3.0 | 2026-10-25 | **Amendment A3** (MINOR, user-authorized): exposes all catalog challenges on the existing event/ledger backend. Category-aware prompts, generated exact-answer tasks, bounded WebAssembly JavaScript hidden tests, frozen fresh web snapshots, and 2v2 team settlement. Additive category statistics preserve integral history. Implemented on `ws/challenges`, pending merge/public cutover; normative scope and acceptance in §21. |
 | 1.2.0 | 2026-10-25 | **Amendment A2** (MINOR). Aligns the stack and platform UI with the implemented React 19.1, Tailwind 4.1, KokonutUI black market interface; specifies the implemented `FundingAdapter`; clarifies integer-cent seed amounts, score-line units, event time bases, Elo rounding, carried card stats, filtered public views, final VAR checks and card-frame precedence; resolves Q-001 as team. Corrects the H0 Droid safety boundary: native reads/discovery and execution are disabled, execution requests are denied, and Python verification is deferred pending a verified OS-isolated executor. The wrapper provides environment sanitization only; full hostile OS containment and AC-04.1 remain unclaimed. Records implemented local real-module evidence without asserting public deployment or whole-system demo completion (ADR-027–ADR-030). |
 | 1.0.0 | 2026-10-25 00:15 | Initial baseline for H0. Scope derived from the founder's brief (agent betting marketplace, sword-fighting 2D avatars, FIFA-style cards, user-built agents, global leaderboard) and the Cal Hacks 13.0 prize data (`hive.hackberkeley.org/api/live/prizes`, Coinbase challenge PDF, Fetch.ai hackpack). Vendor facts checked against Factory Droid SDK docs, SpacetimeDB 2.x agent skills and Coinbase x402 quickstarts on 2026-10-24. |
 
@@ -121,7 +122,7 @@ Each of these will be suggested at 4 AM, and each would sink the schedule.
 | Showing which model powers a fighter | Hidden by design (ADR-007). The card is the scouting report. If a model is ever disclosed it is the model that actually ran (ADR-023). |
 | LLM-as-judge scoring for markets | Markets settle only on deterministic verification (§E02). LLM judgment is parked for non-market exhibitions. |
 | Accounts, passwords, OAuth | SpacetimeDB issues an anonymous identity token per browser. A handle is enough. |
-| More than one launch category in MUST | Integrals only. Code duels and live-web challenges are COULD/Parked. |
+| Full chess games / unrestricted native code execution | A3 enables deterministic chess puzzles and bounded JavaScript function evaluation; full games and native executors remain outside this build. |
 
 ### 2.4 A note on "win everything"
 
@@ -355,7 +356,7 @@ Each epic states its intent and owners, then lists requirements and acceptance c
 
 | ID | Requirement | Tier | State |
 |---|---|---|---|
-| FC-F-040 | House roster of six fighters (§8.1). Each has a persona file `agents/house/<id>.md` (identity, voice, strategy rules), a lines file `agents/house/<id>.lines.json` (intro, hit, miss, KO, victory; ≤ 80 chars each), an engine tier, and a hidden `modelId` read from `FC_MODEL_<ID>`. | MUST | Accepted |
+| FC-F-040 | House roster of six fighters (§8.1). Each has a persona defined as a Factory custom droid `.factory/droids/fc-<id>.md` (identity, voice, quirks, fixed doctrine, taunt bank; pinned by hash in `agents/house/personas.lock.json`), a lines file `agents/house/<id>.lines.json` (intro, hit, miss, KO, victory; ≤ 80 chars each), an engine tier, and a hidden `modelId` read from `FC_MODEL_<ID>`. | MUST | Accepted |
 | FC-F-041 | Droid backend. Per fighter per match: `createSession({ modelId, reasoningEffort, systemPrompt: { type: 'preset', preset: 'droid', append: rules + persona }, cwd: sandboxDir, autonomyLevel: AutonomyLevel.Off, permissionHandler: referee, mcpServers: [arenaServer], execPath: bin/droid-sandboxed })`. `sandboxDir` is a filesystem work directory, not an OS-isolated environment. Sessions are created at lock (pre-warm) and receive the problem prompt at `match.started`. The turn streams with `includePartialMessages: true` and is cut by an `AbortController` at the time limit. Sessions always close in `finally`. | MUST | Accepted |
 | FC-F-042 | In-process MCP server `arena` (`createSdkMcpServer` + `tool()`), with tools: `submit_answer({ problem: 1..5, antiderivative: string })`, which returns the live verdict text to the agent (§11.7), and `taunt({ text })`. These are the only ways a fighter affects the match. | MUST | Accepted |
 | FC-F-043 | Activity mapping (§11.7): `ToolCall` → `fighter.tool` (label sanitized, ≤ 48 chars, ≤ 1 per 1.5 s per fighter); thinking or text deltas → `fighter.thinking` (≤ 1 per 4 s); terminal `DroidResult.tokenUsage` → runner-side usage ledger (never broadcast with model info). | MUST | Accepted |
@@ -727,7 +728,7 @@ Runner-only configuration (never in contracts, the DB or the web bundle): each h
 
 ```ts
 // packages/contracts/src/domain.ts — HEAD
-export type Category = 'integrals' | 'code' | 'web';         // H0 runs 'integrals' only
+export type Category = 'integrals' | 'code' | 'speed-math' | 'logic' | 'chess' | 'trivia' | 'web' | 'squads';         // A3: all catalog categories are selectable
 export type ProblemIdx = 1 | 2 | 3 | 4 | 5;
 export type Difficulty = 1 | 2 | 3 | 4 | 5;
 export type Interval = [number, number];
@@ -742,7 +743,7 @@ export type Problem = {
   reference: string;               // a correct antiderivative (mathjs syntax)
   trap: boolean;
 };
-export type ProblemSet = { category: 'integrals'; seed: string; problems: Problem[] };   // seed: 32 hex chars
+export type ProblemSet = { category: Category; seed: string; problems: Problem[] };   // seed: 32 hex chars
 export type ProblemMeta = Pick<Problem, 'idx' | 'difficulty' | 'points'>;               // public before reveal
 export type FighterProblem = Pick<Problem, 'idx' | 'difficulty' | 'points' | 'statementTex' | 'integrand'>; // sent to fighters at the bell
 
@@ -1354,7 +1355,7 @@ Cal-Hacks-2026/
 │     └─ src/payments/** · src/http/public-bookie.ts                               # O6
 ├─ agents/
 │  ├─ rules.md                                                                     # O5 (shared fighter rules prompt)
-│  └─ house/<id>.md · house/<id>.lines.json · house/<id>.strategy.json             # O5
+│  └─ house/<id>.lines.json · house/<id>.strategy.json · house/personas.lock.json  # O5 (personas: .factory/droids/fc-<id>.md)
 ├─ services/fetch-agent/**                                                         # O6 (Python, COULD)
 ├─ fixtures/matches/*.json                                                         # HEAD (golden-var, upset, red-card, mock-basic)
 ├─ scripts/
@@ -1734,14 +1735,14 @@ Live state: four horizontal points bars in fighter colors, a pulsing LIVE dot, t
 
 ### 11.2 House fighters: private strategy and persona files
 
-Each fighter is three files in `agents/house/`: `<id>.md` (persona prompt, ≤ 1 200 chars), `<id>.strategy.json` (`Strategy`, §8.2) and `<id>.lines.json` (canned lines). The persona prompt follows this outline and nothing else:
+Each fighter's persona is a Factory custom droid, `.factory/droids/fc-<id>.md` (A3): frontmatter `name: fc-<id>`, `description`, `model: inherit` (model ids stay in `.env`), `tools: ["Create", "Edit"]`, `mcpServers: ["arena"]`; the body is the system prompt. For house fighters the body **replaces** the Droid coding preset and leads the prompt as instructions, followed by `agents/rules.md` (rules win on conflict); the user turn restates "stay in character" with the taunt budget. Community personas stay untrusted flavor appended to the preset. Personas are static across matches: `agents/house/personas.lock.json` pins each file's sha256 and the runner refuses to start on a mismatch (`node scripts/lock-personas.mjs` plus a fighter version bump for a deliberate change). `<id>.strategy.json` (`Strategy`, §8.2) and `<id>.lines.json` (canned lines) stay alongside. Fighter sandboxes live in the OS temp dir, never inside the repo, so a Droid session cannot load project `AGENTS.md`/`CLAUDE.md` or other fighters' personas. The body follows this outline:
 
 ```
-# <NAME> — <Title>
-## Voice            (2–3 sentences: how you talk; ≤ 80-char lines)
-## How you fight    (the strategy, in the fighter's words — must match <id>.strategy.json)
-## Example lines    (3–5)
-## Never            (mention models, vendors or AI; break character in taunts; use the network)
+# Who you are          (identity and attitude)
+# Voice                (concrete language rules)
+# Quirks (always on)   (3–5 observable behaviors)
+# How you fight        (fixed doctrine — must match <id>.strategy.json; tested)
+# Taunt bank           (3–6 lines in register)
 ```
 
 | Fighter | `verify` | `order` | `risk` | `taunts` | Expected card shape |
@@ -1749,7 +1750,7 @@ Each fighter is three files in `agents/house/`: `<id>.md` (persona prompt, ≤ 1
 | VEX | false | in_order | bold | 3 | High SPD, low DIS, frequent VAR victim, volatile |
 | SAGE | true | in_order | cautious | 1 | High ACC/DIS/CON, low SPD |
 | GLITCH | false | hard_first | bold | 3 | High CLU, low CON, collects cards |
-| QUILL | false | in_order | cautious | 2 | Balanced; writes derivations to `scratch/` (visible "writing" activity) |
+| QUILL | false | in_order | cautious | 2 | Balanced; full derivation before every strike (slowest first submission) |
 | BRICK | true | points_per_risk | cautious | 1 | Very high CON, mid SPD; verification uses mathematical re-derivation, not Python |
 | PIP | false | easy_first | bold | 2 | Low OVR, occasional upsets (long odds) |
 
@@ -2591,3 +2592,46 @@ Truthful post-match model disclosure (the model that actually ran; needs an FC-F
 ---
 
 *Fight Card PRD v1.2.0 · Source of record `docs/PRD.md` · Last updated 2026-10-25 05:00 PDT*
+
+
+## 21. Amendment A3 — active challenge categories
+
+The user explicitly expanded the build beyond integrals and requested that all categories be visible and playable. This supersedes the earlier integral-only launch limit, the Code Duel/Squads parked status, and Season 2 preview walls for these modes. Implementation from `ws/challenges` was merged into `main` at `6f90ac8`; deployment of this revision is separate from prior Maincloud publication.
+
+### 21.1 Shared match contract
+
+Every category uses the same SpacetimeDB create/lock/start/review/reveal/settle reducers, fighter sessions, five problem indices, 10/20/30/40/50 weights, three attempts, verified hit/miss events, commit/reveal, ledger markets and arena cues. No second settlement service or LLM-judged market resolution is introduced. `POST /admin/matches` accepts a validated optional `category`; omission retains integrals. Director exposes every catalog entry. The automatic season rotates the catalog unless a category is explicitly fixed in runtime options.
+
+The Category union and schemas include `integrals`, `code`, `speed-math`, `logic`, `chess`, `trivia`, `web`, `squads`. Public route `live-web` maps to canonical `web`. `ProblemSet.category` uses that union. Legacy integral fields remain for replay compatibility; `Problem.evaluation` is optional and is either:
+
+- exact: `{kind:'exact', format:'number'|'json'|'text', caseSensitive?:boolean, prompt:string, answers:string[]}`;
+- code: `{kind:'code', format:'javascript', prompt:string, tests:{inputJson:string,outputJson:string}[], liveTests:number}`.
+
+`FighterProblem` may carry category, prompt and answerFormat. Neither private references nor evaluator answers/tests reach fighters or bettors before reveal. `FighterRunInput.category` selects the instructions. The existing `antiderivative` transport key remains backward compatible and carries the category's answer. Integral answers retain their 400-character/parser limits; other answers allow up to 10,000 characters with bounded format checks. Public match rows expose category and slots for filtering and consistent team labels.
+
+### 21.2 Category rules
+
+| Category | Challenge and deterministic evaluation |
+|---|---|
+| Integrals | Existing derivative comparison, quick live samples and domain-aware final VAR remain unchanged. |
+| Code duels | Submit a pure synchronous JavaScript function expression. Seeded algorithm tasks cover sums, word counts, grouping, stable uniqueness and top-k. Three cases check live hits; 12 cases check final correctness, including edge cases. QuickJS WebAssembly creates a fresh VM per case, with 8 MiB heap, 512 KiB stack and 100 ms interrupt deadline. There are no Node, filesystem, network, native command or module-loader bindings; Date/randomness and unsafe serialization are disabled/rejected. This does not enable native Droid Execute or claim OS containment. |
+| Speed math | Seeded arithmetic operations with finite numeric answers, increasing across the five weights. |
+| Logic | Seeded constraint/deduction puzzles with unique generated answers. |
+| Chess | Explicit piece-movement and capture puzzles on stated boards, with blockers where specified. These are puzzles, not full chess games; prompt rules specify whether check/king safety applies. |
+| Trivia | Stable curated factual questions sampled/shuffled by seed; accepted text aliases are committed. |
+| Live web | Before any market opens, fetch five current stories from the fixed official Hacker News API. Capture IDs, timestamps and source fields. Embed escaped frozen source JSON in the problem prompt and commit it with the answer key. Score extraction against that exact snapshot, preserving URL case. Fetches have a timeout, byte caps and field validation. Missing data returns challenge_unavailable; no mock fallback. |
+| Squads | Four fighters in two teams: public slots 0/1 are Team A, slots 2/3 Team B, independent of shuffled candidate order. Both teammates solve the same reasoning set. A separate team_winner market settles from the sum of verified final points; ties use earlier last surviving hit, fewer total misses, then Team A. Individual winner/side markets remain available. Arena targeting excludes teammates. |
+
+### 21.3 Category records and interface
+
+An additive public `fighter_category_stats` table keys rows by fighter/category, storing that category's stats and Elo. Existing `fighter_stats` and fighter.elo remain the legacy integral card/rating, preserving old clients. Runner settlement reads persisted entries and category stats; new categories begin at 1000, and demo/mock runs do not alter competitive records. Leaderboard tabs select category-specific stats, with an unrated baseline instead of borrowing another category's results. Lobby pages filter matches, odds, results and feed by category; an empty category shows honest empty-state copy without a lock or an integral preview. Full prompts, accepted answers and code test cases become reviewable after reveal.
+
+### 21.4 Acceptance and operation
+
+- All catalog entries must complete create→settle, validate every event, recompute the reveal hash, and settle actual integer-cent ledger bets from two independent clients.
+- A wrong code function that passes live cases must be overturned when hidden cases fail; malformed, looping, memory-heavy and host-access attempts must terminate without host capabilities.
+- Per-category history and ratings must survive a runner reconnect, preserve other categories and exclude mock/demo results.
+- Category HTTP validation, shuffled squad membership, team-sum winner resolution and public page filtering have regression coverage.
+- Generate ignored bindings with `npm run gen` and publish the additive module before cutting the new runner/web over to a database. Never delete production data. `scripts/smoke-challenges.ts` targets only the dedicated local `fightcard-challenges` database and keeps its identity in ignored `.arena/`; `--real` uses configured low-cost Droid mappings and records actual live category history.
+
+Primary implementation references: `packages/contracts/src/categories.ts`, runner `src/problems/{generator,check,code}.ts`, runner `src/match/**`, `spacetime/src/{schema,match,settle}.ts`, and web category/leaderboard/Director UI.

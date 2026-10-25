@@ -2,10 +2,10 @@
 // from ./module_bindings (gitignored, `npm run gen`). If they are absent or the connection fails, connectStdb()
 // returns a 'down' implementation whose methods reject with Error('stdb_down').
 import type {
-  EngineTier, FighterId, FighterPublic, FighterStats, MarketSpec, MatchMode, ProblemMeta, Slot, Standing, Strategy, Category,
+  EntryRow, EngineTier, FighterId, FighterPublic, FighterStats, MarketSpec, MatchMode, ProblemMeta, Slot, Standing, Strategy, Category,
 } from '@fc/contracts';
 import type { Env } from './env.js';
-import { fightEnvelopeSchema, parseRunnerPostable } from '@fc/contracts';
+import { fightEnvelopeSchema, parseRunnerPostable, fighterStatsSchema } from '@fc/contracts';
 import { Identity, Timestamp } from 'spacetimedb';
 
 export type FightEventRow = { matchId: string; seq: number; t: number; type: string; data: unknown };
@@ -20,6 +20,8 @@ export interface Stdb {
   /** Optional: matches currently in the subscribed `match` table (for orphan recovery). Omitted when unavailable. */
   listActiveMatches?(): Promise<{ id: string; status: string }[]>;
 
+  /** Public persisted history for the selected category, reloaded from subscribed rows after restarts. */
+  fighterHistory?(fighterId: FighterId, category: Category): { entries: EntryRow[]; stats: FighterStats | null; elo: number };
   claimRunner(): Promise<void>;
   creditTestFunds(a: { identity: string; amountCents: number }): Promise<void>;
   upsertHouseFighter(a: { fighter: FighterPublic & { strategy: Strategy; tier: EngineTier } }): Promise<void>;
@@ -160,7 +162,7 @@ export async function connectStdb(env: Pick<Env, 'FC_STDB_URI' | 'FC_STDB_DB' | 
     await new Promise<void>((resolve, reject) => {
       const timer = setTimeout(() => reject(new Error('subscription_timeout')), 8000);
       conn.subscriptionBuilder().onApplied(() => { clearTimeout(timer); resolve(); })
-        .onError(() => { clearTimeout(timer); reject(new Error('subscription_failed')); }).subscribe(['SELECT * FROM fight_event', 'SELECT * FROM match']);
+        .onError(() => { clearTimeout(timer); reject(new Error('subscription_failed')); }).subscribe(['SELECT * FROM fight_event', 'SELECT * FROM match', 'SELECT * FROM entry', 'SELECT * FROM fighter', 'SELECT * FROM fighter_stats', 'SELECT * FROM fighter_category_stats']);
     });
   } catch (e) {
     conn.disconnect();
@@ -196,6 +198,23 @@ export async function connectStdb(env: Pick<Env, 'FC_STDB_URI' | 'FC_STDB_DB' | 
         return out;
       },
     } : {}),
+    fighterHistory(fighterId, category) {
+      const millis = (v: any): number | null => v == null ? null : Number(v.toMillis?.() ?? v.microsSinceUnixEpoch / 1000n);
+      const matches = new Map<string, any>([...conn.db.match.iter()].map((m: any) => [String(m.id), m]));
+      const rows = [...conn.db.fighterCategoryStats.iter()].filter((r: any) => r.fighterId === fighterId && r.category === category);
+      const legacy = category === 'integrals' ? [...conn.db.fighterStats.iter()].find((r: any) => r.fighterId === fighterId && r.category === category) : null;
+      const row = rows[0] ?? legacy;
+      const stats = row ? fighterStatsSchema.parse({ ...row, upsetUntil: millis(row.upsetUntil) }) : null;
+      const entries: EntryRow[] = [...conn.db.entry.iter()].filter((e: any) => e.fighterId === fighterId).flatMap((e: any) => {
+        const m = matches.get(String(e.matchId));
+        if (!m || m.category !== category || m.status !== 'settled' || e.rank == null) return [];
+        return [{ ...e, rank: Number(e.rank), mode: m.mode, isDemo: m.isDemo, voided: false, timeLimitMs: Number(m.timeLimitMs),
+          endedAt: millis(m.endedAt) ?? 0, firstHitMs: e.firstHitMs ?? null, lastScoreMs: e.lastScoreMs ?? null,
+          eloAfter: e.eloAfter ?? null, wonAtOdds: e.wonAtOdds ?? null } as EntryRow];
+      });
+      const f = [...conn.db.fighter.iter()].find((r: any) => r.id === fighterId);
+      return { entries, stats, elo: Number(rows[0]?.elo ?? (category === 'integrals' ? f?.elo ?? 1000 : 1000)) };
+    },
     claimRunner: c('claimRunner'), creditTestFunds: c('creditTestFunds'), upsertHouseFighter: c('upsertHouseFighter'),
     createMatch: c('createMatch'), lockMatch: c('lockMatch'), startMatch: c('startMatch'), postEvents: c('postEvents'),
     beginReview: c('beginReview'), finalizeMatch: c('finalizeMatch'), revealMatch: c('revealMatch'), settleMatch: c('settleMatch'),

@@ -2,9 +2,22 @@ import { EventEmitter } from 'node:events';
 import { describe, expect, it, vi } from 'vitest';
 import type { lookup } from 'node:dns/promises';
 import type { request } from 'node:https';
-import { postByo, publicAddress } from './http.js';
+import { postByo, publicAddress, buildByoPayload } from './http.js';
+import { HOUSE_ROSTER } from '@fc/contracts';
+import type { FighterRunInput } from './types.js';
 
 describe('BYO outbound protection', () => {
+  it('sends category prompts and whitelisted public problem metadata', () => {
+    const input = {
+      matchId: 'http-test', fighter: HOUSE_ROSTER.vex, origin: 'house', persona: '', strategy: { verify: false, order: 'in_order', risk: 'bold', taunts: 0 },
+      modelId: null, reasoningEffort: null, category: 'logic', problems: [{ idx: 1, difficulty: 1, points: 10, statementTex: '', integrand: '', category: 'logic', prompt: 'Find the next item.', answerFormat: 'text', reference: 'SECRET-REFERENCE' }],
+      timeLimitMs: 10_000, deadlineAt: 1, sandboxDir: '', endpointUrl: 'https://example.com', submitUrl: 'https://example.com/submit', token: 'token',
+    } as unknown as FighterRunInput;
+    const payload = buildByoPayload(input, 123);
+    const serialized = JSON.stringify(payload);
+    expect(serialized).toContain('Find the next item.'); expect(serialized).toContain('logic prompt');
+    expect(serialized).not.toContain('SECRET-REFERENCE');
+  });
   it('rejects local, metadata, private, mapped and reserved endpoints', () => {
     for (const ip of ['127.0.0.1', '0.0.0.0', '10.2.3.4', '100.64.0.1', '169.254.169.254', '172.16.0.1', '192.168.0.1', '198.18.0.1', '224.0.0.1', '::1', '::ffff:127.0.0.1', 'fc00::1', 'fe80::1', '2001:db8::1', '2002:7f00:1::1']) expect(publicAddress(ip)).toBe(false);
     for (const ip of ['8.8.8.8', '1.1.1.1', '2606:4700:4700::1111']) expect(publicAddress(ip)).toBe(true);

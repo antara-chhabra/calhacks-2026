@@ -68,6 +68,11 @@ describe('validateCreateMatch', () => {
     markets: [{ id: 'm1:w', outcomes: ['a', 'b'], seeds: [5n, 5n] }],
   };
   it('accepts a good payload', () => expect(validateCreateMatch(ok)).toBeNull());
+  it('rejects unsupported categories and squads without four fighters', () => {
+    expect(validateCreateMatch({ ...ok, category: 'unknown' })).toBe('bad_match');
+    expect(validateCreateMatch({ ...ok, category: 'squads' })).toBe('bad_match');
+    expect(validateCreateMatch({ ...ok, category: 'speed-math' })).toBeNull();
+  });
   it('rejects bad fighters/problems/markets', () => {
     expect(validateCreateMatch({ ...ok, fighterIds: ['a', 'a'] })).toBe('bad_match');
     expect(validateCreateMatch({ ...ok, fighterIds: ['a'], slots: [0] })).toBe('bad_match');

@@ -96,8 +96,8 @@ export function createFighterIO(rt: FighterRt, c: MatchCtx): FighterIO {
       return {
         ok: false, points: MISS_POINTS,
         message: reason === 'invalid_syntax'
-          ? `MISS on P${problem}: could not parse your expression (mathjs syntax). −5. Attempts left: ${left}.`
-          : `MISS on P${problem}: derivative does not match the integrand. −5. Attempts left: ${left}.`,
+          ? `MISS on P${problem}: ${p.evaluation ? `invalid answer format (expected ${p.evaluation.format})` : 'could not parse your expression (mathjs syntax)'}. −5. Attempts left: ${left}.`
+          : `MISS on P${problem}: ${p.evaluation ? 'answer does not match the committed solution' : 'derivative does not match the integrand'}. −5. Attempts left: ${left}.`,
       };
     },
 

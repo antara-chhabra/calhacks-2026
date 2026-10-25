@@ -1,8 +1,5 @@
-<!--
-Last 3 sessions across all features. Newest first. Drop the oldest when adding a 4th.
-Format: N. YYYY-MM-DD — feature/slug — one-line outcome
--->
+<!-- Last3 logical sessions, newest first; split files share a session ID. -->
 
-1. 2026-10-25 — planning/a1-money-keys-setup — keys + tooling set up; PRD v1.1.0 (A1): real-currency ledger, low-cost models, library audio; arena art bible split out
-2. 2026-10-25 — platform/kokonut-market-ui — Figma v1/v2 design, then pivot: KokonutUI market UI in `apps/web` (Flow Field entry + `/markets` bento dashboard, trackers, metric card); mock data, builds clean
-3. 2026-10-25 — ship/figma-stage-log — Figma "Idea To Demo" stage log started in `submission/figma-stage-log.md` and kept current through 02:09
+1. 2026-10-25 — fighters/mode-personas — personas made mode-aware (By-mode line per category, locked), ws/personas merged with A3 → main 44922fa; 631 tests, 24/24 live persona runs; Maincloud republished, runner + web live at https://ist-colleagues-twisted-variations.trycloudflare.com.
+2. 2026-10-25 — planning/challenge-categories — recall1e5913b saved, then ws/challenges6a3b1d2 merged cleanly into main6f90ac8; merged-main624 tests/typecheck/build and all8-category actual-ledger smoke pass. Earlier opt-in live SDK and7 genuine Droid category matches passed. Split dump: [planning](features/planning/sessions/2026-10-25-challenge-categories.md), [platform](features/platform/sessions/2026-10-25-challenge-categories.md), [backend](features/backend/sessions/2026-10-25-challenge-categories.md), [runtime](features/runtime/sessions/2026-10-25-challenge-categories.md), [fighters](features/fighters/sessions/2026-10-25-challenge-categories.md), [ship](features/ship/sessions/2026-10-25-challenge-categories.md). Dump/merge request fulfilled; A3 public cutover and independent persona merge remain pending.
+3. 2026-10-25 — planning/merge-all — all 8 branches merged into main and pushed (638e598); typecheck, 586 tests, web build, live smoke and secrets scan green on merged revision. Then published to Maincloud `fightcard` and claimed runner. Next: point runner/web at Maincloud + public URLs, refresh submission evidence, submit.

@@ -25,3 +25,23 @@ Project-wide decisions live in docs/PRD.md §18 (ADR-001…022); record only O2-
 **Date:** 2026-10-25
 **Call:** `narrowSpan` in the owned bento-grid returns 2.
 **Why:** Half-width market tiles were unreadable at 375 px.
+
+## Wait for hydration before selecting a source
+**Date:** 2026-10-25
+**Call / why:** A cold real-match URL must not fall back to a mock fixture before the database snapshot arrives.
+
+## Keep results handoff state mounted
+**Date:** 2026-10-25
+**Call / why:** Unmounting the controller during live play loses podium timing and reveals settled results too early.
+
+## Scope result markets by match
+**Date:** 2026-10-25
+**Call / why:** The global store contains multiple matches; settled results must not show unrelated markets.
+
+## Use category-specific data throughout the page
+**Date:** 2026-10-25
+**Call / why:** A category route must not display another category’s matches or borrow its competitive stats.
+
+## Use recorded slots and settled team outcomes
+**Date:** 2026-10-25
+**Call / why:** Scheduler candidate order is shuffled; team identities and winners must agree with backend settlement.

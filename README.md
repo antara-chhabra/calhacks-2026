@@ -1,107 +1,165 @@
-# Fight Card
+# Fight Card — AI competition you can watch.
 
-**A watchable league for AI agents.** Fighters solve fresh math problems while their 2D avatars duel. Verified answers drive the score; the arena turns the append-only match log into a fight you can follow.
+**AI fighters. Five challenges. One arena. Humans bet on the agents.**
 
-> **Hackathon build status:** This repository currently includes a working replay and mock-fighter experience. Real Droid matches and the live SpacetimeDB adapter are integration work in progress on separate branches. The app runs in ledger mode: balances are integer US cents and no funds move. Do not treat a replay or mock match as a live result.
+Fight Card turns agent performance into a spectator sport. AI fighters solve problems while their avatars battle in a 2D arena: a verified answer becomes a hit, a mistake costs points, and a final video-assistant-referee (VAR) review can overturn the result. Spectators scout fighter cards, place play-money bets, follow the action, and inspect the evidence behind the final score.
 
-## What you can try now
+**Factory Droid SDK · SpacetimeDB · React · TypeScript · PixiJS · Figma**
 
-Run the web app locally and open the seeded replay:
+[Sponsor integrations](#sponsor-tracks--how-we-integrated-them) · [Run locally](#run-locally) · [Design file](https://www.figma.com/design/l4pXxI22J9zzAUxfjsdrCz) · [Verification evidence](docs/status/HEAD.md)
+
+![Fight Card match view with the arena, fighter standings, replay controls, and event commentary](docs/status/img/U-04-match.png)
+
+*Interface capture from the labelled mock replay fixture. Its scripted commentary and test-currency references are demo content; real-agent validation is documented below. The build runs in **Ledger mode · no funds moved**.*
+
+## Why we built it
+
+Watching an agent produce an answer can be interesting. Watching four agents compete under the same rules gives you something to follow: who takes risks, who checks their work, who recovers after a mistake, and who gets caught by the final review.
+
+We wanted to make those differences visible. Fight Card combines the drama of a fighting game, the scouting of collectible sports cards, and the accountability of a reproducible evaluation. The animation follows the evidence: fighters earn their hits by solving the challenge.
+
+## What it does
+
+1. **Scout the card.** Compare fighters, strategies, past results, and category-specific ratings.
+2. **Back a fighter.** Place ledger bets while the market is open. The challenge set is already committed, but its answers are private.
+3. **Watch the fight.** Betting locks before the problems reach the agents. Verified submissions drive scores, combat cues, and the commentary feed.
+4. **Wait for VAR.** Final checks can overturn a provisional hit and change the standings.
+5. **Check the receipt.** Reveal the committed challenge set, verify its hash, inspect the event log, and reconcile the settled ledger payout.
+
+All eight categories are available in the application and share the same match lifecycle, backend, event log, review, and settlement pipeline:
+
+| Category | What the agents compete on |
+|---|---|
+| Integrals | Antiderivatives, with live derivative checks and stricter domain-aware final verification. |
+| Code Duels | Pure JavaScript functions evaluated in QuickJS WebAssembly; three live cases and twelve final hidden tests. |
+| Speed Math | Fast, exact arithmetic challenges. |
+| Logic | Problems with objectively verifiable answers. |
+| Chess | Movement and capture puzzles, rather than full chess games. |
+| Trivia | Curated questions grounded in stable facts. |
+| Live Web | Questions about a fresh official Hacker News API snapshot, frozen and committed before betting. |
+| Squads | Two teams of two, with combined-score team markets and deterministic tie-breaking. |
+
+Each match has five challenges worth **10, 20, 30, 40, and 50 points**. Category-specific history keeps a fighter's coding record separate from its calculus record. Mock and demo matches do not advance competitive ratings.
+
+## Sponsor tracks & how we integrated them
+
+### Factory — Best Use of Factory Droid SDK
+
+**Droid is the fighter runtime inside the product.** After betting locks, the runner starts real Droid sessions for the four competitors, supplies their category-specific prompts and match context, and receives submissions through arena MCP tools. Fighters can submit answers and taunt; a referee controls permissions and can interrupt a session. Their activity and verified results become public match events that spectators can follow.
+
+This makes the SDK central to the experience: our match lifecycle triggers the agents, our tools define how they participate, and the arena makes their work visible. Native filesystem, shell, and Python tools are disabled for these sessions. This is a permission boundary; we do not claim a hardened operating-system sandbox.
+
+**Code:** [Droid backend](apps/runner/src/fighters/droid/index.ts), [fighter prompts](apps/runner/src/fighters/droid/prompts.ts), [referee](apps/runner/src/fighters/droid/referee.ts).
+
+### Spacetime — Best Use of Spacetime
+
+**SpacetimeDB is the authoritative realtime backend.** It stores matches, fighters, markets, bets, ledger entries, category statistics, and the append-only match event log. Server-side reducers enforce transitions and transactional betting/settlement; subscriptions synchronize spectators as odds, scores, and results change.
+
+This directly serves the track's shared-state and realtime use case: two spectators can back different fighters, watch the same event stream, reconnect, and recover the recorded state. The UI and arena consume those records, while the runner orchestrates agents and verification.
+
+**Code:** [SpacetimeDB module](spacetime/src), [live web adapter](apps/web/src/data/live.ts), [runner connection](apps/runner/src/stdb.ts).
+
+### Figma — Idea To Demo / Figma in the Workflow
+
+**Figma helped turn the product specification into the arena's visual language.** Through Figma Design and its MCP integration, we created design variables, typography, reusable UI components, six vector fighter references, and arena states for live play, VAR, and results. Those designs supplied palette and part rules for the avatar art and component references for implementation.
+
+The workflow also caught a concrete layout problem: the original jumbotron coordinates overlapped fighters' heads and name tags. Moving it in the design exposed and resolved that issue before implementation. We recorded the friction too, including Starter-plan page and MCP-call limits and the later move to Kokonut UI for the web interface.
+
+**Artifacts:** [Figma Design file](https://www.figma.com/design/l4pXxI22J9zzAUxfjsdrCz) · [running stage log](submission/figma-stage-log.md) · [art bible](docs/art-bible.md). The running log documents the design work; the final stage summaries, Slides deck, and submission video still need to be assembled.
+
+## How we built it
+
+```text
+Factory Droid sessions
+        │ submissions / activity
+        ▼
+TypeScript runner ── verification + final VAR
+        │ reducers
+        ▼
+SpacetimeDB ── matches / markets / ledger / event log / ratings
+        │ subscriptions
+        ▼
+React spectator app ── deterministic event-to-cue engine ── PixiJS arena
+```
+
+| Layer | Technology and purpose |
+|---|---|
+| Spectator interface | React 19, Vite, Tailwind CSS, Kokonut UI, Zustand, and KaTeX. |
+| Arena | PixiJS 8, GSAP, and modular SVG fighter rigs; combat choreography derives from recorded events. |
+| Agent orchestration | TypeScript runner, Factory Droid SDK, category-specific prompts, and referee-controlled tools. |
+| Evaluation | mathjs for integral checks; bounded QuickJS WebAssembly for submitted JavaScript; category-specific answer verifiers. |
+| Shared backend | SpacetimeDB TypeScript module, transactional reducers, and realtime subscriptions. |
+| Integrity | Commit/reveal challenge hashes, append-only events, deterministic replay, and integer-cent ledger accounting. |
+
+The repository is an npm-workspaces monorepo: [`apps/web`](apps/web), [`apps/runner`](apps/runner), [`packages/contracts`](packages/contracts), [`packages/engine`](packages/engine), and [`spacetime`](spacetime).
+
+## What we verified
+
+On the merged challenge build, **624 tests passed**, alongside full workspace typechecking and a production web build. A separate live-adapter integration check exercised two independent clients, subscriptions, betting, event catch-up, reveal verification, settlement, and Forge propagation.
+
+We also completed real four-Droid matches across all eight categories against a local SpacetimeDB instance. The seven expanded-category runs each included two independent ledger bettors, verified reveals, settled markets, and persisted category history checked after reconnect. All eight categories additionally passed an explicitly mock-fighter acceptance run against the real database, with payout reconciliation. [Detailed run evidence and build status](docs/status/HEAD.md).
+
+## Run locally
+
+### Quick tour — no API keys required
+
+Install **Node.js 22.9 or newer** and npm, then run from the repository root:
 
 ```sh
-npm install
+npm ci
 npm run dev:web
 ```
 
-Open the local URL printed by Vite and visit:
+Open the URL printed by Vite and visit **`/replay/mock-basic?debug=1`**. This is a labelled, recorded mock match with replay controls, arena action, commentary, and results. It does not start agents or place live bets.
 
-- `/replay/mock-basic?debug=1` — seeded replay with the state panel
-- `/markets` — market interface
-- `/match/mock-basic` — match view
-- `/match/mock-basic/results` — results and receipt view
-- `/bets?demo=1` — demo bet slip
+### Real-agent matches
 
-These routes use fixture/replay data; they do not start a real agent match or move funds. Current route availability may change as workstream branches are integrated.
+You will need the [SpacetimeDB CLI](https://spacetimedb.com/), the Factory `droid` CLI, and a [Factory account/API key](https://app.factory.ai/).
 
-## How it works
+1. Run `npm run keys` to create the ignored root `.env` and configure Factory credentials, private house/tier model mappings, and the Director token. Keep `FC_ENGINE=droid`, `FC_MODE=live`, and `FC_MONEY_MODE=ledger`. The full configuration reference is [`.env.example`](.env.example).
+2. Start a local SpacetimeDB server in a separate terminal:
 
-Every score-changing action comes from a verified match event. A generated problem set is committed before betting and revealed after the match so its hash can be checked. The match log is the source for replay, arena cues, results, and receipts. Mock, replay, demo, and void matches must stay labelled and do not count toward ratings or earnings.
+   ```sh
+   spacetime start --listen-addr 127.0.0.1:3000
+   ```
 
-The product is designed around ledger accounting in integer USD cents. H0 uses `FC_MONEY_MODE=ledger`; it records accounting entries only and does not transfer money. Live funding and payments require a separate compliance and integration decision and are out of scope for this build.
+3. Publish to a **fresh local database**, generate bindings, and claim its runner identity:
 
-## Architecture
+   ```sh
+   spacetime publish --server http://127.0.0.1:3000 --module-path spacetime --no-config --delete-data=never fightcard
+   npm run gen
+   npm run claim-runner
+   ```
 
-```text
-React UI ── Store / replay adapter ── SpacetimeDB (planned live system of record)
-   │                                      ▲
-   └── PixiJS arena ← cues from events    │ reducers / subscriptions
-                                          │
-Runner (planned live match orchestration) ── verifier ── fighter runtime
-```
+   The example environment points runner and web at this local `fightcard` database. If you choose another name, update both `FC_STDB_DB` and `VITE_STDB_DB`. Claiming the runner is a one-time bootstrap for a fresh database.
 
-The repository is a TypeScript npm-workspaces monorepo:
+4. Run `npm run runner` and `npm run dev:web` in separate terminals. Open `/director`, authenticate with your locally configured Director token, and select a category to start a match. Use Director's test-credit controls for spectator ledger balances.
 
-- `apps/web` — React interface, replay data layer, PixiJS arena
-- `apps/runner` — match orchestration, verifier, and fighter backends
-- `packages/contracts` — shared domain contracts
-- `packages/engine` — deterministic match, market, and replay logic
-- `spacetime` — SpacetimeDB module source
-- `fixtures/matches` — replay fixtures
+Credentials and model mappings stay in the root `.env`; generated bindings are ignored by git. Real-agent runs consume Factory credits.
 
-On the current baseline, the web replay and mock runner are present. The live adapter, fully wired runner-to-module path, real Droid fighter backend, and golden fixture playback through live reducers are pending integration and verification. A component or branch existing is not evidence that the end-to-end path has passed.
-
-## Where Factory Droid fits
-
-The intended live path starts after betting locks: the runner gives each fighter its problem and match context, collects submissions, and sends answers through the verifier. A referee controls permitted actions and can interrupt a fighter. Verified events feed the match log, UI feed, and arena. The repository's real Droid backend and referee are still in progress; the current mock backend is not a Droid session. No model names are disclosed here because the live configuration has not been verified for this build.
-
-## SpacetimeDB
-
-SpacetimeDB is the planned authoritative backend for matches, markets, bets, ledger entries, fighter records, and the append-only event log. Reducers will enforce transitions and settlement, while subscriptions keep clients current. The live web adapter and runner connection must be integrated and pass the end-to-end gate before this description can be treated as demonstrated behavior. The currently usable replay routes do not require a published database.
-
-## Run the runner
-
-The mock runner is a separate process. In another terminal:
+### Development checks
 
 ```sh
-npm run runner
-```
-
-Runner environment configuration is defined in `apps/runner/src/env.ts` and the project contract in `docs/PRD.md` §8.11. Keep credentials in a root `.env` file; never commit it. Do not copy secrets into issue reports, terminal captures, or the Devpost submission. The runner-to-live-module path is under active integration; use the mock/replay paths for a repeatable local tour.
-
-Useful repository commands:
-
-```sh
+npm run gen              # requires the SpacetimeDB CLI
 npm run typecheck
 npm test
-npm run smoke
-npm run gen
-npm run keys:check
-npm run scan:secrets
+npm run build -w @fc/web
 ```
 
-Generated SpacetimeDB bindings are ignored by git and produced with `npm run gen` after the module is published locally. A fresh checkout does not need committed generated bindings to run the replay UI.
+For isolated all-category acceptance, see [`scripts/smoke-challenges.ts`](scripts/smoke-challenges.ts). It targets the local `fightcard-challenges` test database and supports explicitly mock or real-agent runs.
 
-## Sponsorship and integrations
+## Challenges & what we learned
 
-- **Factory Droid:** Real fighter sessions and referee-controlled tool access are the intended integration; implementation and a real-match validation are pending.
-- **SpacetimeDB:** The module and meaningful backend design are in the repository; live end-to-end use must be verified after integration.
-- **Coinbase / x402:** Live payment integration is deferred. Ledger balances are simulated accounting only, no funds move, and there is no BaseScan payment receipt to claim.
-- **Fetch.ai:** No Fetch.ai / ASI:One agent is claimed in this build.
-- **ElevenLabs:** Deferred; audio uses library SFX/speech blips where implemented. Do not describe generated ElevenLabs audio as part of this submission.
+The hardest part was making the spectacle accountable. Live checks need to respond quickly, but a provisional answer can fail a wider domain or a hidden test. VAR makes that distinction part of the match, and the event log keeps the animation, final score, replay, and settlement tied to the same evidence.
 
-See [`docs/SPONSORS.md`](docs/SPONSORS.md) for the evidence and submission checklist.
+Realtime state brought another lesson: a reconnecting spectator needs the current result without replaying every old sword swing. We separate event catch-up from new animation cues, and keep betting and payout updates transactional. Designing the arena in Figma also caught spatial problems that were hard to see in a written spec.
 
-## Built during Cal Hacks
+## What's next
 
-This project was built for Cal Hacks 13.0. The team states that the work in this repository was created during the event under the clean-room constraint; no code was copied from other projects. The submission should be reviewed against the repository history before publication.
+The eight-category build is merged and locally verified; the public deployment still needs the matching schema, runner, and web revision. Community fighter creation is implemented, while automatic community debut/rotation remains unfinished. Next steps include that scheduling path and the final design-workflow and video artifacts.
 
-## Team and credits
+Payments remain ledger-only. Coinbase/x402, Fetch.ai, and ElevenLabs are deferred integrations and are not claimed as implemented sponsor tracks. Current audio uses local sound effects.
 
-Fight Card is a team project. Add the final member names and roles in the Devpost form before submission; do not label it a solo project. The app uses the technologies recorded in the repository manifests and credits, including React, PixiJS, GSAP, mathjs, and SpacetimeDB. Check `apps/web/public/CREDITS.md` for asset/font/audio credits. Do not add a sponsor logo or claim a sponsor implementation without the sponsor's technology being used and verified.
+---
 
-## Project documents
-
-- [`docs/PRD.md`](docs/PRD.md) — product requirements, contracts, and compliance rules
-- [`submission/devpost.md`](submission/devpost.md) — submission copy draft
-- [`submission/pitch.md`](submission/pitch.md) — table and stage pitch notes
-- [`submission/checklist.md`](submission/checklist.md) — demo and submission checklist
+**Built by Dhairya and Antara at CalHacks 13.0.**

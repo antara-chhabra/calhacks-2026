@@ -1,5 +1,6 @@
 // Match receipt (FC-F-084) + replay controls (FC-F-242). Source of truth: the recorded event log.
 import type { FightEnvelope } from '@fc/contracts';
+import { squadTeam } from '@fc/contracts';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ButtonX, Panel, Skeleton } from '@/components/fightcard/primitives';
@@ -8,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { useStore } from '@/data/store';
 import { AppShell } from '@/ui/shell';
 import { basescanUrl, buildReceipt, hashCheck, isHighlight, isTxHash, summarize, type HashCheck, type Receipt } from './model';
+import { categoryLabel } from '@/ui/match/model';
 
 const fmtT = (ms: number) => `${(ms / 1000).toFixed(1)}s`;
 const short = (h: string) => `${h.slice(0, 10)}…${h.slice(-6)}`;
@@ -43,7 +45,7 @@ export function ReceiptScreen({ id }: { id: string | null }) {
     <AppShell title="Match receipt">
       <div className="space-y-4" data-testid="receipt">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h1 className="font-semibold text-lg text-zinc-50">Receipt <span className="font-mono text-sm text-zinc-500">{id}</span></h1>
+          <h1 className="font-semibold text-lg text-zinc-50">{receipt ? `${categoryLabel(receipt.state.category)} receipt` : 'Match receipt'} <span className="font-mono text-sm text-zinc-500">{id}</span></h1>
           <div className="flex gap-2">
             <Link to={`/match/${id}/results`}><ButtonX size="sm">Results</ButtonX></Link>
             <Link onClick={() => id && openReplay(id)} to={`/match/${id}`}><ButtonX size="sm" tone="primary">Watch replay</ButtonX></Link>
@@ -74,7 +76,7 @@ export function ReceiptScreen({ id }: { id: string | null }) {
                   <tbody>
                     {receipt.submissions.map((s) => (
                       <tr className="border-zinc-900 border-t" key={s.seq}>
-                        <td className="py-1 pr-3 text-zinc-500">{fmtT(s.t)}</td><td className="pr-3 text-zinc-200">{s.fighterId}</td><td className="pr-3">P{s.problem}</td><td className="pr-3">{s.attempt}</td>
+                        <td className="py-1 pr-3 text-zinc-500">{fmtT(s.t)}</td><td className="pr-3 text-zinc-200">{s.fighterId}{receipt.state.category === 'squads' && <span className="ml-1 rounded bg-zinc-800 px-1 py-0.5 text-[9px] text-zinc-400">TEAM {squadTeam(receipt.state.fighters[s.fighterId]?.slot ?? receipt.state.order.indexOf(s.fighterId)) === 'team_a' ? 'A' : 'B'}</span>}</td><td className="pr-3">P{s.problem}</td><td className="pr-3">{s.attempt}</td>
                         <td className={cn('pr-3', s.verdict?.ok ? 'text-emerald-400' : 'text-red-400')}>{s.verdict ? `${s.verdict.ok ? 'hit' : 'miss'} ${s.verdict.points >= 0 ? '+' : ''}${s.verdict.points}` : '—'}</td>
                         <td className={cn('pr-3', s.finalVerdict?.overturned ? 'text-amber-300' : 'text-zinc-400')}>{s.finalVerdict ? (s.finalVerdict.overturned ? 'overturned' : 'upheld') : '—'}</td>
                         <td className="font-mono text-zinc-400">{s.answer ?? <span className="text-zinc-600">hidden until reveal</span>}</td>

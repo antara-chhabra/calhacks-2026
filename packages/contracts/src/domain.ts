@@ -1,7 +1,10 @@
 // Domain types (PRD §8.2).
 import type { Archetype, FighterId, SkinSpec } from './roster.js';
 
-export type Category = 'integrals' | 'code' | 'web';         // H0 runs 'integrals' only
+export type Category = 'integrals' | 'code' | 'speed-math' | 'logic' | 'chess' | 'trivia' | 'web' | 'squads';
+export type AnswerFormat = 'expression' | 'number' | 'json' | 'text' | 'javascript';
+export type CodeEvaluation = { kind: 'code'; format: 'javascript'; prompt: string; tests: { inputJson: string; outputJson: string }[]; liveTests: number };
+export type ExactEvaluation = { kind: 'exact'; format: 'number' | 'json' | 'text'; caseSensitive?: boolean; prompt: string; answers: string[] };
 export type ProblemIdx = 1 | 2 | 3 | 4 | 5;
 export type Difficulty = 1 | 2 | 3 | 4 | 5;
 export type Interval = [number, number];
@@ -15,17 +18,18 @@ export type Problem = {
   finalDomains: Interval[];        // 48 final sample points are drawn across these
   reference: string;               // a correct antiderivative (mathjs syntax)
   trap: boolean;
+  evaluation?: ExactEvaluation | CodeEvaluation;    // private until reveal; never sent to fighters
 };
-export type ProblemSet = { category: 'integrals'; seed: string; problems: Problem[] };   // seed: 32 hex chars
+export type ProblemSet = { category: Category; seed: string; problems: Problem[] };   // seed: 32 hex chars
 export type ProblemMeta = Pick<Problem, 'idx' | 'difficulty' | 'points'>;               // public before reveal
-export type FighterProblem = Pick<Problem, 'idx' | 'difficulty' | 'points' | 'statementTex' | 'integrand'>; // sent to fighters at the bell
+export type FighterProblem = Pick<Problem, 'idx' | 'difficulty' | 'points' | 'statementTex' | 'integrand'> & { category?: Category; prompt?: string; answerFormat?: AnswerFormat }; // sent to fighters at the bell
 
 export type Slot = 0 | 1 | 2 | 3;                // 0 left float · 1 main-left · 2 main-right · 3 right float
 export type MatchStatus = 'scheduled' | 'open' | 'locked' | 'live' | 'review' | 'settled' | 'void';
 export type MatchMode = 'live' | 'mock';
 
 export type Strategy = {
-  verify: boolean;                                              // may run python to check answers (house only in H0)
+  verify: boolean;                                              // mathematical re-derivation only; native execution disabled
   order: 'in_order' | 'easy_first' | 'hard_first' | 'points_per_risk';
   risk: 'cautious' | 'bold';
   taunts: 0 | 1 | 2 | 3;

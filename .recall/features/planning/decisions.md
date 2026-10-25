@@ -55,3 +55,43 @@ The full ADR log is docs/PRD.md §18; these are the headline calls with their re
 **Date:** 2026-10-25
 **Call:** Library SFX and speech blips now; same hook for ElevenLabs later.
 **Why:** Removes three account setups from the critical path.
+
+## Keep all work unmerged (SUPERSEDED 2026-10-25 — user said "merge everything")
+**Date:** 2026-10-25
+**Call / why:** The user explicitly said “We will merge everything later”; validation uses an ignored source assembly and does not alter main’s code.
+
+## Use nested worktrees and a source assembly
+**Date:** 2026-10-25
+**Call / why:** Keep work under the authorized repository root; .arena/worktrees holds branches and .arena/combined holds disposable integration evidence.
+
+## Register the public house roster on runner startup
+**Date:** 2026-10-25
+**Call / why:** All six configured fighters must exist publicly before rotation; fail startup if registration fails rather than running against an incomplete roster.
+
+## Use a shared active-match guard
+**Date:** 2026-10-25
+**Call / why:** Director live/demo and season starts must not overlap; cancellation/shutdown must release the slot and await cleanup.
+
+## Model remap approved privately
+**Date:** 2026-10-25
+**Call / why:** The user approved the verified Standard model for GLITCH/PIP; keep values only in ignored environment configuration.
+
+## Merge everything, HEAD order, verify in a separate worktree
+**Date:** 2026-10-25
+**Call / why:** User authorized merging after Antara posted "HEAD done". Merged into `merge/final` from origin/main in `.arena/worktrees/fc-merge` (root checkout had dirty `.recall/`), ran full regression there, then pushed to main and fast-forwarded root. HEAD branches went after O5 because wiring/registry use the O4/O5 code.
+
+## Expose the entire catalog
+**Date:** 2026-10-25
+**Call / why:** User explicitly expanded scope and rejected preview/Season2 walls; preserve the same match and ledger backend.
+
+## Keep deployment separate from merging
+**Date:** 2026-10-25
+**Call / why:** The user authorized a recall dump then a merge; the live Maincloud/persona deployment is a separate ongoing workstream.
+
+## Use a dedicated local acceptance database
+**Date:** 2026-10-25
+**Call / why:** fightcard-challenges isolates seeded/mock and genuine-model verification from existing local/Maincloud data.
+
+## Merge challenge work after saving recall
+**Date:** 2026-10-25
+**Call / why:** The user explicitly requested recall dump then merge; saved memory1e5913b before clean challenge merge6f90ac8. The separate persona/deployment workstream remains untouched.

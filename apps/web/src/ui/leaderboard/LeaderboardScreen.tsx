@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { CATEGORY_CATALOG, type Category } from "@fc/contracts";
 import { Link } from "react-router-dom";
 import { Tabs } from "@/components/fightcard/primitives";
 import { useStore } from "@/data/store";
@@ -8,11 +9,7 @@ import { needsDemo } from "@/ui/lobby/selectors";
 import { AppShell } from "@/ui/shell";
 import { type BoardFilter, type BoardTab, type LeaderRow, selectLeaderboard } from "./selectors";
 
-const TABS: { id: BoardTab; label: string }[] = [
-  { id: "integrals", label: "Integrals" },
-  { id: "code", label: "Code Duel · soon" },
-  { id: "web", label: "Live Web · soon" },
-];
+const TABS: { id: BoardTab; label: string }[] = CATEGORY_CATALOG.map((c) => ({ id: c.id as Category, label: c.label }));
 const FILTERS: { id: BoardFilter; label: string }[] = [
   { id: "all", label: "All" },
   { id: "house", label: "House" },
@@ -81,7 +78,6 @@ export function LeaderboardScreen() {
   const fighters = useStore((s) => s.fighters);
   useEffect(() => { if (needsDemo({ conn, matches })) useStore.getState().openReplay("mock-basic", 4); }, [conn, matches]);
   const rows = useMemo(() => selectLeaderboard({ fighters }, tab, filter), [fighters, tab, filter]);
-  const soon = tab !== "integrals";
 
   return (
     <AppShell wide>
@@ -92,9 +88,7 @@ export function LeaderboardScreen() {
           <Tabs label="Category" onChange={setTab} tabs={TABS} value={tab} />
           <Tabs label="Origin" onChange={setFilter} tabs={FILTERS} value={filter} />
         </div>
-        {soon ? (
-          <p className="rounded-xl bg-zinc-950 px-4 py-12 text-center text-[13px] text-zinc-500 ring-1 ring-zinc-900">Coming soon. {tab === "code" ? "Code Duel" : "Live Web"} opens in Season 2; Integrals is the launch category.</p>
-        ) : rows.length === 0 ? (
+        {rows.length === 0 ? (
           <p className="rounded-xl bg-zinc-950 px-4 py-12 text-center text-[13px] text-zinc-500 ring-1 ring-zinc-900">No fighters match this filter yet.</p>
         ) : (
           <div className="overflow-hidden rounded-xl bg-zinc-950 ring-1 ring-zinc-900">

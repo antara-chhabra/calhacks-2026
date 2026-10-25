@@ -35,7 +35,7 @@ export const fighterPublicSchema = z.object({
 });
 
 /* ---------- domain ---------- */
-export const categorySchema = lit(['integrals', 'code', 'web']);
+export const categorySchema = lit(['integrals', 'code', 'speed-math', 'logic', 'chess', 'trivia', 'web', 'squads']);
 export const problemIdxSchema = z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal(5)]);
 export const difficultySchema = problemIdxSchema;
 export const pointsSchema = z.union([z.literal(10), z.literal(20), z.literal(30), z.literal(40), z.literal(50)]);
@@ -51,13 +51,17 @@ export const marketKindSchema = lit(['winner', 'score_line', 'beat_clock', 'firs
 export const problemSchema = z.object({
   idx: problemIdxSchema, difficulty: difficultySchema, points: pointsSchema,
   family: z.string().min(1).max(64), statementTex: z.string().min(1).max(500), integrand: z.string().min(1).max(500),
-  liveDomain: interval, finalDomains: z.array(interval).min(1).max(16), reference: z.string().min(1).max(500), trap: z.boolean(),
+  liveDomain: interval, finalDomains: z.array(interval).min(1).max(16), reference: z.string().min(1).max(10000), trap: z.boolean(),
+  evaluation: z.discriminatedUnion('kind', [
+    z.object({ kind: z.literal('exact'), format: lit(['number', 'json', 'text']), caseSensitive: z.boolean().optional(), prompt: z.string().min(1).max(12000), answers: z.array(z.string().min(1).max(10000)).min(1).max(32) }),
+    z.object({ kind: z.literal('code'), format: z.literal('javascript'), prompt: z.string().min(1).max(12000), tests: z.array(z.object({ inputJson: z.string().max(10000), outputJson: z.string().max(10000) })).min(2).max(64), liveTests: z.number().int().min(1).max(8) }),
+  ]).optional(),
 });
 export const problemSetSchema = z.object({
-  category: z.literal('integrals'), seed: z.string().regex(/^[0-9a-f]{32}$/), problems: z.array(problemSchema).length(5),
+  category: categorySchema, seed: z.string().regex(/^[0-9a-f]{32}$/), problems: z.array(problemSchema).length(5),
 });
 export const problemMetaSchema = problemSchema.pick({ idx: true, difficulty: true, points: true });
-export const fighterProblemSchema = problemSchema.pick({ idx: true, difficulty: true, points: true, statementTex: true, integrand: true });
+export const fighterProblemSchema = problemSchema.pick({ idx: true, difficulty: true, points: true, statementTex: true, integrand: true }).extend({ category: categorySchema.optional(), prompt: z.string().max(12000).optional(), answerFormat: lit(['expression', 'number', 'json', 'text', 'javascript']).optional() });
 
 export const strategySchema = z.object({
   verify: z.boolean(), order: lit(['in_order', 'easy_first', 'hard_first', 'points_per_risk']),

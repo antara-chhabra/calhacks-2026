@@ -71,10 +71,11 @@ export const settle_match = spacetimedb.reducer({ name: 'settle_match' }, {
     const f = ctx.db.fighter.id.find(u.fighterId);
     if (!f) throw new SenderError('no_fighter');
     const matches = f.matches + 1;
-    eloEvt[f.id] = [f.elo, u.after];
-    ovrEvt[f.id] = [ovrFromElo(f.elo), ovrFromElo(u.after)];
+    const before = ctx.db.entry.id.find(`${matchId}:${f.id}`)?.eloBefore ?? f.elo;
+    eloEvt[f.id] = [before, u.after];
+    ovrEvt[f.id] = [ovrFromElo(before), ovrFromElo(u.after)];
     ctx.db.fighter.id.update({
-      ...f, elo: u.after, matches, lastMatchAt: ctx.timestamp, debutPending: false, status: nextFighterStatus(f.status, matches),
+      ...f, elo: m.category === 'integrals' ? u.after : f.elo, matches, lastMatchAt: ctx.timestamp, debutPending: false, status: nextFighterStatus(f.status, matches),
     });
     const e = ctx.db.entry.id.find(`${matchId}:${f.id}`);
     if (e) ctx.db.entry.id.update({ ...e, eloAfter: u.after });
@@ -82,8 +83,15 @@ export const settle_match = spacetimedb.reducer({ name: 'settle_match' }, {
 
   // 4. fighter_stats upsert.
   for (const s of rated ? stats : []) {
-    if (ctx.db.fighterStats.fighterId.find(s.fighterId)) ctx.db.fighterStats.fighterId.update(s);
-    else ctx.db.fighterStats.insert(s);
+    if (s.category !== m.category) throw new SenderError('bad_category');
+    const id = `${s.fighterId}:${m.category}`;
+    const categoryRow = { ...s, id, elo: elo.find((u) => u.fighterId === s.fighterId)?.after ?? 1000 };
+    if (ctx.db.fighterCategoryStats.id.find(id)) ctx.db.fighterCategoryStats.id.update(categoryRow);
+    else ctx.db.fighterCategoryStats.insert(categoryRow);
+    if (m.category === 'integrals') {
+      if (ctx.db.fighterStats.fighterId.find(s.fighterId)) ctx.db.fighterStats.fighterId.update(s);
+      else ctx.db.fighterStats.insert(s);
+    }
   }
 
   ctx.db.match.id.update({ ...ctx.db.match.id.find(matchId)!, status: 'settled' });

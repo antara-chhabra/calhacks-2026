@@ -27,4 +27,20 @@ describe('explicit direct fallback', () => {
     const result = await createDirectBackend({ fetch: request }).run(input(), io(), new AbortController().signal);
     expect(result.error).toEqual({ code: 'crash', message: 'Direct fallback failed.' });
   });
+  it('sends category-specific challenge instructions without private evaluator data', async () => {
+    config(); const bodies: Record<string, unknown>[] = [];
+    const request = vi.fn(async (_url: unknown, init: RequestInit | undefined) => {
+      bodies.push(JSON.parse(String(init?.body)));
+      return new Response(JSON.stringify({ choices: [{ message: { content: 'done' } }] }));
+    }) as unknown as typeof fetch;
+    const i = input(); i.category = 'code';
+    i.problems[0] = { ...i.problems[0]!, category: 'code', prompt: 'Trace the code and return JSON.', answerFormat: 'json', reference: 'SECRET-REFERENCE' } as typeof i.problems[number];
+    await createDirectBackend({ fetch: request }).run(i, io(), new AbortController().signal);
+    const body = bodies[0]!;
+    expect(JSON.stringify(body.messages)).toContain('Trace the code and return JSON.');
+    expect(JSON.stringify(body.messages)).toContain('pure JavaScript function expression');
+    expect(JSON.stringify(body)).not.toContain('SECRET-REFERENCE');
+    expect(JSON.stringify(body.tools)).toContain('pure JavaScript function expression');
+    expect(JSON.stringify(body.tools)).toContain('10000');
+  });
 });

@@ -86,4 +86,14 @@ describe('mock backend', () => {
     await createMockBackend({ timeScale: SCALE }).run(h.input, h.io, new AbortController().signal);
     expect(h.log.some((l) => l.startsWith('submit:'))).toBe(true);
   }, 20_000);
+
+  it('generates wrong answers safely for JSON, number, and text categories', async () => {
+    for (const [answerFormat, correct] of [['json', '{"value":7}'], ['number', '7'], ['text', 'seven']] as const) {
+      const h = harness('vex', `format-${answerFormat}`);
+      h.input.problems = h.input.problems.map((p) => ({ ...p, category: answerFormat === 'json' ? 'code' : answerFormat === 'number' ? 'speed-math' : 'logic', prompt: 'Test answer formatting.', answerFormat }));
+      const result = await createMockBackend({ timeScale: SCALE, answerFor: () => correct }).run(h.input, h.io, new AbortController().signal);
+      expect(result.error).toBeNull();
+      expect(h.log.some((line) => line.startsWith('submit:'))).toBe(true);
+    }
+  }, 20_000);
 });

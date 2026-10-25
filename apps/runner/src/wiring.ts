@@ -2,7 +2,8 @@
 import { randomBytes } from 'node:crypto';
 import { accessSync, constants } from 'node:fs';
 import { delimiter, join } from 'node:path';
-import type { FighterProblem, FundingAdapter, Problem } from '@fc/contracts';
+import { CATEGORY_IDS } from '@fc/contracts';
+import type { Category, FighterProblem, FundingAdapter, Problem } from '@fc/contracts';
 import { createCandidateSource, type CandidateSource } from './candidates.js';
 import { Director, DirectorError, type DirectorHealth } from './control/director.js';
 import { loadEnv, type Env } from './env.js';
@@ -13,13 +14,13 @@ import { createFunding } from './funding.js';
 import { DemoError, loadDemoFixture, runDemoMatch } from './match/demo.js';
 import { runMatch, type MatchSummary, type RunMatchDeps } from './match/lifecycle.js';
 import type { Candidate, MatchOpts } from './match/types.js';
-import { generateProblemSet } from './problems/index.js';
 import { createPayments, type Payments } from './payments/index.js';
 import { createSeasonLoop, type SeasonLoop } from './season/index.js';
 import { connectStdb, type Stdb } from './stdb.js';
 
 export type WireOverrides = {
   stdb?: Stdb;
+  webSnapshot?: () => Promise<import('./problems/web.js').WebSnapshot>;
   payments?: Payments;
   /** Mock engine only: divide fighter waits by this (tests). */
   mockTimeScale?: number;
@@ -88,15 +89,19 @@ export async function wire(env: Env = loadEnv(), o: WireOverrides = {}): Promise
   const liveSets = new Map<string, Problem[]>();
   const answerFor = (p: FighterProblem): string | null => {
     for (const ps of liveSets.values()) {
-      const m = ps.find((q) => q.idx === p.idx && q.integrand === p.integrand);
-      if (m) return m.reference;
+      const m = ps.find((q) => q.idx === p.idx && q.integrand === p.integrand && (!p.prompt || q.evaluation?.prompt === p.prompt));
+      if (m) return m.evaluation?.kind === 'exact' ? m.evaluation.answers[0]! : m.reference;
     }
     return null;
   };
   const mockBackend = createMockBackend({ answerFor, timeScale: o.mockTimeScale });
   const backendFor = (c: Candidate): FighterBackend => (c.engine === 'mock' ? mockBackend : getBackend(c.engine));
 
-  const deps: RunMatchDeps = { stdb, backendFor, log: (m) => log(m) };
+  const deps: RunMatchDeps = { stdb, backendFor, webSnapshot: o.webSnapshot, history: stdb.fighterHistory ? (id, category = 'integrals') => stdb.fighterHistory!(id, category) : undefined, log: (m) => log(m), onProblemSet: (id, set) => liveSets.set(id, set.problems) };
+  const eligible = async (category: Category = 'integrals') => {
+    const all = await candidates.list();
+    return all.map((c) => ({ ...c, elo: stdb.fighterHistory?.(c.fighter.id, category).elo ?? c.elo }));
+  };
   const baseOpts: Omit<MatchOpts, 'candidates'> = {
     timeLimitMs: env.FC_MATCH_MS, bettingWindowMs: env.FC_BET_WINDOW_S * 1000, introMs: env.FC_INTRO_MS,
     communitySlots: env.FC_COMMUNITY_SLOTS, ...o.matchOpts,
@@ -108,26 +113,35 @@ export async function wire(env: Env = loadEnv(), o: WireOverrides = {}): Promise
   let busy = false;   // one match at a time across director + season + demo
 
   /** Start one match. Returns as soon as the id exists; `done` settles with the summary. */
-  function startOne(opts: Omit<MatchOpts, 'candidates'> & { candidates: Candidate[] }, track: boolean): { matchId: string; done: Promise<MatchSummary> } {
+  function startOne(opts: Omit<MatchOpts, 'candidates'> & { candidates: Candidate[] }, track: boolean): { matchId: string; done: Promise<MatchSummary>; started: Promise<void> } {
     if (busy) throw new DirectorError(409, 'match_active', 'A match is already active');
     busy = true;
     const matchId = opts.matchId ?? `m_${randomBytes(5).toString('hex')}`;
     const seed = opts.seed ?? randomBytes(16).toString('hex');
-    liveSets.set(matchId, generateProblemSet(seed).problems);
     const ctl = new AbortController();
     aborts.set(matchId, ctl);
     const off = track ? stdb.onEvent(matchId, (e) => { const s = EVENT_STATUS[e.type]; if (s) director.setMatchStatus(matchId, s); }) : () => {};
-    const done = runMatch(deps, { ...opts, matchId, seed, signal: ctl.signal, mode: opts.mode ?? (env.FC_ENGINE === 'mock' ? 'mock' : 'live') }).then((s) => {
+    let created!: () => void;
+    let failed!: (error: unknown) => void;
+    const started = new Promise<void>((resolve, reject) => { created = resolve; failed = reject; });
+    // Season callers await done; consuming started here avoids an unhandled startup rejection.
+    void started.catch(() => {});
+    const done = runMatch(deps, { ...opts, matchId, seed, onCreated: () => { created(); opts.onCreated?.(); }, signal: ctl.signal, mode: opts.mode ?? (env.FC_ENGINE === 'mock' ? 'mock' : 'live') }).then((s) => {
       if (s.mode === 'live' && !s.isDemo) candidates.played(s.standings.map((x) => x.fighterId), s.elo);
       return s;
     }).finally(() => { off(); liveSets.delete(matchId); aborts.delete(matchId); busy = false; activeRuns.delete(done); });
+    void done.catch(failed);
     activeRuns.add(done);
-    return { matchId, done };
+    return { matchId, done, started };
   }
 
+  let seasonCategory = 0;
   const season: SeasonLoop = createSeasonLoop({
-    runMatch: (opts) => startOne(opts, false).done,
-    candidates: async () => (director.currentMatch() || busy ? [] : candidates.list()),
+    runMatch: async (opts) => {
+      const category = opts.category ?? CATEGORY_IDS[seasonCategory++ % CATEGORY_IDS.length]!;
+      return startOne({ ...opts, category, candidates: await eligible(category) }, false).done;
+    },
+    candidates: async () => (director.currentMatch() || busy ? [] : eligible(baseOpts.category)),
     matchOpts: { ...baseOpts },
     betWindowS: env.FC_SEASON_BET_WINDOW_S,
     maxSessionsPerHour: env.FC_MAX_SESSIONS_PER_HOUR,
@@ -178,10 +192,12 @@ export async function wire(env: Env = loadEnv(), o: WireOverrides = {}): Promise
     mode: env.FC_MODE, engine: env.FC_ENGINE,
     async runMatch(opts) {
       if (env.FC_MODE === 'demo') return startDemo('golden-var');
-      const all = await candidates.list();
+      const all = await eligible(opts.category ?? baseOpts.category);
       const pool = opts.fighters ? all.filter((c) => opts.fighters!.includes(c.fighter.id)) : all;
       if (pool.length < 4) throw new DirectorError(400, 'not_enough_fighters', 'Need at least 4 eligible fighters');
-      const { matchId, done } = startOne({ ...baseOpts, candidates: pool, ...(opts.betWindowS ? { bettingWindowMs: opts.betWindowS * 1000 } : {}) }, true);
+      const { matchId, done, started } = startOne({ ...baseOpts, candidates: pool, ...(opts.category ? { category: opts.category } : {}), ...(opts.betWindowS ? { bettingWindowMs: opts.betWindowS * 1000 } : {}) }, true);
+      try { await started; }
+      catch { throw new DirectorError(503, 'challenge_unavailable', 'Could not prepare the selected challenge. No betting market was opened.'); }
       return { matchId, done };
     },
     lockMatch: (id) => stdb.lockMatch({ matchId: id }),

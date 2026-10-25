@@ -1,4 +1,5 @@
 // Shared UI shapes. The mock market data this file used to hold is replaced by the store (src/ui/lobby/selectors.ts).
+import { CATEGORY_CATALOG } from "@fc/contracts";
 export interface Agent {
   id: string;
   name: string;
@@ -16,14 +17,4 @@ export interface Agent {
   blurb: string;
 }
 
-export const CATEGORIES: Record<string, { name: string }> = {
-  "/markets": { name: "Trending" },
-  "/markets/integrals": { name: "Integrals" },
-  "/markets/code": { name: "Code duels" },
-  "/markets/speed-math": { name: "Speed math" },
-  "/markets/logic": { name: "Logic" },
-  "/markets/chess": { name: "Chess" },
-  "/markets/trivia": { name: "Trivia" },
-  "/markets/live-web": { name: "Live web" },
-  "/markets/squads": { name: "Squads" },
-};
+export const CATEGORIES = Object.fromEntries(CATEGORY_CATALOG.map((c) => [c.path, { name: c.label }])) as Record<string, { name: string }>;

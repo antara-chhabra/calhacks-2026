@@ -59,13 +59,14 @@ export function seedToCents(seed: bigint): bigint {
 }
 
 export type CreateArgs = {
-  id: string; fighterIds: string[]; slots: number[]; problems: unknown[]; bettingWindowMs: number; timeLimitMs: number;
+  category?: string; id: string; fighterIds: string[]; slots: number[]; problems: unknown[]; bettingWindowMs: number; timeLimitMs: number;
   markets: { id: string; outcomes: string[]; seeds: bigint[] }[];
 };
 
 /** Returns an error code or null. */
 export function validateCreateMatch(a: CreateArgs): 'bad_match' | 'bad_market' | null {
-  if (!a.id) return 'bad_match';
+  if (!a.id || (a.category !== undefined && !['integrals', 'code', 'speed-math', 'logic', 'chess', 'trivia', 'web', 'squads'].includes(a.category))) return 'bad_match';
+  if (a.category === 'squads' && a.fighterIds.length !== 4) return 'bad_match';
   const n = a.fighterIds.length;
   if (n < 2 || n > 4 || a.slots.length !== n || new Set(a.fighterIds).size !== n || new Set(a.slots).size !== n) return 'bad_match';
   if (a.problems.length !== 5 || a.bettingWindowMs <= 0 || a.timeLimitMs <= 0) return 'bad_match';

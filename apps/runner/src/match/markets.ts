@@ -1,5 +1,5 @@
 // Market specs and seeds (PRD §11.8; HEAD decision: seed totals are dollars × 100 → cents).
-import type { MarketSpec } from '@fc/contracts';
+import type { Category, MarketSpec } from '@fc/contracts';
 import { scoreLine, seedSplit, winProbabilities } from '@fc/engine';
 import type { Candidate } from './types.js';
 
@@ -7,7 +7,7 @@ export const SEED_CENTS = { winner: 20000, score_line: 10000, beat_clock: 10000,
 export const RAKE_BPS = 500;
 export const BEAT_CLOCK_MS = 60_000;
 
-export function buildMarkets(matchId: string, picked: Candidate[], o: { beatClockRate?: number; scoreHistory?: Record<string, number[]> } = {}): MarketSpec[] {
+export function buildMarkets(matchId: string, picked: Candidate[], o: { beatClockRate?: number; scoreHistory?: Record<string, number[]>; category?: Category; slots?: number[] } = {}): MarketSpec[] {
   const ids = picked.map((c) => c.fighter.id);
   const elos: Record<string, number> = {};
   for (const c of picked) elos[c.fighter.id] = c.elo;
@@ -38,5 +38,13 @@ export function buildMarkets(matchId: string, picked: Candidate[], o: { beatCloc
     id: `${matchId}:first_blood`, kind: 'first_blood', subject: null, line: null, label: 'Who draws first blood?',
     outcomes: fbOutcomes, seeds: seedSplit(fbOutcomes.map(() => 1 / fbOutcomes.length), SEED_CENTS.first_blood), rakeBps: RAKE_BPS,
   };
+  if (o.category === 'squads') {
+    const team: MarketSpec = {
+      id: `${matchId}:team_winner`, kind: 'team_winner', subject: null, line: null,
+      label: `Team A (${picked.filter((_, i) => (o.slots?.[i] ?? i) < 2).map((c) => c.fighter.name).join(' + ')}) vs Team B (${picked.filter((_, i) => (o.slots?.[i] ?? i) >= 2).map((c) => c.fighter.name).join(' + ')})`,
+      outcomes: ['team_a', 'team_b'], seeds: seedSplit([0.5, 0.5], SEED_CENTS.winner), rakeBps: RAKE_BPS,
+    };
+    return [team, winner, score, beat, first];
+  }
   return [winner, score, beat, first];
 }
