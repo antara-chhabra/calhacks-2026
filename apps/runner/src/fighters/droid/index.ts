@@ -12,7 +12,7 @@ import { prepareSandbox } from './sandbox.js';
 import { answerLimit, problemPrompt, systemPrompt } from './prompts.js';
 import { speechAllowed } from '../speech.js';
 
-type Ready = { session: DroidSession; io?: FighterIO; solved: Set<ProblemIdx>; completed: boolean; timer?: ReturnType<typeof setTimeout>; stopTimer?: ReturnType<typeof setTimeout> };
+type Ready = { session: DroidSession; io?: FighterIO; solved: Set<ProblemIdx>; completed: boolean; taunts: number; timer?: ReturnType<typeof setTimeout>; stopTimer?: ReturnType<typeof setTimeout> };
 type Options = { createSession?: (options: CreateSessionOptions) => Promise<DroidSession>; prewarmTtlMs?: number };
 const wrapper = fileURLToPath(new URL('../../../bin/droid-sandboxed', import.meta.url));
 // Autonomy Off does not mediate read-only tools. Problems arrive in the prompt;
@@ -62,8 +62,11 @@ export function createDroidBackend(options: Options = {}): FighterBackend {
           if (verdict.ok) ready.solved.add(problem as ProblemIdx);
           if (input.problems.every((p) => ready!.solved.has(p.idx)) && !ready.completed) {
             ready.completed = true;
-            // Let the final verdict reach the tool caller before ending its turn.
-            ready.stopTimer = setTimeout(() => { void ready?.session.interrupt().catch(() => undefined); }, 25);
+            // Let the final verdict reach the tool caller before ending its turn; a fighter with taunts left gets a
+            // short window for its closing line, since taunt timing is part of the persona bettors price.
+            const tauntsLeft = ready.taunts < input.strategy.taunts;
+            ready.stopTimer = setTimeout(() => { void ready?.session.interrupt().catch(() => undefined); }, tauntsLeft ? 8_000 : 25);
+            if (tauntsLeft) return `${verdict.message} All problems solved. One closing taunt is allowed now, then stop.`;
           }
           return verdict.message;
         }),
@@ -71,6 +74,7 @@ export function createDroidBackend(options: Options = {}): FighterBackend {
         if (!ready?.io || ready.io.isOut() || ready.io.remainingMs() <= 0) return 'Not allowed: match is not live';
         if (!speechAllowed(text)) return 'Not allowed: stay in character and keep it family friendly';
         const verdict = await ready.io.say(text);
+        if (verdict.accepted) ready.taunts++;
         return verdict.accepted ? 'Crowd heard you.' : `Not allowed: ${verdict.reason ?? 'referee declined'}`;
       }),
     ] });
@@ -78,13 +82,14 @@ export function createDroidBackend(options: Options = {}): FighterBackend {
     const session = await spawn({
       modelId: input.modelId, ...(effort ? { reasoningEffort: effort } : {}),
       cwd: input.sandboxDir, autonomyLevel: AutonomyLevel.Off,
-      systemPrompt: { type: 'preset', preset: 'droid', append: await systemPrompt(input) },
+      // House fighters replace the coding preset with their droid definition; community personas stay appended flavor.
+      systemPrompt: input.origin === 'house' ? await systemPrompt(input) : { type: 'preset', preset: 'droid', append: await systemPrompt(input) },
       permissionHandler: createReferee(input, () => ready?.io, async () => { await ready?.session.interrupt(); }),
       askUserHandler: () => ({ cancelled: true, answers: [] }),
       disabledToolIds: [...H0_DISABLED_TOOLS],
       disableBuiltinSkills: true, mcpServers: [server], execPath: execPath(), env: minimalEnvironment(),
     });
-    ready = { session, solved: new Set(), completed: false };
+    ready = { session, solved: new Set(), completed: false, taunts: 0 };
     // Match creation/void can fail before run(). Do not retain a prewarm forever.
     ready.timer = setTimeout(() => { sessions.delete(key(input)); void session.close().catch(() => undefined); }, options.prewarmTtlMs ?? 120_000);
     ready.timer.unref();
