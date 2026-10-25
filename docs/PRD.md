@@ -2,8 +2,8 @@
 
 <!--meta
 version: 1.2.0
-status: H0 implementation integrated · Amendments A1–A2 applied; public deployment and full hostile-input acceptance remain unverified
-updated: 2026-10-25 05:00 PDT
+status: H0 implementation in workstream branches · Amendments A1–A2 applied; final merge, public deployment and full hostile-input acceptance remain unverified
+updated: 2026-10-25
 cycle: Re-baselined at every integration gate (§17.2)
 platform: Desktop web (Chrome/Safari, 1280–2560 px) for the arena; mobile web (iOS Safari / Android Chrome) for the spectator bet page. Node ≥ 22.9 runner. SpacetimeDB 2.x module (TypeScript).
 -->
