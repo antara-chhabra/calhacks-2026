@@ -26,15 +26,9 @@ export const place_bet = spacetimedb.reducer({ name: 'place_bet' },
     for (const b of ctx.db.bet.marketId.filter(marketId)) {
       if (b.bettor.isEqual(ctx.sender) && b.status !== 'void') already += b.stake;
     }
-    // Creators may back their own fighter to win (no incentive to throw), but not bet against it or on side markets.
-    let isCreator = false;
-    for (const fid of match.fighterIds) {
-      const f = ctx.db.fighter.id.find(fid);
-      if (f?.creator && f.creator.isEqual(ctx.sender)) {
-        const backingSelf = market.kind === 'winner' && outcome === fid;
-        if (!backingSelf) isCreator = true;
-      }
-    }
+    // Ledger (play-money) mode: creators may bet on any market of a match their fighter is in. With real stakes this
+    // must be restricted again (conflict of interest: a creator could bet against a fighter they control).
+    const isCreator = false;
 
     const err = validateBet({
       registered: true,
