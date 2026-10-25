@@ -1,14 +1,18 @@
 // Full match lifecycle: runMatchUntilReview (R-02a) + review + result + reveal + settle (R-02b).
 import { randomBytes } from 'node:crypto';
 import { rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import type { FightEnvelope, FighterId, Standing } from '@fc/contracts';
 import { canonicalJson, checkInvariants, resolveMarkets, type MatchState } from '@fc/engine';
 import { computeStandings, finalVerdicts, postFinalVerdicts, reduceLog } from './review.js';
 import { runMatchUntilReview } from './run.js';
 import { buildSettlement, type HistoryProvider } from './settle.js';
 import type { MatchDeps, MatchOpts, MatchRecord } from './types.js';
+
+// Outside the repository: a Droid session walks up from its cwd and would otherwise load the project's
+// AGENTS.md, CLAUDE.md and every .factory/droids persona into the fighter's context.
+export const FIGHTER_SANDBOX_ROOT = join(tmpdir(), 'fightcard-sandboxes');
 
 export type RunMatchDeps = MatchDeps & {
   /** Prior entries + stats per fighter (for stats / Elo K-factor). Default: empty history. */
@@ -38,7 +42,7 @@ export async function runMatch(deps: RunMatchDeps, opts: MatchOpts): Promise<Mat
   const { stdb } = deps;
   const log = deps.log ?? ((m: string) => console.warn(`[match] ${m}`));
   const matchId = opts.matchId ?? `m_${randomBytes(5).toString('hex')}`;
-  const sandbox = join(opts.sandboxRoot ?? fileURLToPath(new URL('../../../../.arena/sandboxes/', import.meta.url)), matchId);
+  const sandbox = join(opts.sandboxRoot ?? FIGHTER_SANDBOX_ROOT, matchId);
 
   // Collect the event log the runner sees (module events echo back through the subscription).
   const log_: FightEnvelope[] = [];

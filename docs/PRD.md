@@ -355,7 +355,7 @@ Each epic states its intent and owners, then lists requirements and acceptance c
 
 | ID | Requirement | Tier | State |
 |---|---|---|---|
-| FC-F-040 | House roster of six fighters (§8.1). Each has a persona file `agents/house/<id>.md` (identity, voice, strategy rules), a lines file `agents/house/<id>.lines.json` (intro, hit, miss, KO, victory; ≤ 80 chars each), an engine tier, and a hidden `modelId` read from `FC_MODEL_<ID>`. | MUST | Accepted |
+| FC-F-040 | House roster of six fighters (§8.1). Each has a persona defined as a Factory custom droid `.factory/droids/fc-<id>.md` (identity, voice, quirks, fixed doctrine, taunt bank; pinned by hash in `agents/house/personas.lock.json`), a lines file `agents/house/<id>.lines.json` (intro, hit, miss, KO, victory; ≤ 80 chars each), an engine tier, and a hidden `modelId` read from `FC_MODEL_<ID>`. | MUST | Accepted |
 | FC-F-041 | Droid backend. Per fighter per match: `createSession({ modelId, reasoningEffort, systemPrompt: { type: 'preset', preset: 'droid', append: rules + persona }, cwd: sandboxDir, autonomyLevel: AutonomyLevel.Off, permissionHandler: referee, mcpServers: [arenaServer], execPath: bin/droid-sandboxed })`. `sandboxDir` is a filesystem work directory, not an OS-isolated environment. Sessions are created at lock (pre-warm) and receive the problem prompt at `match.started`. The turn streams with `includePartialMessages: true` and is cut by an `AbortController` at the time limit. Sessions always close in `finally`. | MUST | Accepted |
 | FC-F-042 | In-process MCP server `arena` (`createSdkMcpServer` + `tool()`), with tools: `submit_answer({ problem: 1..5, antiderivative: string })`, which returns the live verdict text to the agent (§11.7), and `taunt({ text })`. These are the only ways a fighter affects the match. | MUST | Accepted |
 | FC-F-043 | Activity mapping (§11.7): `ToolCall` → `fighter.tool` (label sanitized, ≤ 48 chars, ≤ 1 per 1.5 s per fighter); thinking or text deltas → `fighter.thinking` (≤ 1 per 4 s); terminal `DroidResult.tokenUsage` → runner-side usage ledger (never broadcast with model info). | MUST | Accepted |
@@ -1354,7 +1354,7 @@ Cal-Hacks-2026/
 │     └─ src/payments/** · src/http/public-bookie.ts                               # O6
 ├─ agents/
 │  ├─ rules.md                                                                     # O5 (shared fighter rules prompt)
-│  └─ house/<id>.md · house/<id>.lines.json · house/<id>.strategy.json             # O5
+│  └─ house/<id>.lines.json · house/<id>.strategy.json · house/personas.lock.json  # O5 (personas: .factory/droids/fc-<id>.md)
 ├─ services/fetch-agent/**                                                         # O6 (Python, COULD)
 ├─ fixtures/matches/*.json                                                         # HEAD (golden-var, upset, red-card, mock-basic)
 ├─ scripts/
@@ -1734,14 +1734,14 @@ Live state: four horizontal points bars in fighter colors, a pulsing LIVE dot, t
 
 ### 11.2 House fighters: private strategy and persona files
 
-Each fighter is three files in `agents/house/`: `<id>.md` (persona prompt, ≤ 1 200 chars), `<id>.strategy.json` (`Strategy`, §8.2) and `<id>.lines.json` (canned lines). The persona prompt follows this outline and nothing else:
+Each fighter's persona is a Factory custom droid, `.factory/droids/fc-<id>.md` (A3): frontmatter `name: fc-<id>`, `description`, `model: inherit` (model ids stay in `.env`), `tools: ["Create", "Edit"]`, `mcpServers: ["arena"]`; the body is the system prompt. For house fighters the body **replaces** the Droid coding preset and leads the prompt as instructions, followed by `agents/rules.md` (rules win on conflict); the user turn restates "stay in character" with the taunt budget. Community personas stay untrusted flavor appended to the preset. Personas are static across matches: `agents/house/personas.lock.json` pins each file's sha256 and the runner refuses to start on a mismatch (`node scripts/lock-personas.mjs` plus a fighter version bump for a deliberate change). `<id>.strategy.json` (`Strategy`, §8.2) and `<id>.lines.json` (canned lines) stay alongside. Fighter sandboxes live in the OS temp dir, never inside the repo, so a Droid session cannot load project `AGENTS.md`/`CLAUDE.md` or other fighters' personas. The body follows this outline:
 
 ```
-# <NAME> — <Title>
-## Voice            (2–3 sentences: how you talk; ≤ 80-char lines)
-## How you fight    (the strategy, in the fighter's words — must match <id>.strategy.json)
-## Example lines    (3–5)
-## Never            (mention models, vendors or AI; break character in taunts; use the network)
+# Who you are          (identity and attitude)
+# Voice                (concrete language rules)
+# Quirks (always on)   (3–5 observable behaviors)
+# How you fight        (fixed doctrine — must match <id>.strategy.json; tested)
+# Taunt bank           (3–6 lines in register)
 ```
 
 | Fighter | `verify` | `order` | `risk` | `taunts` | Expected card shape |
@@ -1749,7 +1749,7 @@ Each fighter is three files in `agents/house/`: `<id>.md` (persona prompt, ≤ 1
 | VEX | false | in_order | bold | 3 | High SPD, low DIS, frequent VAR victim, volatile |
 | SAGE | true | in_order | cautious | 1 | High ACC/DIS/CON, low SPD |
 | GLITCH | false | hard_first | bold | 3 | High CLU, low CON, collects cards |
-| QUILL | false | in_order | cautious | 2 | Balanced; writes derivations to `scratch/` (visible "writing" activity) |
+| QUILL | false | in_order | cautious | 2 | Balanced; full derivation before every strike (slowest first submission) |
 | BRICK | true | points_per_risk | cautious | 1 | Very high CON, mid SPD; verification uses mathematical re-derivation, not Python |
 | PIP | false | easy_first | bold | 2 | Low OVR, occasional upsets (long odds) |
 

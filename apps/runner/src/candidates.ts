@@ -1,10 +1,12 @@
-// Scheduler candidates (FC-F-002). House fighters come from HOUSE_ROSTER + agents/house/<id>.{strategy.json,md} + agents/rules.md.
+// Scheduler candidates (FC-F-002). House fighters come from HOUSE_ROSTER + agents/house/<id>.strategy.json + the pinned
+// Factory droid persona .factory/droids/fc-<id>.md (agents/rules.md is added by the fighter prompt).
 // Model ids come from env FC_MODEL_<ID> and are never logged.
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { HOUSE_FIGHTERS, HOUSE_ROSTER, type FighterId, type Strategy } from '@fc/contracts';
 import type { Env } from './env.js';
+import { DEFAULT_REPO_ROOT, loadHouseDroid, readLock } from './fighters/droid/persona.js';
 import type { Candidate } from './match/types.js';
 
 const DEFAULT_AGENTS_ROOT = fileURLToPath(new URL('../../../agents/', import.meta.url));
@@ -17,15 +19,15 @@ export type CandidateSource = {
 };
 
 export function loadHouseCandidates(env: Env, agentsRoot: string = DEFAULT_AGENTS_ROOT): Candidate[] {
-  const read = (p: string) => (existsSync(p) ? readFileSync(p, 'utf8') : '');
-  const rules = read(join(agentsRoot, 'rules.md'));
+  const repoRoot = agentsRoot === DEFAULT_AGENTS_ROOT ? DEFAULT_REPO_ROOT : join(agentsRoot, '..');
+  const lock = readLock(repoRoot);
   const out: Candidate[] = [];
   for (const id of HOUSE_FIGHTERS) {
     const dir = join(agentsRoot, 'house');
     const sp = join(dir, `${id}.strategy.json`);
     if (!existsSync(sp)) continue;
     const strategy = JSON.parse(readFileSync(sp, 'utf8')) as Strategy;
-    const persona = [read(join(dir, `${id}.md`)), rules].filter(Boolean).join('\n\n');
+    const persona = loadHouseDroid(id, repoRoot, lock).body;
     const modelId = (env as unknown as Record<string, string | undefined>)[`FC_MODEL_${id.toUpperCase()}`] ?? null;
     const reasoningEffort = (env as unknown as Record<string, string | undefined>)[`FC_EFFORT_${id.toUpperCase()}`] ?? null;
     out.push({
