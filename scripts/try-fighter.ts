@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { createHash, randomUUID } from 'node:crypto';
-import { HOUSE_ROSTER, type HouseFighterId, type ProblemIdx, type Strategy } from '@fc/contracts';
+import { HOUSE_ROSTER, type Category, type HouseFighterId, type ProblemIdx, type Strategy } from '@fc/contracts';
 import { createDroidBackend } from '../apps/runner/src/fighters/droid/index.js';
 import { generateProblemSet, checkLive, checkFinal } from '../apps/runner/src/problems/index.js';
 import type { FighterIO, FighterRunInput } from '../apps/runner/src/fighters/types.js';
@@ -23,7 +23,9 @@ const tier = args.includes('--community') ? value('--community', 'standard') : n
 const neutral = args.includes('--neutral');
 const NEUTRAL = 'You are a fighter in an integral-solving arena. Solve the problems and submit answers.';
 if (tier && tier !== 'standard' && tier !== 'pro') throw new Error('Choose community tier standard or pro.');
-const problems = generateProblemSet(seed).problems;
+// --category <id> runs a challenge mode (integrals, code, speed-math, logic, chess, trivia; web needs a snapshot).
+const category = value('--category', 'integrals') as Category;
+const problems = generateProblemSet(seed, category).problems;
 const backend = createDroidBackend();
 
 function safe(s: string): string {
@@ -42,7 +44,10 @@ const results = await Promise.all(ids.map(async (id) => {
     matchId, fighter: tier ? { ...HOUSE_ROSTER[id], id: `f_try_${tier}` } : HOUSE_ROSTER[id], origin: tier ? 'community' : 'house', persona, strategy,
     modelId: process.env[tier ? `FC_TIER_${tier.toUpperCase()}_MODEL` : `FC_MODEL_${id.toUpperCase()}`] ?? null,
     reasoningEffort: process.env[`FC_EFFORT_${id.toUpperCase()}`] ?? null,
-    problems: problems.map(({ idx, difficulty, points, integrand, statementTex }) => ({ idx, difficulty, points, integrand, statementTex })),
+    category,
+    // Same public fields as match/run.ts: the evaluation prompt and format, never the hidden answer data.
+    problems: problems.map((p) => ({ idx: p.idx, difficulty: p.difficulty, points: p.points, integrand: p.integrand, statementTex: p.statementTex, category,
+      ...(p.evaluation ? { prompt: p.evaluation.prompt, answerFormat: p.evaluation.format } : { answerFormat: 'expression' as const }) })),
     timeLimitMs: seconds * 1000, deadlineAt: 0, sandboxDir, endpointUrl: null, submitUrl: null, token: null,
   };
   let denials = 0, submissions = 0, hits = 0, firstSubmissionMs: number | null = null;

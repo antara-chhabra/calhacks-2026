@@ -15,6 +15,13 @@ describe('admin client', () => {
     expect((init.headers as Record<string, string>).Authorization).toBe('Bearer tok123');
     expect(JSON.parse(init.body as string)).toEqual({ fighters: ['vex', 'pip'], betWindowS: 20 });
   });
+  it('forwards the selected category when creating a match', async () => {
+    const f = vi.fn(async () => res(201, { matchId: 'm1' }));
+    const c = createAdminClient('http://x:1', 'tok123', f as unknown as typeof fetch);
+    await c.createMatch({ category: 'squads', fighters: ['vex', 'pip'] });
+    const [, init] = f.mock.calls[0] as unknown as [string, RequestInit];
+    expect(JSON.parse(init.body as string)).toEqual({ category: 'squads', fighters: ['vex', 'pip'] });
+  });
   it('handles 204 and builds action paths', async () => {
     const f = vi.fn(async () => res(204));
     const c = createAdminClient('http://x:1', 't', f as unknown as typeof fetch);

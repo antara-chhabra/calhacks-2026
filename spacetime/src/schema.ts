@@ -65,6 +65,23 @@ export const fighterStats = table({ name: 'fighter_stats', public: true }, {
   earningsUsdc: t.f64(),
 });
 
+// Additive per-category history; legacy fighter_stats remains the integral card for existing clients.
+export const fighterCategoryStats = table({ name: 'fighter_category_stats', public: true }, {
+  id: t.string().primaryKey(), // fighterId:category
+  fighterId: t.string().index('btree'),
+  elo: t.f64(),
+  category: t.string(),
+  matches: t.u32(), wins: t.u32(), podiums: t.u32(),
+  avgScorePct: t.f64(),
+  spd: t.f64(), acc: t.f64(), clu: t.f64(), dis: t.f64(), grt: t.f64(), con: t.f64(), ovr: t.f64(),
+  form: t.string(),
+  streak: t.i32(),
+  upsetUntil: t.option(t.timestamp()),
+  eloHistory: t.array(t.f64()),
+  backersWon: t.u32(),
+  earningsUsdc: t.f64(),
+});
+
 export const match = table({ name: 'match', public: true }, {
   id: t.string().primaryKey(),
   number: t.u32(),
@@ -176,6 +193,6 @@ export const lockTimer = table({ name: 'lock_timer', public: false }, {
 });
 
 const spacetimedb = schema({
-  config, player, fighter, fighterSecret, fighterStats, match, entry, market, pool, bet, fightEvent, ledgerTx, purse, lockTimer,
+  config, player, fighter, fighterSecret, fighterStats, fighterCategoryStats, match, entry, market, pool, bet, fightEvent, ledgerTx, purse, lockTimer,
 });
 export default spacetimedb;

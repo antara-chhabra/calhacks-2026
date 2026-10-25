@@ -24,7 +24,7 @@ const row = (i: number) => ({ ...fixture.events[i]!, data: JSON.stringify(fixtur
 function setup(initialMatchId: string | null = null) {
   const store = createStore<Store>()(() => ({ ...useStore.getState(), conn: 'offline', me: null,
     watch: { ...useStore.getState().watch, matchId: initialMatchId, mode: 'live', state: initialMatchState(), playbackRevision: 0 } }));
-  const db = Object.fromEntries(['player', 'fighter', 'fighterStats', 'match', 'market', 'pool', 'bet', 'fightEvent'].map((k) => [k, new FakeTable()]));
+  const db = Object.fromEntries(['player', 'fighter', 'fighterStats', 'fighterCategoryStats', 'match', 'market', 'pool', 'bet', 'fightEvent'].map((k) => [k, new FakeTable()]));
   db.player!.rows = [{ identity: who, handle: 'fan', balanceCents: 10000n }];
   db.fighter!.rows = fixture.fighters.map((f) => ({ ...f, origin: 'house', status: 'active', elo: 1000, version: 1 }));
   const reducers = { placeBet: vi.fn(async () => {}), registerPlayer: vi.fn(async () => {}), creditTestFunds: vi.fn(async () => {}), createFighter: vi.fn(async () => {}) };

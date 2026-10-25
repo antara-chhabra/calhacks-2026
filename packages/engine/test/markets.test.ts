@@ -105,3 +105,18 @@ describe('resolveMarkets', () => {
     expect(resolveMarkets(s, [mk('bc', 'beat_clock', { line: 60000 })])).toEqual([{ marketId: 'bc', outcome: 'yes' }]);
   });
 });
+
+describe('squad team settlement', () => {
+  const teamMarket = mk('m:team_winner', 'team_winner', { outcomes: ['team_a', 'team_b'] });
+  const squad = (points: number[], times: (number | null)[] = [100, 200, 300, 400], misses = [0, 0, 0, 0]) => ({
+    ...state(['a', 'b', 'c', 'd'].map((id, slot) => live(id, slot as 0 | 1 | 2 | 3, slot + 1, {})), ['a', 'b', 'c', 'd'].map((id, i) => ({ ...standing(id, (i + 1) as 1 | 2 | 3 | 4, points[i]! / 150), points: points[i]!, lastScoreMs: times[i]!, misses: misses[i]! }))), category: 'squads' as const,
+  });
+  it('sums both teammates, even when the individual champion is on the losing side', () => {
+    expect(resolveMarkets(squad([150, 0, 100, 100]), [teamMarket])).toEqual([{ marketId: teamMarket.id, outcome: 'team_b' }]);
+  });
+  it('breaks equal totals by completion time, misses, then the fixed public team', () => {
+    expect(resolveMarkets(squad([100, 0, 50, 50], [300, null, 100, 200]), [teamMarket])[0]!.outcome).toBe('team_b');
+    expect(resolveMarkets(squad([50, 50, 50, 50], [100, 200, 100, 200], [2, 0, 0, 0]), [teamMarket])[0]!.outcome).toBe('team_b');
+    expect(resolveMarkets(squad([0, 0, 0, 0], [null, null, null, null]), [teamMarket])[0]!.outcome).toBe('team_a');
+  });
+});

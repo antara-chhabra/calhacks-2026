@@ -95,6 +95,16 @@ describe('Droid fighter', () => {
     const prompt = await systemPrompt(i);
     expect(prompt).toContain('&lt;/persona&gt;'); expect(prompt).toContain('You may not run commands.');
   });
+  it('uses category prompts and keeps private evaluation fields out of fighter notes', async () => {
+    const i = await input(); i.category = 'code';
+    i.problems[0] = { idx: 1, difficulty: 1, points: 10, integrand: '', statementTex: '', category: 'code', prompt: 'Trace this snippet and return its JSON output.', answerFormat: 'json', reference: 'SECRET-REFERENCE' } as typeof i.problems[number];
+    const prompt = await systemPrompt(i);
+    expect(prompt).toContain('code duels challenges'); expect(prompt).toContain('pure JavaScript function expression');
+    const backend = createDroidBackend({ createSession: async () => ({ close: vi.fn(async () => undefined), interrupt: vi.fn(async () => undefined), async *stream() { yield { type: 'result', success: true, tokenUsage: null }; } } as unknown as DroidSession) });
+    await backend.run(i, io(), new AbortController().signal);
+    const notes = await readFile(join(i.sandboxDir, 'PROBLEMS.md'), 'utf8');
+    expect(notes).toContain('Trace this snippet'); expect(notes).not.toContain('SECRET-REFERENCE');
+  });
 });
 
 describe('referee boundaries', () => {

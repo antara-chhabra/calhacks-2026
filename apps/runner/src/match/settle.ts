@@ -1,17 +1,17 @@
 // Settlement inputs (R-02b): Elo (live, non-demo matches only) and card stats (PRD §11.8–11.9, §16.2 #8).
-import type { EntryRow, FighterId, FighterStats, Standing } from '@fc/contracts';
+import type { Category, EntryRow, FighterId, FighterStats, Standing } from '@fc/contracts';
 import { computeStats, updateElo } from '@fc/engine';
 import type { MatchRecord } from './types.js';
 
 /** Past entries and the previous stats row of one fighter. */
-export type FighterHistory = { entries: EntryRow[]; stats: FighterStats | null };
-export type HistoryProvider = (fighterId: FighterId) => Promise<FighterHistory> | FighterHistory;
+export type FighterHistory = { entries: EntryRow[]; stats: FighterStats | null; elo?: number };
+export type HistoryProvider = (fighterId: FighterId, category?: Category) => Promise<FighterHistory> | FighterHistory;
 
 const realEntry = (e: EntryRow) => e.mode === 'live' && !e.isDemo && !e.voided;
 
 export async function buildSettlement(rec: MatchRecord, standings: Standing[], history: HistoryProvider | undefined, now: number) {
   const hist = new Map<FighterId, FighterHistory>();
-  for (const id of rec.fighters) hist.set(id, (await history?.(id)) ?? { entries: [], stats: null });
+  for (const id of rec.fighters) hist.set(id, (await history?.(id, rec.category)) ?? { entries: [], stats: null });
   const eloBefore = new Map(rec.candidates.map((c) => [c.fighter.id, c.elo]));
   const counts = rec.mode === 'live' && !rec.isDemo;
 

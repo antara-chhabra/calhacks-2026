@@ -96,6 +96,18 @@ export function createMockBackend(opts: MockOptions = {}): FighterBackend {
       };
 
       const wrongAnswer = (p: FighterProblem, correct: string | null): string => {
+        if (p.answerFormat === 'json') {
+          if (rnd() < prof.pInvalidSyntax) return '{';
+          if (correct != null) {
+            try {
+              const value: unknown = JSON.parse(correct);
+              if (value && typeof value === 'object' && !Array.isArray(value)) return JSON.stringify({ ...value, __mock_wrong: true });
+            } catch { /* use a valid generic JSON answer below */ }
+          }
+          return JSON.stringify({ answer: 'mock-wrong' });
+        }
+        if (p.answerFormat === 'number') return rnd() < prof.pInvalidSyntax ? 'not-a-number' : String(Number(correct ?? 0) + 1);
+        if (p.answerFormat === 'text') return rnd() < prof.pInvalidSyntax ? '' : (correct == null ? 'mock-wrong' : `${correct} (mock-wrong)`);
         if (rnd() < prof.pSloppy) {
           if (correct == null) return SLOPPY_FALLBACK;
           return correct.includes('abs(') ? correct.replace(/abs\(/g, '(') : `${correct} + x`;   // missing |·| or lost constant-ish term

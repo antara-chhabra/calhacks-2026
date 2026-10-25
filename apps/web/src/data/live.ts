@@ -48,8 +48,8 @@ export type LiveOptions = {
   loadBindings?: () => Promise<Bindings>;
   storage?: StorageLike;
 };
-const boardTables = ['player', 'fighter', 'fighterStats', 'match', 'market', 'pool', 'bet'];
-const boardQueries = ['player', 'fighter', 'fighter_stats', 'match', 'market', 'pool', 'bet'].map((t) => `SELECT * FROM ${t}`);
+const boardTables = ['player', 'fighter', 'fighterStats', 'fighterCategoryStats', 'match', 'market', 'pool', 'bet'];
+const boardQueries = ['player', 'fighter', 'fighter_stats', 'fighter_category_stats', 'match', 'market', 'pool', 'bet'].map((t) => `SELECT * FROM ${t}`);
 const idHex = (id: Identity | string | undefined | null): string | null => id == null ? null : typeof id === 'string' ? id : id.toHexString();
 export const timestampMs = (t: unknown): number | null => {
   if (t == null) return null;
@@ -99,19 +99,20 @@ export function createLiveAdapter(o: LiveOptions): LiveAdapter {
       const me = players.find((p) => idHex(p.identity) === identity);
       const stats = new Map<string, FighterStats>();
       for (const r of cached('fighterStats')) stats.set(r.fighterId, fighterStatsSchema.parse({ ...r, upsetUntil: timestampMs(r.upsetUntil) }));
+      const categoryRows = cached('fighterCategoryStats');
       const fighters: Store['fighters'] = {};
       for (const r of cached('fighter')) {
         const s = stats.get(r.id) ?? null;
         const provisional = r.status === 'provisional';
         const f: FighterCardData = { ...fighterPublicSchema.parse(r), origin: r.origin, status: r.status,
           creatorHandle: players.find((p) => idHex(p.identity) === idHex(r.creator))?.handle ?? null,
-          elo: Number(r.elo), stats: s, frame: s ? cardFrame(s, provisional, Date.now()) : provisional ? 'rookie' : 'bronze',
+          elo: Number(r.elo), stats: s, categoryStats: Object.fromEntries(categoryRows.filter((row) => row.fighterId === r.id).map((row) => [row.category, fighterStatsSchema.parse({ ...row, upsetUntil: timestampMs(row.upsetUntil) })])), frame: s ? cardFrame(s, provisional, Date.now()) : provisional ? 'rookie' : 'bronze',
           walletAddress: r.walletAddress ?? null, version: Number(r.version) };
         fighters[f.id] = f;
       }
       const matches: Store['matches'] = {};
       for (const r of cached('match')) {
-        const m: MatchRow = { id: r.id, number: Number(r.number), status: r.status, mode: r.mode, isDemo: r.isDemo,
+        const m: MatchRow = { slots: Array.from(r.slots ?? []), category: r.category, id: r.id, number: Number(r.number), status: r.status, mode: r.mode, isDemo: r.isDemo,
           fighterIds: r.fighterIds, problems: r.problems, commitHash: r.commitHash,
           bettingClosesAt: timestampMs(r.bettingClosesAt)!, startedAt: timestampMs(r.startedAt), timeLimitMs: Number(r.timeLimitMs), winnerId: r.winnerId ?? null };
         matches[m.id] = m;
@@ -191,7 +192,7 @@ export function createLiveAdapter(o: LiveOptions): LiveAdapter {
         conn = c; identity = idHex(who); saveToken(auth); retryMs = 1000;
         for (const key of boardTables) {
           const t = c.db[key];
-          t.onInsert(queueBoard); t.onUpdate?.(queueBoard); t.onDelete?.(queueBoard);
+          t?.onInsert(queueBoard); t?.onUpdate?.(queueBoard); t?.onDelete?.(queueBoard);
         }
         c.db.fightEvent.onInsert(receive);
         c.subscriptionBuilder().onApplied(() => { if (stopped || gen !== generation) return; applied = true; publishBoard(); }).onError(offline).subscribe(boardQueries);

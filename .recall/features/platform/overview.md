@@ -8,27 +8,27 @@
 Workstream O2 of the Fight Card build. React UI: lobby, match HUD, bet slip, results, FIFA cards, profiles, leaderboard, Forge, /m mobile, Director (E08, E09, E11 UI, E12). Owns exactly the paths above (PRD §9.3, §17.5); everything else is read-only for this workstream.
 
 ## Current state
-- **Direction changed (founder, 2026-10-25 ~01:55):** the UI is built in code from **KokonutUI** in a black, minimal Kalshi/Polymarket style. Figma is no longer used for UI. The PRD §10 navy/gold design is superseded for the platform (needs a HEAD amendment).
-- `apps/web` exists: Vite 5.4 + React 19.1 + Tailwind 4.1 + react-router 6.30 + motion + lucide. KokonutUI components are installed via the shadcn registry `@kokonutui` into `src/components/kokonutui/` (owned code).
-- Routes: `/` is the Flow Field entry page ("Fight Card", "AI agents fight. You call it."). `/markets` and `/markets/:category` are the dashboard: Morphic Navbar categories; a bento board (leaderboard + Enter-the-arena / movers, recent bets, Build-your-agent); live bet and fight trackers (`StepTracker`, from Currency Transfer); a Metric Card ("Your chips earned"); agent tiles; a prediction hub with interest filters.
-- All data is mock (`src/ui/mock.ts`). Buttons are visual only. Avatars are monograms; agent and arena art are deferred.
-- Verified: tsc clean, `vite build` OK, no console errors, 1440 px + 375 px renders. Run with `npm --prefix apps/web run dev` (port 5173).
-- Figma reference file (v1 + v2 frames, agents v2, volcanic arena): https://www.figma.com/design/l4pXxI22J9zzAUxfjsdrCz
+
+- A3 challenge implementation is now merged into main at6f90ac8; merged-main typecheck,624 tests and production build pass. The pre-merge session remains historical evidence.
+- A3 on ws/challenges @ 6a3b1d2 enables all eight catalog routes/leaderboard tabs and Director category selection. Season2 walls and nonintegral integral-preview substitution are removed.
+- Lobby poster, odds, results and bet feed filter by category; empty categories show honest mechanics/activity copy. Category-specific leaderboard rows use category stats or an unrated1000 baseline; their card data matches the selected category.
+- Squad labels use recorded slots (0/1 TeamA, 2/3 TeamB), not shuffled candidate order. Results show the authoritative settled team_winner result and combined score; individual standings remain visible.
+- Revealed nonintegral prompts render as plain text once; accepted answers/hidden code cases/reference are visible only after reveal. Legacy integral-only details are hidden for other modes.
+- Web249 tests/typecheck/build pass. Brave verified eight-category nav, actual Code Duel filtering and persisted Code leaderboard Elo with integral records remaining unrated. Later full visual pass was interrupted by browser connection changes; squad fixes have targeted regression evidence. Impeccable checks reported no findings.
 
 ## Open threads
-- [ ] Wire `src/data/**` SpacetimeDB bridge (HEAD, PRD §8.7) in place of `src/ui/mock.ts`
-- [ ] Bet slip / place-bet flow; match page with the arena canvas; Forge page; `/m` mobile bet page; card modal
-- [ ] Agent and arena art (use Figma v2 frames as reference)
-- [ ] Root npm workspaces (K-01) so `apps/web` joins the monorepo
-- [ ] Ask HEAD to amend PRD §9.2 (React 19, Tailwind v4, KokonutUI) and §10 (market UI direction)
-- [ ] Task cards still apply where relevant: U-02–U-05 (P1) · U-09 (P2) · U-06–U-08 (P3) · U-10 (P4)
+
+- [ ] Publish matching A3 module/runner/web revision and validate public/mobile category flows; code merge is complete.
+- [ ] Resolve existing arena floating-name overlap and live Forge preview separately.
 
 ## Key files
-- `apps/web/src/pages/Markets.tsx`: dashboard composition
-- `apps/web/src/ui/widgets.tsx`: bento tile bodies; `src/ui/mock.ts`: mock data
-- `apps/web/src/components/fightcard/step-tracker.tsx`: bet/fight tracker
-- `apps/web/src/components/kokonutui/morphic-navbar.tsx`: react-router shim at the top
-- `docs/PRD.md` §17.6 (O2 task cards) and §17.5 (charter)
+
+- apps/web/src/pages/Markets.tsx; ui/lobby/selectors.ts — active category routes and filtered data.
+- apps/web/src/ui/{director,leaderboard,match,receipt}/** — controls, records, team results and reveal.
+- apps/web/src/data/{store,live,board}.ts — category/slot/categoryStats public mapping.
 
 ## Recent sessions
+
+- [2026-10-25-challenge-categories](sessions/2026-10-25-challenge-categories.md) — A3 challenge build, real evidence and pre-merge handoff [deep]
+- [2026-10-25-verified-build-handoff](sessions/2026-10-25-verified-build-handoff.md) — verified build, unmerged branch evidence and remaining work [deep]
 - 2026-10-25-kokonut-market-ui — Figma v1/v2 design, then KokonutUI market UI in code [deep]

@@ -98,3 +98,42 @@ Verification:
 - Earlier local four-Droid match `real_mvnqmsz4` settled with all four fighters submitting, 80 valid events, a verified reveal and real Elo/history updates. VEX/SAGE/BRICK scored 150; QUILL scored 30. Earlier normal live smoke and original-timing demo smoke also passed.
 
 Remaining independent work: Maincloud/public deployment and phone-on-cellular acceptance; actual golden VAR/upset/red-card recordings; community-fighter rotation and persisted candidate-history loading (the candidate source still has its database TODO); a real OS-isolated executor before enabling native commands; optional direct-provider/public BYO end-to-end validation; the arena jumbotron/name-tag overlap, live Forge preview and recompute `--apply` reducer. These are not silently marked done by the branch checks above.
+
+
+## A3 challenge expansion — verified on ws/challenges (2026-10-25)
+
+User explicitly requested every visible duel category on the existing backend. This revision starts from merged baseline `638e598`, lives in `.arena/worktrees/fc-challenges` on `ws/challenges`, and has not been merged or deployed to Maincloud/public hosting.
+
+- Active catalog: integrals, code, speed-math, logic, chess puzzles, trivia, web, squads. Category-aware fighter prompts and evaluators reuse the existing lifecycle, event schema/cues, commit/reveal, markets, ledger and settlement. Director selects categories; the season cycles the catalog. Public tabs and leaderboards have no Season 2 wall or integral-preview substitution.
+- Code Duel accepts actual pure JavaScript functions. Fresh QuickJS WebAssembly VM per case, 8 MiB memory / 512 KiB stack / 100 ms interrupt, no host bindings; three live cases versus 12 final hidden cases. Adversarial tests cover hangs, memory pressure, host access, async/non-JSON output, serialization tampering and depth. Native Droid execution remains disabled; this is not an OS-containment claim.
+- Live Web fetches current official HN API data before any market exists, freezes source IDs/timestamps/fields in the commitment, and embeds quoted source data in fighter prompts. Fixed HTTPS fetches, redirect rejection, 5s abort and streaming byte caps; extraction is deterministic against the captured snapshot. Source failure rejects startup with 503 challenge_unavailable and releases the slot.
+- Squads: slots 0/1 versus 2/3 regardless of shuffled candidate order; combined-score team market with deterministic tie-break; teammate targeting excluded; team labels and results derive from recorded slots/settled team market.
+- Additive `fighter_category_stats` keeps separate category Elo/stats; old fighter_stats/fighter.elo remain the integral card. Runner reloads persisted history by category after reconnect; other categories begin at 1000. Mock/demo cannot advance competitive history. Generated bindings are ignored.
+
+Verification:
+- Full workspace: typecheck PASS; 624 tests PASS (contracts36, engine83, web249, runner179, module77), one opt-in live adapter test skipped; production web build PASS. Later streaming-source hardening and pre-create schema validation passed focused category/lifecycle checks and full typecheck.
+- The opt-in two-client real SDK adapter integration also passed separately (new table subscriptions, bets, catch-up/live cues, fairness reveal, ledger settlement and Forge propagation).
+- New isolated local module `fightcard-challenges` published with --delete-data=never; no existing local or Maincloud data changed.
+- All eight categories completed an explicitly MOCK reference-backend smoke against the actual database, with two independent bettors, gapless event/hash checks and exact ledger balance/payout reconciliation. `scripts/smoke-challenges.ts` is the reusable acceptance command.
+- Seven actual four-Droid matches (mode live, not demo) settled, all with two actual ledger bettors and verified reveal; each reconnected runner found its persisted category entries/stats:
+  - code: challenge_code_mvnup37h, 90 events, all four scored150.
+  - speed-math: challenge_speed-math_mvnupd3s, 86 events, all four scored150.
+  - logic: challenge_logic_mvnupknh, 86 events, all four scored150.
+  - chess: challenge_chess_mvnus3x3, 118 events; SAGE150, QUILL150, VEX145, BRICK140.
+  - trivia: challenge_trivia_mvnut33l, 94 events, all four scored150.
+  - web: challenge_web_mvnuthzu, 87 events, all four scored150 from a fresh snapshot.
+  - squads: challenge_squads_mvnutr6m, 87 events, all four scored150; five markets including team_winner settled.
+- Full match tests cover every category, no reference/test leakage, true code VAR overturns, source-failure cleanup, HTTP category validation and shuffled team membership/settlement/targeting.
+- Brave verified active eight-category navigation, correct Code Duel match/feed/results filtering, and real per-category leaderboard records (integrals stayed unrated; Code had persisted Elo/card rows). Later full visual inspection was interrupted when the browser connection changed; subsequent squad UI fixes have focused regression coverage, not a claimed second full visual pass. Impeccable checks reported no UI findings.
+- Private-value scan of changed source and production JS/CSS/HTML passed; no private model values, API keys or runner tokens printed/committed.
+
+Local review setup (check liveness on resume): web `http://127.0.0.1:5182/markets`; challenge runner admin/public `127.0.0.1:8791/8792`, automatic season OFF; database fightcard-challenges on local port3000. Private test identity/start wrapper/results live under ignored `.arena/` in this worktree. Existing public deployment remains on the earlier baseline.
+
+Next integration step when authorized: merge `ws/challenges`, publish the additive schema without data deletion, regenerate bindings, and deploy the matching runner/web revision together. Prior independent gaps (community candidate loading/debut, actual golden recordings, recompute --apply, live Forge preview and arena label overlap) are outside this category expansion. Chess is a puzzle category, not a full chess game; native executors and real money rails remain deferred.
+
+
+## A3 merge complete — 2026-10-25
+
+User requested recall dump then merge. Shared split recall committed first as `1e5913b`; `ws/challenges` (`6a3b1d2`) then merged cleanly into `main` as `6f90ac8`. Installed the merged lockfile and regenerated ignored web/runner bindings. Typecheck, all624 package tests (36/83/249/179/77), and production web build pass on actual merged main. The opt-in SDK integration had passed separately on the identical challenge source. Merged-main all8-category actual-database smoke PASS: two independent bettors,45 events per match,4 markets per individual mode/5 for squads, verified reveals and reconciled ledger payouts. Local service had stopped; restarted its existing persistent data directory before the successful rerun. No republish or data deletion was needed.
+
+No Maincloud publish or public process cutover occurred. Independent `ws/personas` remains unmerged and its worktree/serving environment were not modified. Do not use the earlier pre-merge “remaining integration” paragraph as the current code state.

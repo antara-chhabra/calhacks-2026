@@ -2,7 +2,7 @@ import { mkdtemp, mkdir, readFile, rm, writeFile, cp } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { HOUSE_FIGHTERS, HOUSE_ROSTER, type Strategy } from '@fc/contracts';
+import { CATEGORY_CATALOG, HOUSE_FIGHTERS, HOUSE_ROSTER, type Strategy } from '@fc/contracts';
 import { DEFAULT_REPO_ROOT, droidPath, loadHouseDroid, loadHouseDroids, parseDroid } from './persona.js';
 import { systemPrompt } from './prompts.js';
 import type { FighterRunInput } from '../types.js';
@@ -24,6 +24,14 @@ describe('house personas (Factory custom droids)', () => {
       expect(d.body).not.toMatch(/python|sympy|\bclaude\b|\bgpt|openai|anthropic/i);   // no unavailable tools, no vendors
     }
     expect(new Set(droids.map((d) => d.sha256)).size).toBe(6);
+  });
+
+  it('pins one fixed line per challenge mode, so behavior is defined for every category', () => {
+    for (const d of loadHouseDroids()) {
+      const section = d.body.slice(d.body.search(/# by mode/i));
+      expect(section, `${d.id} By mode section`).toMatch(/# by mode/i);
+      for (const c of CATEGORY_CATALOG) expect(section, `${d.id} ${c.id}`).toMatch(new RegExp(`^- ${c.label}:`, 'im'));
+    }
   });
 
   it('keeps each persona doctrine consistent with its strategy.json', async () => {
@@ -60,7 +68,7 @@ describe('house personas (Factory custom droids)', () => {
 
   it('leads the house system prompt with the persona as instructions, with arena rules after it', async () => {
     const vex = loadHouseDroid('vex');
-    const input = { origin: 'house', persona: vex.body, strategy: await strategyOf('vex'), timeLimitMs: 120_000 } as unknown as FighterRunInput;
+    const input = { origin: 'house', persona: vex.body, strategy: await strategyOf('vex'), timeLimitMs: 120_000, problems: [] } as unknown as FighterRunInput;
     const prompt = await systemPrompt(input);
     expect(prompt.startsWith('You are VEX')).toBe(true);
     expect(prompt.indexOf('THE MATCH')).toBeGreaterThan(prompt.indexOf('Taunt bank'));

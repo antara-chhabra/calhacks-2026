@@ -1,5 +1,5 @@
 // Director panel (FC-F-007). Token from location.hash -> sessionStorage; polls health (3 s) and log (3 s).
-import { HOUSE_ROSTER } from '@fc/contracts';
+import { CATEGORY_CATALOG, HOUSE_ROSTER, type Category } from '@fc/contracts';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ButtonX, LiveDot, Modal, Panel, toast } from '@/components/fightcard/primitives';
 import { config } from '@/config';
@@ -27,6 +27,7 @@ export function DirectorPanel() {
   const [lines, setLines] = useState<string[]>([]);
   const [matchId, setMatchId] = useState('');
   const [picked, setPicked] = useState<string[]>([]);
+  const [category, setCategory] = useState<Category>('integrals');
   const [windowS, setWindowS] = useState('');
   const [demoFx, setDemoFx] = useState('');
   const [voidOpen, setVoidOpen] = useState(false);
@@ -114,17 +115,23 @@ export function DirectorPanel() {
 
       <div className="grid gap-4 md:grid-cols-2">
         <Panel title="Create match">
+          <label className="mb-1 block text-[12px] text-zinc-400">Challenge category
+            <select aria-label="Challenge category" className="mt-1 block h-9 w-full rounded-lg bg-zinc-900 px-3 text-sm text-zinc-100 ring-1 ring-zinc-800 outline-hidden focus-visible:ring-zinc-400" onChange={(e) => setCategory(e.target.value as Category)} value={category}>
+              {CATEGORY_CATALOG.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
+            </select>
+          </label>
+          <p className="mb-3 text-[11px] leading-relaxed text-zinc-500">{CATEGORY_CATALOG.find((c) => c.id === category)?.description}</p>
           <div className="mb-2 flex flex-wrap gap-1.5" role="group" aria-label="Fighters">
             {Object.entries(HOUSE_ROSTER).map(([id, f]) => (
               <button aria-pressed={picked.includes(id)} className={cn('rounded-full px-3 py-1 text-[12px] ring-1', picked.includes(id) ? 'bg-zinc-100 text-zinc-900 ring-zinc-100' : 'bg-zinc-900 text-zinc-300 ring-zinc-800 hover:ring-zinc-600')} key={id} onClick={() => toggleFighter(id)} type="button">{f.name}</button>
             ))}
           </div>
-          <p className="mb-3 text-[11px] text-zinc-500">{picked.length === 0 ? 'No selection: the runner picks fighters.' : picked.length < 2 ? 'Pick at least 2 fighters (max 8).' : `${picked.length} selected`}</p>
+          <p className="mb-3 text-[11px] text-zinc-500">{picked.length === 0 ? 'No selection: four fighters are picked automatically.' : picked.length < 4 ? 'Select at least 4 fighters.' : `${picked.length} selected`}</p>
           <label className="mb-3 block text-[12px] text-zinc-400">Bet window (seconds)
             <input className="mt-1 block h-9 w-28 rounded-lg bg-zinc-900 px-3 text-sm text-zinc-100 ring-1 ring-zinc-800 outline-hidden focus-visible:ring-zinc-400" inputMode="numeric" onChange={(e) => setWindowS(e.target.value.replace(/\D/g, ''))} placeholder="default" value={windowS} />
           </label>
-          <ButtonX disabled={dis || (picked.length > 0 && picked.length < 2)} loading={busy === 'create'} onClick={() => void run('create', async () => {
-            const r = await client.createMatch({ ...(picked.length ? { fighters: picked } : {}), ...(wnum >= 1 ? { betWindowS: wnum } : {}) });
+          <ButtonX disabled={dis || (picked.length > 0 && picked.length < 4)} loading={busy === 'create'} onClick={() => void run('create', async () => {
+            const r = await client.createMatch({ category, ...(picked.length ? { fighters: picked } : {}), ...(wnum >= 1 ? { betWindowS: wnum } : {}) });
             setMatchId(r.matchId);
           }, 'Match created')} tone="primary">Create match now</ButtonX>
         </Panel>
