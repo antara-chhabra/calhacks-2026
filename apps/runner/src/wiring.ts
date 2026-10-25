@@ -10,6 +10,7 @@ import { createMockBackend } from './fighters/mock.js';
 import { getBackend } from './fighters/registry.js';
 import type { FighterBackend } from './fighters/types.js';
 import { createFunding } from './funding.js';
+import { DemoError, loadDemoFixture, runDemoMatch } from './match/demo.js';
 import { runMatch, type MatchSummary, type RunMatchDeps } from './match/lifecycle.js';
 import type { Candidate, MatchOpts } from './match/types.js';
 import { generateProblemSet } from './problems/index.js';
@@ -26,6 +27,10 @@ export type WireOverrides = {
   matchOpts?: Partial<Omit<MatchOpts, 'candidates'>>;
   agentsRoot?: string;
   seasonGapMs?: number;
+  /** Demo clock seams for deterministic integration tests. */
+  demoNow?: () => number;
+  demoSleep?: (ms: number) => Promise<void>;
+  demoFixtureRoot?: string;
   log?: (m: string) => void;
 };
 
@@ -67,6 +72,17 @@ export async function wire(env: Env = loadEnv(), o: WireOverrides = {}): Promise
   const [stdb, payments] = await Promise.all([o.stdb ? Promise.resolve(o.stdb) : connectStdb(env), o.payments ?? createPayments()]);
   const log = o.log ?? ((m: string) => console.warn(`[runner] ${m}`));
   const candidates = createCandidateSource(env, { agentsRoot: o.agentsRoot });
+  if (stdb.status() === 'ok') {
+    const house = (await candidates.list()).filter((c) => c.origin === 'house');
+    try {
+      await Promise.all(house.map((c) => stdb.upsertHouseFighter({
+        fighter: { ...c.fighter, strategy: c.strategy, tier: c.tier ?? 'standard' },
+      })));
+    } catch {
+      stdb.close();
+      throw new Error('House fighter registration failed; runner cannot start against this SpacetimeDB instance.');
+    }
+  }
 
   // Reference answers for the mock engine: the backend only sees FighterProblem, so keep the problem sets of live matches.
   const liveSets = new Map<string, Problem[]>();
@@ -88,7 +104,8 @@ export async function wire(env: Env = loadEnv(), o: WireOverrides = {}): Promise
 
   let director!: Director;
   const aborts = new Map<string, AbortController>();
-  let busy = false;   // one match at a time across director + season loop
+  const activeRuns = new Set<Promise<unknown>>();
+  let busy = false;   // one match at a time across director + season + demo
 
   /** Start one match. Returns as soon as the id exists; `done` settles with the summary. */
   function startOne(opts: Omit<MatchOpts, 'candidates'> & { candidates: Candidate[] }, track: boolean): { matchId: string; done: Promise<MatchSummary> } {
@@ -100,10 +117,11 @@ export async function wire(env: Env = loadEnv(), o: WireOverrides = {}): Promise
     const ctl = new AbortController();
     aborts.set(matchId, ctl);
     const off = track ? stdb.onEvent(matchId, (e) => { const s = EVENT_STATUS[e.type]; if (s) director.setMatchStatus(matchId, s); }) : () => {};
-    const done = runMatch(deps, { ...opts, matchId, seed, signal: ctl.signal }).then((s) => {
-      candidates.played(s.standings.map((x) => x.fighterId), s.elo);
+    const done = runMatch(deps, { ...opts, matchId, seed, signal: ctl.signal, mode: opts.mode ?? (env.FC_ENGINE === 'mock' ? 'mock' : 'live') }).then((s) => {
+      if (s.mode === 'live' && !s.isDemo) candidates.played(s.standings.map((x) => x.fighterId), s.elo);
       return s;
-    }).finally(() => { off(); liveSets.delete(matchId); aborts.delete(matchId); busy = false; });
+    }).finally(() => { off(); liveSets.delete(matchId); aborts.delete(matchId); busy = false; activeRuns.delete(done); });
+    activeRuns.add(done);
     return { matchId, done };
   }
 
@@ -124,9 +142,42 @@ export async function wire(env: Env = loadEnv(), o: WireOverrides = {}): Promise
     onPause: (r) => director.pauseSeason(r),
   });
 
+  async function startDemo(fixture: string): Promise<{ matchId: string; done: Promise<unknown> }> {
+    // Loading validates the named fixture before the shared slot is acquired.
+    let validated;
+    try { validated = await loadDemoFixture(fixture, o.demoFixtureRoot); }
+    catch (error) {
+      if (error instanceof DemoError) throw new DirectorError(error.code === 'fixture_unavailable' ? 404 : 400, error.code, error.message);
+      throw error;
+    }
+    director.setSeason(false); // an explicit demo pauses the season loop
+    if (busy) throw new DirectorError(409, 'match_active', 'A match is already active');
+    busy = true;
+    const matchId = `m_demo_${randomBytes(6).toString('hex')}`;
+    const ctl = new AbortController();
+    aborts.set(matchId, ctl);
+    let created = false;
+    let resolveStarted!: (value: { matchId: string; done: Promise<unknown> }) => void;
+    let rejectStarted!: (error: unknown) => void;
+    const started = new Promise<{ matchId: string; done: Promise<unknown> }>((resolve, reject) => { resolveStarted = resolve; rejectStarted = reject; });
+    const off = stdb.onEvent(matchId, (e) => { const s = EVENT_STATUS[e.type]; if (s) director.setMatchStatus(matchId, s); });
+    const done = runDemoMatch({ stdb, log, now: o.demoNow, sleep: o.demoSleep }, {
+      fixture: validated, matchId, signal: ctl.signal,
+      onCreated(id) {
+        created = true;
+        resolveStarted({ matchId: id, done });
+      },
+    }).finally(() => { off(); aborts.delete(matchId); busy = false; activeRuns.delete(done); });
+    activeRuns.add(done);
+    // Failure before creation rejects the command. A post-create failure is reported on `done`.
+    void done.catch((error) => { if (!created) rejectStarted(error); });
+    return await started;
+  }
+
   director = new Director({
     mode: env.FC_MODE, engine: env.FC_ENGINE,
     async runMatch(opts) {
+      if (env.FC_MODE === 'demo') return startDemo('golden-var');
       const all = await candidates.list();
       const pool = opts.fighters ? all.filter((c) => opts.fighters!.includes(c.fighter.id)) : all;
       if (pool.length < 4) throw new DirectorError(400, 'not_enough_fighters', 'Need at least 4 eligible fighters');
@@ -136,6 +187,8 @@ export async function wire(env: Env = loadEnv(), o: WireOverrides = {}): Promise
     lockMatch: (id) => stdb.lockMatch({ matchId: id }),
     voidMatch: async (id, reason) => { aborts.get(id)?.abort(); await stdb.voidMatch({ matchId: id, reason }); },
     onSeason: (on) => { if (on) season.start(); else void season.stop(); },
+    killed: () => env.FC_KILL,
+    runDemo: (fixture) => startDemo(fixture),
     creditsHour: () => season.creditsHour(),
     stdbStatus: () => stdb.status(),
     droidStatus: () => (env.FC_ENGINE === 'mock' ? 'mock' : onPath('droid') ? 'ok' : 'down'),
@@ -157,6 +210,7 @@ export async function wire(env: Env = loadEnv(), o: WireOverrides = {}): Promise
       const stopping = season.stop();               // loop exits after its current match
       for (const c of aborts.values()) c.abort();   // ring the bell now; the match still reviews/settles
       await stopping;
+      await Promise.allSettled([...activeRuns]);
     },
   };
 }

@@ -18,7 +18,8 @@ export type DirectorDeps = {
   holdMatch?(id: string, seconds: number): Promise<void> | void;
   voidMatch(id: string, reason: string): Promise<void> | void;
   onSeason?(on: boolean): void;
-  runDemo?(fixture: string): Promise<void> | void;
+  runDemo?(fixture: string): Promise<StartedMatch | void> | StartedMatch | void;
+  killed?(): boolean;
   stdbStatus?(): 'ok' | 'down';
   droidStatus?(): 'ok' | 'down' | 'mock';
   paymentsStatus?(): 'off' | 'ok' | 'down';
@@ -41,6 +42,7 @@ export class Director {
   private season = { on: false, played: 0, pausedReason: null as string | null };
   private lines: string[] = [];
   private starting = false;
+  private activeDone: Promise<unknown> | null = null;
 
   constructor(private deps: DirectorDeps) { this.season.on = !!deps.seasonOn; }
 
@@ -66,16 +68,24 @@ export class Director {
   pauseSeason(reason: string | null): void { this.season.pausedReason = reason; }
 
   async startMatch(opts: StartMatchOpts = {}): Promise<{ matchId: string }> {
+    if (this.deps.killed?.()) throw new DirectorError(409, 'killed', 'New matches are disabled by the kill switch');
     if (this.current || this.starting) throw new DirectorError(409, 'match_active', 'A match is already active');
     this.starting = true;
     try {
       const m = await this.deps.runMatch(opts);
-      this.current = { id: m.matchId, status: 'betting' };
-      this.log(`match ${m.matchId} started`);
-      const end = () => { if (this.current?.id === m.matchId) this.current = null; this.log(`match ${m.matchId} ended`); };
-      if (m.done) m.done.then(end, (e) => { this.log(`match ${m.matchId} failed: ${(e as Error)?.message ?? 'error'}`); if (this.current?.id === m.matchId) this.current = null; });
+      this.track(m);
       return { matchId: m.matchId };
     } finally { this.starting = false; }
+  }
+  private track(m: StartedMatch): void {
+    this.current = { id: m.matchId, status: 'betting' };
+    this.log(`match ${m.matchId} started`);
+    if (m.done) {
+      this.activeDone = m.done;
+      const end = () => { if (this.current?.id === m.matchId) this.current = null; if (this.activeDone === m.done) this.activeDone = null; this.log(`match ${m.matchId} ended`); };
+      // Consume failure even when no caller awaits the background run.
+      void m.done.then(end, (e) => { this.log(`match ${m.matchId} failed: ${(e as Error)?.message ?? 'error'}`); end(); });
+    }
   }
   private need(id: string) {
     if (!this.current || this.current.id !== id) throw new DirectorError(404, 'not_found', 'No such active match');
@@ -99,7 +109,14 @@ export class Director {
   }
   async demo(fixture: string): Promise<void> {
     if (!this.deps.runDemo) throw new DirectorError(409, 'unsupported', 'Demo mode is not available');
-    await this.deps.runDemo(fixture); this.log(`demo fixture ${fixture}`);
+    if (this.deps.killed?.()) throw new DirectorError(409, 'killed', 'New matches are disabled by the kill switch');
+    if (this.current || this.starting) throw new DirectorError(409, 'match_active', 'A match is already active');
+    this.starting = true;
+    try {
+      const m = await this.deps.runDemo(fixture);
+      if (m) this.track(m);
+      this.log(`demo fixture ${fixture}`);
+    } finally { this.starting = false; }
   }
   health(): DirectorHealth {
     const d = this.deps;

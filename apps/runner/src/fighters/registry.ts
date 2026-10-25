@@ -2,6 +2,9 @@
 // by replacing the entry's implementation file, not this map's shape.
 import type { FighterBackend } from './types.js';
 import { createMockBackend } from './mock.js';
+import { createDroidBackend } from './droid/index.js';
+import { createDirectBackend } from './direct.js';
+import { createHttpBackend } from './http.js';
 
 const stub = (engine: FighterBackend['engine']): FighterBackend => ({
   engine,
@@ -9,10 +12,10 @@ const stub = (engine: FighterBackend['engine']): FighterBackend => ({
 });
 
 const BACKENDS: Record<FighterBackend['engine'], FighterBackend> = {
-  droid: stub('droid'),
-  direct: stub('direct'),
+  droid: createDroidBackend(),
+  direct: createDirectBackend(),
   mock: createMockBackend(),   // no answerFor: O4 builds its own via createMockBackend({ answerFor }) when it knows the references
-  http: stub('http'),
+  http: createHttpBackend(),
   uagent: stub('uagent'),
 };
 

@@ -1,5 +1,11 @@
 # Status — HEAD (O0)
 
+## DV1277 runner integration — in progress
+- K-07 follow-up: connected registry factories for Droid, Direct and HTTP; candidate effort mapping (`FC_EFFORT_<ID>`); shared single-match control for live/demo/season; golden-var demo starts on fresh `m_demo_*` IDs and uses the O4 replay through reducers; kill switch now blocks manual and demo starts. Demo fixture loading occurs before slot acquisition and preserves `fixture_unavailable` visibly. When SpacetimeDB is up, startup registers/refreshes all six house fighters with public data, strategy and tier; registration failure stops startup.
+- Demo/mock runs do not update candidate rotation or real season counters. Shutdown aborts and awaits all active runner runs.
+- Added runner tests for effort parsing/mapping, fixture failure, cross-mode concurrency, demo-mode routing, kill switch, history exclusion, demo failure cleanup, and startup registration paths. Combined overlay: full typecheck passes; runner 148 tests pass across 19 files.
+- HUMAN config: all six house mappings and both tiers verified against the catalog; GLITCH/PIP have no existing public module rows, so their first registration starts at version 1. Local values remain private.
+
 ## Gates
 
 | Gate | Planned | Status |
@@ -74,3 +80,21 @@ Open items for the next HEAD:
 - Jumbotron covers the name tags of the two floating slots; Forge preview uses static poses (needs an arena preview export).
 - Recompute `--apply` needs a runner-only reducer that writes `fighter_stats` / `fighter.elo`.
 - PRD amendments pending (§9.2 React 19 + KokonutUI, §8.9 FundingAdapter, §11.8 seed units, Q-001 team) — list above under "HEAD decisions".
+
+## DV1277 integration follow-up — verified, unmerged (2026-10-25)
+
+The user requested merging later. No Git merges were performed; local `main` remains unchanged. Verification used an ignored source-only assembly at `.arena/combined`, built from remote `main` plus the workstream snapshots. This is test evidence, not a claim that those branches are already integrated into `main`.
+
+- `ws/head-integration`: real Droid/direct/HTTP registry factories, configured reasoning effort, shared live/demo/season guard, Director demo bookkeeping and cancellation, kill switch on manual starts, shutdown awaiting active work, and house-roster registration on connected runner startup. Mock/demo runs do not advance real rotation/history counters.
+- `ws/ui-integration`: match deep links wait for database hydration; replay is limited to known fixture names; poster mode labels use the selected match; mute control is mounted; live results wait for the correct podium handoff; result markets are scoped to the watched match.
+- `ws/spec-sync`: PRD v1.2.0 Amendment A2 records the actual stack, contracts, cents, time bases, team entry and fail-closed native execution policy. Public deployment and hostile-code OS isolation are not claimed.
+- Private configuration: user approved the verified Standard model for GLITCH/PIP. All six house mappings and both tiers are available. GLITCH/PIP had no public rows/history before startup registration, so their initial version is 1; QUILL low reasoning effort is configured. Values were neither printed nor committed.
+
+Verification:
+- Full assembled workspace typecheck and web production build pass. Package suites pass: contracts 36, engine 80, web 246, runner 148, module 76 (586 tests in total; the opt-in live adapter test is separate).
+- Opt-in two-client live adapter check passes with independent identities/token jars: shared odds/stakes, silent catch-up then live cues, real ledger settlement, Forge creation propagated to the other client, and browser credit attempts rejected.
+- Normal assembled runner boots with `stdb=ok` in mock/ledger mode and registers the six house fighters. Real authenticated HTTP checks: unavailable demo fixture 404, demo start 204, simultaneous match rejected 409, demo cancellation 204, and the active slot is released.
+- Brave verified a cold direct load of `/match/real_mvnqmsz4/results`: four correct standings, only the four matching markets, LIVE mode, ledger disclosure and `Provably fair ✓`.
+- Earlier local four-Droid match `real_mvnqmsz4` settled with all four fighters submitting, 80 valid events, a verified reveal and real Elo/history updates. VEX/SAGE/BRICK scored 150; QUILL scored 30. Earlier normal live smoke and original-timing demo smoke also passed.
+
+Remaining independent work: Maincloud/public deployment and phone-on-cellular acceptance; actual golden VAR/upset/red-card recordings; community-fighter rotation and persisted candidate-history loading (the candidate source still has its database TODO); a real OS-isolated executor before enabling native commands; optional direct-provider/public BYO end-to-end validation; the arena jumbotron/name-tag overlap, live Forge preview and recompute `--apply` reducer. These are not silently marked done by the branch checks above.
