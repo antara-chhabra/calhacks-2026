@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils';
 import { getPodium, subscribePodium } from '@/arena/sequences/podium';
 import { AppShell } from '@/ui/shell';
 import { BetSlip } from '@/ui/betslip';
+import { PresenterControls } from './presenter';
 import { categoryLabel, clockText, FEED_STYLE, feedStamp, matchNumber, matchSourceFor, plates, problemGems, ResultsRevealGate, STATUS_BADGE } from './model';
 import { ResultsPanel } from './results';
 
@@ -200,6 +201,7 @@ export function MatchScreen({ id }: { id: string | null }) {
         {state.status === 'void' && <div className="bg-zinc-900 px-4 py-2 text-center text-sm text-zinc-200">MATCH VOID · all bets refunded{state.voidReason ? ` · ${state.voidReason}` : ''}</div>}
         <div className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)_300px]">
           <aside className="order-2 space-y-3 overflow-y-auto border-zinc-800 p-3 lg:order-1 lg:border-r">
+            {mode === 'live' && <PresenterControls />}
             {mode === 'live' && <BetSlip matchId={state.matchId} />}
             {mode === 'replay' && <div className="rounded-lg border border-zinc-800 p-3 text-xs text-zinc-500">Replay. Bet controls are hidden.</div>}
             <Qr matchId={state.matchId} />
