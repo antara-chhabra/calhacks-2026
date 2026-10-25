@@ -1,0 +1,8 @@
+#!/bin/sh
+# FC-F-062: never inherit runner secrets into the fighter subprocess.
+set -eu
+if [ "${FC_WRAPPER_SELFTEST:-}" = 1 ]; then
+  printf '%s\n' 'PATH' 'HOME' 'LANG' 'TERM' 'FACTORY_API_KEY (masked)'
+  exit 0
+fi
+exec env -i PATH="$PATH" HOME="$HOME" LANG=en_US.UTF-8 TERM=dumb FACTORY_API_KEY="${FACTORY_API_KEY:-}" droid "$@"

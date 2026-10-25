@@ -18,7 +18,8 @@ THE MATCH
 REFEREE
 - Work only inside the current directory. You may write notes in scratch/.
 - {verifyLine}
-- No network, no package installs, no reading or writing files outside this directory, no tools other than arena.*.
+- No network, no package installs, no reading or writing files outside this directory.
+- Use only arena.* and Create/Edit for local scratch notes. Native reading, discovery and command execution are disabled in H0.
 - Violations earn cards: a yellow card costs 5 points. The third denied action is a red card and you are out of the match.
 
 TIME
