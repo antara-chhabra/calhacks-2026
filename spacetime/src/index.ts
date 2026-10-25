@@ -1,3 +1,7 @@
-// SpacetimeDB module (PRD §8.8). O3 owns this directory; B-01 replaces this placeholder with the schema and reducers.
-// Pattern: `import { schema, table, t } from 'spacetimedb/server'` — see PRD §8.8.
-export {};
+// SpacetimeDB module entry (PRD §8.8). The default export is the schema; every reducer/view is a named export.
+export { default } from './schema.js';
+export * from './reducers.js';
+export * from './match.js';
+export * from './bets.js';
+export * from './settle.js';
+export * from './forge.js';
