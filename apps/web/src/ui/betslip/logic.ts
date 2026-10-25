@@ -13,7 +13,7 @@ export const ERROR_COPY: Record<string, string> = {
   market_locked: 'Bets closed for this match.',
   insufficient_funds: 'Not enough balance. Add funds or bet less.',
   market_cap: 'Max $50 per market.',
-  self_bet_forbidden: "You can't bet on a match your own fighter is in.",
+  self_bet_forbidden: 'You can back your own fighter to win, but not bet against it or on side markets.',
   slow_down: 'Easy — one bet at a time.',
   bad_stake: 'Stake must be between $1 and $25.',
   bad_outcome: 'That pick is no longer available. Choose another.',

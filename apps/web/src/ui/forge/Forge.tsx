@@ -1,5 +1,5 @@
 // The Forge wizard (PRD §10.11, FC-F-200/-201): six steps, live preview, review + mint.
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { formatCents } from '@fc/contracts';
@@ -21,18 +21,13 @@ const INPUT = cn('w-full rounded-lg bg-zinc-900 px-3 py-2 text-sm text-zinc-100 
 
 /** Live preview: alternates the idle and hero (attack) portraits. The Pixi rig is not mountable outside ArenaCanvas. */
 export function LivePreview({ skin, size = 180 }: { skin: SkinSpec; size?: number }) {
-  const [attack, setAttack] = useState(false);
-  useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const t = setInterval(() => setAttack((a) => !a), 1100);
-    return () => clearInterval(t);
-  }, []);
+  const [attack, setAttack] = useState(false);   // hover to see the attack pose; no auto-flicker
   return (
     <div className="flex flex-col items-center gap-2">
-      <div className="rounded-xl bg-zinc-900 p-2 ring-1 ring-zinc-800" data-testid="forge-preview">
+      <div className="rounded-xl bg-zinc-900 p-2 ring-1 ring-zinc-800" data-testid="forge-preview" onMouseEnter={() => setAttack(true)} onMouseLeave={() => setAttack(false)}>
         <FighterPortrait pose={attack ? 'hero' : 'idle'} size={size} skin={skin} />
       </div>
-      <span className="text-[11px] text-zinc-500">Preview · {attack ? 'slashHeavy' : 'idle'}</span>
+      <span className="text-[11px] text-zinc-500">Hover to preview the attack</span>
     </div>
   );
 }

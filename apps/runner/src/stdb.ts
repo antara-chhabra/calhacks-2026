@@ -10,6 +10,11 @@ import { Identity, Timestamp } from 'spacetimedb';
 
 export type FightEventRow = { matchId: string; seq: number; t: number; type: string; data: unknown };
 
+export type CommunityFighter = {
+  fighter: FighterPublic; persona: string; strategy: Strategy; tier: EngineTier;
+  debutPending: boolean; lastMatchAt: number; elo: number;
+};
+
 export interface Stdb {
   status(): 'ok' | 'down';
   /** Hex identity of the connected runner, or null when down. */
@@ -22,6 +27,8 @@ export interface Stdb {
 
   /** Public persisted history for the selected category, reloaded from subscribed rows after restarts. */
   fighterHistory?(fighterId: FighterId, category: Category): { entries: EntryRow[]; stats: FighterStats | null; elo: number };
+  /** Forged community fighters joined with their runner-only secrets (persona/strategy/tier). Omitted when unavailable. */
+  communityFighters?(): CommunityFighter[];
   claimRunner(): Promise<void>;
   creditTestFunds(a: { identity: string; amountCents: number }): Promise<void>;
   upsertHouseFighter(a: { fighter: FighterPublic & { strategy: Strategy; tier: EngineTier } }): Promise<void>;
@@ -168,6 +175,16 @@ export async function connectStdb(env: Pick<Env, 'FC_STDB_URI' | 'FC_STDB_DB' | 
     conn.disconnect();
     return makeDown(`event subscription unavailable (${(e as Error).message})`);
   }
+  // Forged fighters' secrets are a runner-only view; a failure here only disables community scheduling.
+  let secrets = false;
+  try {
+    await new Promise<void>((resolve, reject) => {
+      const timer = setTimeout(() => reject(new Error('subscription_timeout')), 8000);
+      conn.subscriptionBuilder().onApplied(() => { clearTimeout(timer); resolve(); })
+        .onError(() => { clearTimeout(timer); reject(new Error('subscription_failed')); }).subscribe(['SELECT * FROM runner_fighter_secrets']);
+    });
+    secrets = typeof conn.db?.runnerFighterSecrets?.iter === 'function';
+  } catch (e) { console.warn(`[stdb] community fighters unavailable (${(e as Error).message})`); }
   let matchTable = false;
   try {
     matchTable = typeof conn.db?.match?.iter === 'function';
@@ -215,6 +232,21 @@ export async function connectStdb(env: Pick<Env, 'FC_STDB_URI' | 'FC_STDB_DB' | 
       const f = [...conn.db.fighter.iter()].find((r: any) => r.id === fighterId);
       return { entries, stats, elo: Number(rows[0]?.elo ?? (category === 'integrals' ? f?.elo ?? 1000 : 1000)) };
     },
+    ...(secrets ? {
+      communityFighters() {
+        const millis = (v: any): number => v == null ? 0 : Number(v.toMillis?.() ?? v.microsSinceUnixEpoch / 1000n);
+        const bySecret = new Map<string, any>([...conn.db.runnerFighterSecrets.iter()].map((r: any) => [String(r.fighterId), r]));
+        return [...conn.db.fighter.iter()].flatMap((f: any): CommunityFighter[] => {
+          const sec = bySecret.get(String(f.id));
+          if (f.origin !== 'community' || f.status === 'retired' || !sec) return [];
+          return [{
+            fighter: { id: String(f.id), name: f.name, title: f.title, archetype: f.archetype, skin: f.skin, catchphrase: f.catchphrase, bio: f.bio, strategyBlurb: f.strategyBlurb },
+            persona: sec.persona, strategy: { ...sec.strategy, verify: false }, tier: sec.tier as EngineTier,
+            debutPending: !!f.debutPending, lastMatchAt: millis(f.lastMatchAt), elo: Number(f.elo ?? 1000),
+          }];
+        });
+      },
+    } : {}),
     claimRunner: c('claimRunner'), creditTestFunds: c('creditTestFunds'), upsertHouseFighter: c('upsertHouseFighter'),
     createMatch: c('createMatch'), lockMatch: c('lockMatch'), startMatch: c('startMatch'), postEvents: c('postEvents'),
     beginReview: c('beginReview'), finalizeMatch: c('finalizeMatch'), revealMatch: c('revealMatch'), settleMatch: c('settleMatch'),

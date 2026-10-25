@@ -234,6 +234,7 @@ export function createLiveAdapter(o: LiveOptions): LiveAdapter {
       watchSub?.unsubscribe(); watchSub = null; conn?.disconnect(); conn = null; offline(); },
     watchMatch(id) { watchId = id; if (applied) publishBoard(); subscribeWatch(); },
     register: (handle) => call('registerPlayer', { handle }),
+    claimDemoFunds: () => call('claimDemoFunds', {}),
     creditTestFunds: (who, amountCents) => call('creditTestFunds', { identity: Identity.fromString(who), amountCents: BigInt(safeInteger(amountCents)) }),
     placeBet: (marketId, outcome, stake) => call('placeBet', { marketId, outcome, stake: BigInt(safeInteger(stake)) }),
     async createFighter(spec: ForgeSpec) {

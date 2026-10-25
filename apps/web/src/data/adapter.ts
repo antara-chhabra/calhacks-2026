@@ -13,6 +13,7 @@ export interface LiveAdapter {
   watchMatch(matchId: string): void;
   register(handle: string): Promise<void>;
   creditTestFunds(identity: string, amountCents: number): Promise<void>;
+  claimDemoFunds(): Promise<void>;
   placeBet(marketId: string, outcome: string, stake: number): Promise<void>;
   createFighter(spec: ForgeSpec): Promise<FighterId>;
 }

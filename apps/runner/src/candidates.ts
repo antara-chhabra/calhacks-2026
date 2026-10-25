@@ -8,6 +8,7 @@ import { HOUSE_FIGHTERS, HOUSE_ROSTER, type FighterId, type Strategy } from '@fc
 import type { Env } from './env.js';
 import { DEFAULT_REPO_ROOT, loadHouseDroid, readLock } from './fighters/droid/persona.js';
 import type { Candidate } from './match/types.js';
+import type { Stdb } from './stdb.js';
 
 const DEFAULT_AGENTS_ROOT = fileURLToPath(new URL('../../../agents/', import.meta.url));
 
@@ -38,16 +39,22 @@ export function loadHouseCandidates(env: Env, agentsRoot: string = DEFAULT_AGENT
   return out;
 }
 
-export function createCandidateSource(env: Env, opts: { agentsRoot?: string; now?: () => number } = {}): CandidateSource {
+export function createCandidateSource(env: Env, opts: { agentsRoot?: string; now?: () => number; stdb?: Stdb } = {}): CandidateSource {
   const now = opts.now ?? Date.now;
   const house = loadHouseCandidates(env, opts.agentsRoot);
   const state = new Map<FighterId, { lastMatchAt: number; elo: number }>();
   return {
     async list() {
-      // TODO(community): append community/BYO fighters from the runner_fighter_secrets view once the stdb subscription exposes it.
-      return house.map((c) => {
+      // Forged fighters join the rotation as soon as they exist; debutPending puts them in the next match.
+      const env2 = env as unknown as Record<string, string | undefined>;
+      const community: Candidate[] = (opts.stdb?.communityFighters?.() ?? []).map((f) => ({
+        fighter: f.fighter, origin: 'community', engine: env.FC_ENGINE, persona: f.persona, strategy: f.strategy, tier: f.tier,
+        elo: f.elo, lastMatchAt: f.lastMatchAt, debutPending: f.debutPending, active: true,
+        modelId: env2[`FC_TIER_${f.tier.toUpperCase()}_MODEL`] ?? null, reasoningEffort: null,
+      }));
+      return [...house, ...community].map((c) => {
         const s = state.get(c.fighter.id);
-        return s ? { ...c, lastMatchAt: s.lastMatchAt, elo: s.elo } : c;
+        return s ? { ...c, lastMatchAt: s.lastMatchAt, elo: s.elo, debutPending: false } : c;
       });
     },
     played(ids, elo) {

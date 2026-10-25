@@ -72,7 +72,7 @@ const EVENT_STATUS: Record<string, string> = {
 export async function wire(env: Env = loadEnv(), o: WireOverrides = {}): Promise<Runtime> {
   const [stdb, payments] = await Promise.all([o.stdb ? Promise.resolve(o.stdb) : connectStdb(env), o.payments ?? createPayments()]);
   const log = o.log ?? ((m: string) => console.warn(`[runner] ${m}`));
-  const candidates = createCandidateSource(env, { agentsRoot: o.agentsRoot });
+  const candidates = createCandidateSource(env, { agentsRoot: o.agentsRoot, stdb });
   if (stdb.status() === 'ok') {
     const house = (await candidates.list()).filter((c) => c.origin === 'house');
     try {

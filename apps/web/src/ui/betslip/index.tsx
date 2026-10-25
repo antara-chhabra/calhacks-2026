@@ -68,6 +68,12 @@ function Ticket({ markets, tab, setTab }: { markets: MarketView[]; tab: string; 
   const me = useStore((s) => s.me);
   const bets = useStore((s) => s.bets);
   const placeBet = useStore((s) => s.placeBet);
+  const register = useStore((s) => s.register);
+  const claimDemoFunds = useStore((s) => s.claimDemoFunds);
+  const fund = async (fn: () => Promise<void>, ok: string) => {
+    setBusy(true);
+    try { await fn(); setNote({ ok: true, text: ok }); } catch (e) { setNote({ ok: false, text: errorCopy(e) }); } finally { setBusy(false); }
+  };
   useEffect(() => { if (!note) return; const t = setTimeout(() => setNote(null), 4000); return () => clearTimeout(t); }, [note]);
 
   if (kinds.length === 0) return <p className="py-6 text-center text-sm text-zinc-500">No markets for this match yet.</p>;
@@ -85,8 +91,25 @@ function Ticket({ markets, tab, setTab }: { markets: MarketView[]; tab: string; 
     finally { setBusy(false); }
   };
 
+  // Ledger-mode wallet strip: join in one click (welcome $100) and refill when low, so anyone can bet during a demo.
+  const wallet = !me?.handle ? (
+    <button className="h-9 rounded-lg bg-emerald-500 font-semibold text-black text-sm disabled:opacity-40" disabled={busy}
+      onClick={() => fund(() => register(`fan_${Math.random().toString(36).slice(2, 8)}`), 'Joined. $100 in demo funds added.')} type="button">
+      Join &amp; get $100 to bet
+    </button>
+  ) : (
+    <div className="flex items-center justify-between rounded-lg px-3 py-2 text-sm ring-1 ring-zinc-800">
+      <span className="text-zinc-400">Balance <span className="font-semibold text-zinc-100 tabular-nums">{formatCents(me.balanceCents ?? 0)}</span></span>
+      {(me.balanceCents ?? 0) < 1000 && (
+        <button className="rounded-md px-2 py-1 text-[12px] font-semibold text-emerald-400 ring-1 ring-emerald-500/40 disabled:opacity-40" disabled={busy}
+          onClick={() => fund(claimDemoFunds, '$100 in demo funds added.')} type="button">+ $100 demo funds</button>
+      )}
+    </div>
+  );
+
   return (
     <div className="flex flex-col gap-3">
+      {wallet}
       <div className="flex flex-wrap gap-1.5" role="tablist">
         {kinds.map((k) => {
           const ms = markets.filter((m) => m.kind === k.kind);

@@ -29,6 +29,7 @@ export type Store = {
            playbackRevision: number };                                 // bumps on watch/seek/reconnect so the arena snaps
   cues$: Subscribe<ArenaCue>;                                         // cues for the watched match only
   register(handle: string): Promise<void>; creditTestFunds(identity: string, amountCents: number): Promise<void>;  // Director only, ledger mode
+  claimDemoFunds(): Promise<void>;   // ledger mode: refill +$100 when the balance is under $10
   placeBet(marketId: string, outcome: string, stake: number): Promise<void>;   // rejects with Error(code) from §8.8
   createFighter(spec: ForgeSpec): Promise<FighterId>;
   watchMatch(matchId: string): void; openReplay(src: string, speed?: number): void;
@@ -82,7 +83,7 @@ export const useStore = create<Store>()((set, get) => {
   markets: {}, bets: [],
   watch: { matchId: null, state: safeInitialState(), mode: 'live', speed: 1, playing: true, playbackRevision: 0 },
   cues$: (f) => { cueListeners.add(f); return () => { cueListeners.delete(f); }; },
-  register: viaAdapter('register'), creditTestFunds: viaAdapter('creditTestFunds'),
+  register: viaAdapter('register'), creditTestFunds: viaAdapter('creditTestFunds'), claimDemoFunds: viaAdapter('claimDemoFunds'),
   placeBet: viaAdapter('placeBet'), createFighter: viaAdapter('createFighter'),
   watchMatch: (matchId) => {
     stopReplay();

@@ -42,7 +42,7 @@ describe('error copy', () => {
     expect(errorCopy(new Error('market_locked'))).toBe('Bets closed for this match.');
     expect(errorCopy(new Error('insufficient_funds'))).toBe('Not enough balance. Add funds or bet less.');
     expect(errorCopy(new Error('market_cap'))).toBe('Max $50 per market.');
-    expect(errorCopy(new Error('self_bet_forbidden'))).toBe("You can't bet on a match your own fighter is in.");
+    expect(errorCopy(new Error('self_bet_forbidden'))).toBe("You can back your own fighter to win, but not bet against it or on side markets.");
     expect(errorCopy(new Error('slow_down'))).toBe('Easy — one bet at a time.');
     expect(errorCopy(new Error('not_connected'))).toBe('Replay is read-only — join a live match to bet');
     expect(errorCopy(new Error('weird'))).toBe('Could not place that bet. Try again.');
