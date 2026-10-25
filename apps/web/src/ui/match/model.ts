@@ -41,8 +41,50 @@ export function matchSourceFor(input: {
   return input.fixtures.includes(input.target) ? 'replay' : 'none';
 }
 
-export function resultIsInstant(input: { reducedMotion: boolean; hudOnly: boolean; initiallySettled: boolean }): boolean {
-  return input.reducedMotion || input.hudOnly || input.initiallySettled;
+export type ResultRevealInput = {
+  matchId: string | null; status: MatchState['status']; playbackRevision: number;
+  reducedMotion: boolean; hudOnly: boolean;
+};
+
+/** Tracks a match from its non-settled state through its podium handoff or a silent snap. */
+export class ResultsRevealGate {
+  private matchId: string | null | undefined;
+  private sawState = false;
+  private settled = false;
+  private playbackRevision = 0;
+  private revealed = false;
+
+  update(input: ResultRevealInput): boolean {
+    if (input.matchId !== this.matchId) {
+      this.matchId = input.matchId;
+      this.sawState = false;
+      this.settled = false;
+      this.playbackRevision = input.playbackRevision;
+      this.revealed = false;
+    }
+    this.settled = input.status === 'settled';
+    if (input.status !== 'settled') {
+      this.sawState = true;
+      this.playbackRevision = input.playbackRevision;
+      this.revealed = false;
+      return false;
+    }
+    if (input.reducedMotion || input.hudOnly || !this.sawState) this.revealed = true;
+    else if (this.playbackRevision !== input.playbackRevision) this.revealed = true;
+    this.sawState = true;
+    return this.revealed;
+  }
+
+  podium(matchId: string | null): boolean {
+    if (!this.settled || matchId !== this.matchId) return false;
+    this.revealed = true;
+    return true;
+  }
+
+  fallback(): boolean {
+    if (this.settled) this.revealed = true;
+    return this.revealed;
+  }
 }
 
 export type Gem = { idx: number; points: number; state: 'open' | 'held' | 'pending' | 'overturned' };

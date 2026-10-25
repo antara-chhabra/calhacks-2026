@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { verifyReveal } from '@fc/engine';
 import { stopReplay, useStore } from '../src/data/store';
 import { loadFixture } from '../src/data/replay';
-import { checkFairness, clockText, FEED_STYLE, feedTone, matchSourceFor, mmss, plates, podium, problemGems, resultIsInstant, sourceFor, varOverturns } from '../src/ui/match/model';
+import { checkFairness, clockText, FEED_STYLE, feedTone, matchSourceFor, mmss, plates, podium, problemGems, ResultsRevealGate, sourceFor, varOverturns } from '../src/ui/match/model';
 
 afterEach(() => { stopReplay(); vi.useRealTimers(); });
 
@@ -31,11 +31,28 @@ describe('match view models', () => {
     expect(matchSourceFor({ target: 'missing', conn: 'offline', matches: {}, fixtures: ['mock-basic'] })).toBe('none');
     expect(matchSourceFor({ target: 'mock-basic', conn: 'offline', matches: {}, fixtures: ['mock-basic'] })).toBe('replay');
   });
-  it('reveals results immediately for reduced motion, hidden arena and settled snapshots', () => {
-    expect(resultIsInstant({ reducedMotion: true, hudOnly: false, initiallySettled: false })).toBe(true);
-    expect(resultIsInstant({ reducedMotion: false, hudOnly: true, initiallySettled: false })).toBe(true);
-    expect(resultIsInstant({ reducedMotion: false, hudOnly: false, initiallySettled: true })).toBe(true);
-    expect(resultIsInstant({ reducedMotion: false, hudOnly: false, initiallySettled: false })).toBe(false);
+  it('waits for the matching podium after a live transition and resets for a new match', () => {
+    const gate = new ResultsRevealGate();
+    expect(gate.update({ matchId: 'm1', status: 'live', playbackRevision: 1, reducedMotion: false, hudOnly: false })).toBe(false);
+    expect(gate.update({ matchId: 'm1', status: 'settled', playbackRevision: 1, reducedMotion: false, hudOnly: false })).toBe(false);
+    expect(gate.podium('other')).toBe(false);
+    expect(gate.podium('m1')).toBe(true);
+    expect(gate.update({ matchId: 'm1', status: 'settled', playbackRevision: 1, reducedMotion: false, hudOnly: false })).toBe(true);
+    expect(gate.update({ matchId: 'm2', status: 'live', playbackRevision: 3, reducedMotion: false, hudOnly: false })).toBe(false);
+    expect(gate.update({ matchId: 'm2', status: 'settled', playbackRevision: 4, reducedMotion: false, hudOnly: false })).toBe(true);
+  });
+  it('reveals a settled snapshot, reduced-motion or hud-only result immediately and has a fallback', () => {
+    const snapshot = new ResultsRevealGate();
+    expect(snapshot.update({ matchId: 'm1', status: 'settled', playbackRevision: 4, reducedMotion: false, hudOnly: false })).toBe(true);
+    for (const opts of [{ reducedMotion: true, hudOnly: false }, { reducedMotion: false, hudOnly: true }]) {
+      const gate = new ResultsRevealGate();
+      gate.update({ matchId: 'm2', status: 'live', playbackRevision: 1, ...opts });
+      expect(gate.update({ matchId: 'm2', status: 'settled', playbackRevision: 1, ...opts })).toBe(true);
+    }
+    const fallback = new ResultsRevealGate();
+    fallback.update({ matchId: 'm3', status: 'live', playbackRevision: 1, reducedMotion: false, hudOnly: false });
+    expect(fallback.update({ matchId: 'm3', status: 'settled', playbackRevision: 1, reducedMotion: false, hudOnly: false })).toBe(false);
+    expect(fallback.fallback()).toBe(true);
   });
   it('builds plates, podium, gems and verifies fairness from the settled fixture', async () => {
     const st = await settledState();

@@ -1,5 +1,5 @@
 // Match screen (FC-F-142/144, §10.9): top bar, arena, plates, commentary feed, bet slip rail, QR, replay controls.
-import { statusLine } from '@fc/engine';
+import { statusLine, type MatchState } from '@fc/engine';
 import QRCode from 'qrcode';
 import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
 import { getPodium, subscribePodium } from '@/arena/sequences/podium';
 import { AppShell } from '@/ui/shell';
 import { BetSlip } from '@/ui/betslip';
-import { clockText, FEED_STYLE, feedStamp, matchNumber, matchSourceFor, plates, problemGems, resultIsInstant, STATUS_BADGE } from './model';
+import { clockText, FEED_STYLE, feedStamp, matchNumber, matchSourceFor, plates, problemGems, ResultsRevealGate, STATUS_BADGE } from './model';
 import { ResultsPanel } from './results';
 
 /** Wait through connection hydration, then attach to a known DB match or bundled fixture. */
@@ -128,34 +128,29 @@ function Qr({ matchId }: { matchId: string | null }) {
   );
 }
 
-function ResultsHandoff({ state, hudOnly }: { state: import('@fc/engine').MatchState; hudOnly: boolean }) {
+function ResultsHandoff({ state, hudOnly }: { state: MatchState; hudOnly: boolean }) {
   const revision = useStore((s) => s.watch.playbackRevision);
   const [revealed, setRevealed] = useState(false);
-  const lastRevision = useRef(revision);
-  const initiallySettled = useRef(state.status === 'settled');
+  const [gate] = useState(() => new ResultsRevealGate());
   useEffect(() => {
-    if (state.status !== 'settled') {
-      lastRevision.current = revision;
-      setRevealed(false);
-      return;
-    }
-    if (resultIsInstant({ reducedMotion: prefersReducedMotion(), hudOnly, initiallySettled: initiallySettled.current || revision !== lastRevision.current })) {
-      lastRevision.current = revision;
-      setRevealed(true);
-      return;
-    }
+    const showNow = gate.update({ matchId: state.matchId, status: state.status, playbackRevision: revision,
+      reducedMotion: prefersReducedMotion(), hudOnly });
+    setRevealed(showNow);
+    if (state.status !== 'settled' || showNow) return;
 
     let done = false;
-    const reveal = () => { if (!done) { done = true; setRevealed(true); } };
+    const reveal = (matchId: string) => {
+      if (!done && gate.podium(matchId)) { done = true; setRevealed(true); }
+    };
     const accept = (podium: ReturnType<typeof getPodium>) => {
-      if (podium.revealed && podium.matchId === state.matchId) reveal();
+      if (podium.revealed && podium.matchId) reveal(podium.matchId);
     };
     const unsubscribe = subscribePodium(accept);
     accept(getPodium());
-    const fallback = window.setTimeout(reveal, 3500);
+    const fallback = window.setTimeout(() => { if (!done) { done = true; setRevealed(gate.fallback()); } }, 3500);
     return () => { done = true; unsubscribe(); window.clearTimeout(fallback); };
-  }, [state.matchId, state.status, revision, hudOnly]);
-  return revealed ? <ResultsPanel state={state} /> : null;
+  }, [gate, state.matchId, state.status, revision, hudOnly]);
+  return state.status === 'settled' && revealed ? <div className="border-t border-zinc-800 p-4"><ResultsPanel state={state} /></div> : null;
 }
 
 function ReplayControls() {
@@ -181,7 +176,6 @@ export function MatchScreen({ id }: { id: string | null }) {
   useMatchSource(id, speed);
   const state = useStore((s) => s.watch.state);
   const mode = useStore((s) => s.watch.mode);
-  const settled = state.status === 'settled';
   return (
     <AppShell title="Match" wide>
       <div className="flex flex-col">
@@ -202,7 +196,7 @@ export function MatchScreen({ id }: { id: string | null }) {
           </main>
           <aside className="order-3 flex h-[320px] flex-col lg:h-auto lg:max-h-[calc(56dvh+200px)] border-zinc-800 lg:border-l"><Feed /></aside>
         </div>
-        {settled && <div className="border-t border-zinc-800 p-4"><ResultsHandoff hudOnly={hudOnly} state={state} /></div>}
+        <ResultsHandoff hudOnly={hudOnly} state={state} />
       </div>
     </AppShell>
   );
