@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node --env-file-if-exists=../../.env --import tsx src/index.ts",
     "typecheck": "tsc --noEmit -p .",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run --passWithNoTests --no-file-parallelism"
   },
   "dependencies": {
     "@factory/droid-sdk": "~0.10.0",
