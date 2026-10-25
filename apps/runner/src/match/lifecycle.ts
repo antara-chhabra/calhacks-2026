@@ -23,7 +23,14 @@ export type MatchSummary = {
   matchId: string; status: 'settled'; mode: MatchRecord['mode']; isDemo: boolean;
   standings: Standing[]; results: { marketId: string; outcome: string }[]; elo: { fighterId: FighterId; after: number }[];
   overturned: number; endedBy: MatchRecord['endedBy']; invariantViolations: string[];
+  /** Fighter runs and Factory credits this match consumed (season budget guard, FC-F-260/261). */
+  usage: { sessions: number; factoryCredits: number };
 };
+
+function usageOf(rec: MatchRecord): { sessions: number; factoryCredits: number } {
+  const outs = Object.values(rec.outcomes);
+  return { sessions: outs.length, factoryCredits: outs.reduce((a, o) => a + (o.result?.usage?.factoryCredits ?? 0), 0) };
+}
 
 const sleep = (ms: number) => new Promise<void>((r) => { setTimeout(r, ms); });
 
@@ -74,7 +81,8 @@ export async function runMatch(deps: RunMatchDeps, opts: MatchOpts): Promise<Mat
       await waitFor(() => has('match.settled'), 'match.settled');
 
       return { matchId, status: 'settled', mode: rec.mode, isDemo: rec.isDemo, standings, results, elo,
-        overturned: verdicts.filter((v) => v.overturned).length, endedBy: rec.endedBy, invariantViolations: checkInvariants(log_).violations };
+        overturned: verdicts.filter((v) => v.overturned).length, endedBy: rec.endedBy, invariantViolations: checkInvariants(log_).violations,
+        usage: usageOf(rec) };
     } catch (e) {
       log(`${matchId}: review/settle failed: ${(e as Error).message}`);
       try { await stdb.voidMatch({ matchId, reason: 'runner_error' }); } catch { /* already void / module down */ }

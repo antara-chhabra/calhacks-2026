@@ -10,6 +10,7 @@ import { commitHash } from '@fc/engine';
 import type { FighterRunInput } from '../fighters/types.js';
 import { generateProblemSet } from '../problems/index.js';
 import { createRng } from '../problems/rng.js';
+import { registerByoSession, unregisterByoSession } from '../http/byo.js';
 import { EventBatcher } from './batcher.js';
 import { createFighterIO, finish, newRt, type FighterRt, type MatchCtx } from './io.js';
 import { buildMarkets } from './markets.js';
@@ -122,6 +123,7 @@ export async function runMatchUntilReview(deps: MatchDeps, opts: MatchOpts): Pro
       const rt = newRt(c.fighter.id, c.strategy.taunts);
       rts.set(c.fighter.id, rt);
       const io = createFighterIO(rt, ctx);
+      if (c.origin === 'byo_http' && c.token) registerByoSession(matchId, c.fighter.id, c.token, io);
       runs.push((async () => {
         try {
           const r = await deps.backendFor(c).run(mkInput(c, startedAt), io, rt.ctrl.signal);
@@ -144,6 +146,7 @@ export async function runMatchUntilReview(deps: MatchDeps, opts: MatchOpts): Pro
       else opts.signal?.addEventListener('abort', () => res('signal'), { once: true });
     });
     const endedBy = await Promise.race([allSettled, bell, killed]);
+    unregisterByoSession(matchId);
     live = false;                                   // the bell has rung: IO goes inert, nothing new reaches the log
     for (const rt of rts.values()) if (rt.state === 'running') rt.ctrl.abort();
     await Promise.race([allSettled, sleep(opts.abortGraceMs ?? 1500)]);
@@ -164,6 +167,7 @@ export async function runMatchUntilReview(deps: MatchDeps, opts: MatchOpts): Pro
       timeLimitMs: opts.timeLimitMs, startedAt, endedAt, answers, outcomes, endedBy, sandboxRoot };
   } catch (e) {
     live = false;
+    unregisterByoSession(matchId);
     for (const rt of rts.values()) rt.ctrl.abort();
     await batcher.stop().catch(() => undefined);
     try { await stdb.voidMatch({ matchId, reason: 'runner_error' }); } catch { /* module may be down or already void */ }

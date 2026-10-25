@@ -29,7 +29,7 @@ describe('http app', () => {
     const bad = await fetch(`http://127.0.0.1:${adminPort}/admin/health`, { headers: { Authorization: 'Bearer nope' } });
     expect(bad.status).toBe(401);
     const ok = await fetch(`http://127.0.0.1:${adminPort}/admin/health`, { headers: { Authorization: `Bearer ${TOKEN}` } });
-    expect(ok.status).toBe(404);   // authorized; stub router has no routes yet
+    expect(ok.status).toBe(404);   // authorized, but no director is wired in this test, so the admin router is empty
     expect((await ok.json()).error.code).toBe('not_found');
   });
 

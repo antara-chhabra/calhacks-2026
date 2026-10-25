@@ -3,6 +3,7 @@ import { timingSafeEqual } from 'node:crypto';
 import type { AddressInfo } from 'node:net';
 import type { Server } from 'node:http';
 import express, { type ErrorRequestHandler, type Express, type NextFunction, type Request, type Response } from 'express';
+import type { Director } from '../control/director.js';
 import type { Env } from '../env.js';
 import type { Payments } from '../payments/index.js';
 import { createAdminRouter } from './admin.js';
@@ -13,6 +14,7 @@ export type AppOptions = {
   adminHost?: string;      // default 127.0.0.1
   publicHost?: string;     // default 0.0.0.0
   payments?: Pick<Payments, 'hintRoute' | 'entryRoute'>;
+  director?: Director;
 };
 export type RunnerApp = {
   start(): Promise<{ adminPort: number; publicPort: number }>;
@@ -65,7 +67,7 @@ export function createApp(env: Env, opts: AppOptions = {}): RunnerApp {
     next();
   });
   adminApp.use(express.json({ limit: '100kb' }));
-  adminApp.use(createAdminRouter());   // router defines full /admin/* paths (§8.10)
+  adminApp.use(createAdminRouter(opts.director ? { director: opts.director } : undefined));   // router defines full /admin/* paths (§8.10)
   finish(adminApp);
 
   // ---- public

@@ -15,6 +15,8 @@ export interface Stdb {
   /** Subscribe to fight_event rows of one match (data is the parsed JSON). Returns an unsubscribe fn. */
   onEvent(matchId: string, f: (e: FightEventRow) => void): () => void;
   close(): void;
+  /** Optional: matches currently in the subscribed `match` table (for orphan recovery). Omitted when unavailable. */
+  listActiveMatches?(): Promise<{ id: string; status: string }[]>;
 
   claimRunner(): Promise<void>;
   creditTestFunds(a: { identity: string; amountCents: number }): Promise<void>;
@@ -127,6 +129,11 @@ export async function connectStdb(env: Pick<Env, 'FC_STDB_URI' | 'FC_STDB_DB' | 
   } catch (e) {
     console.warn(`[stdb] event subscription unavailable (${(e as Error).message})`);
   }
+  let matchTable = false;
+  try {
+    conn.subscriptionBuilder().onError?.(() => { matchTable = false; }).subscribe(['SELECT * FROM match']);
+    matchTable = typeof conn.db?.match?.iter === 'function';
+  } catch { /* match table unavailable: orphan recovery is skipped */ }
 
   const call = (name: ReducerName) => async (args?: Record<string, unknown>) => {
     if (!up) throw new Error('stdb_down');
@@ -146,6 +153,13 @@ export async function connectStdb(env: Pick<Env, 'FC_STDB_URI' | 'FC_STDB_DB' | 
       return () => { set!.delete(f); if (set!.size === 0) listeners.delete(matchId); };
     },
     close() { up = false; try { conn.disconnect?.(); } catch { /* ignore */ } },
+    ...(matchTable ? {
+      async listActiveMatches() {
+        const out: { id: string; status: string }[] = [];
+        for (const row of conn.db.match.iter()) out.push({ id: String(row.id), status: String(row.status) });
+        return out;
+      },
+    } : {}),
     claimRunner: c('claimRunner'), creditTestFunds: c('creditTestFunds'), upsertHouseFighter: c('upsertHouseFighter'),
     createMatch: c('createMatch'), lockMatch: c('lockMatch'), startMatch: c('startMatch'), postEvents: c('postEvents'),
     beginReview: c('beginReview'), finalizeMatch: c('finalizeMatch'), revealMatch: c('revealMatch'), settleMatch: c('settleMatch'),
