@@ -5,7 +5,7 @@
 **Last touched:** 2026-10-25
 
 ## What this is
-Workstream O7 of the Fight Card build. Submission: README with sponsor sections, Devpost text, pitch cards, table checklist, sponsor artifacts. Owns exactly the paths above (PRD §9.3, §17.5); everything else is read-only for this workstream.
+Workstream O7 of the En Garde build. Submission: README with sponsor sections, Devpost text, pitch cards, table checklist, sponsor artifacts. Owns exactly the paths above (PRD §9.3, §17.5); everything else is read-only for this workstream.
 
 ## Current state
 

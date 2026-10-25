@@ -1,4 +1,4 @@
-# Fight Card (Cal Hacks 13.0)
+# En Garde (Cal Hacks 13.0)
 
 <!--
 Project-level facts that don't belong to any single feature.

@@ -79,7 +79,7 @@ export function selectLive(s: LobbySnapshot, category?: Category): LiveVM | null
   return { matchId: id, number: m.number, category: w.state.category, statusLine: statusLine(w.state), rows, href: `/match/${id}` };
 }
 
-export function selectResults(s: LobbySnapshot, limit = 5, category?: Category): ResultVM[] {
+export function selectResults(s: Pick<LobbySnapshot, "matches" | "fighters" | "markets">, limit = 5, category?: Category): ResultVM[] {
   return Object.values(s.matches)
     .filter((m) => m.status === "settled" && (!category || m.category === category))
     .sort((a, b) => b.number - a.number)
@@ -93,7 +93,7 @@ export function selectResults(s: LobbySnapshot, limit = 5, category?: Category):
     });
 }
 
-export function selectFeed(s: LobbySnapshot, limit = 12, category?: Category): FeedVM[] {
+export function selectFeed(s: Pick<LobbySnapshot, "bets" | "matches" | "fighters">, limit = 12, category?: Category): FeedVM[] {
   return [...s.bets]
     .filter((b) => !category || s.matches[b.matchId]?.category === category)
     .sort((a, b) => b.placedAt - a.placedAt)
@@ -107,7 +107,7 @@ export function selectFeed(s: LobbySnapshot, limit = 12, category?: Category): F
     });
 }
 
-export function selectMe(s: LobbySnapshot): MeVM {
+export function selectMe(s: Pick<LobbySnapshot, "me">): MeVM {
   const me = s.me;
   return {
     signedIn: !!me?.handle, handle: me?.handle ?? null, balanceText: formatCents(me?.balanceCents ?? 0),

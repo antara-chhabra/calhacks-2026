@@ -1,139 +1,122 @@
-// Lobby (FC-F-141 / FC-F-148): the Kalshi-style black market UI, fed by the data store.
-import { Activity, BarChart3, History, Swords, Trophy, UserRound } from "lucide-react";
-import { CATEGORY_CATALOG } from "@fc/contracts";
-import { useEffect, useMemo, useState } from "react";
-import { useLocation } from "react-router-dom";
-import WidgetGrid, { type WidgetGridItem } from "@/components/kokonutui/bento-grid";
-import { MorphicNavbar } from "@/components/kokonutui/morphic-navbar";
+import { ArrowUpRight, Search, Swords } from "lucide-react";
+import { CATEGORY_CATALOG, formatCents } from "@fc/contracts";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { shallow } from "zustand/shallow";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { useStore } from "@/data/store";
 import { AppShell } from "@/ui/shell";
-import { fighterVM, needsDemo, selectFeed, selectLive, selectMe, selectPoster, selectResults, winnerMarket } from "@/ui/lobby/selectors";
-import { AccountWidget, BetFeedWidget, FightersWidget, LiveWidget, MarketTile, PosterWidget, ResultsWidget } from "@/ui/widgets";
+import { fighterVM, needsDemo, selectFeed, selectMe, selectResults } from "@/ui/lobby/selectors";
+import { marketTotals, ongoingFight } from "@/ui/lobby/market-board";
+import { AccountWidget, BetFeedWidget, MarketTile, ResultsWidget } from "@/ui/widgets";
 
-const ICON = "size-3.5";
 const NAV_ITEMS = {
   "/markets": { name: "Trending" },
   ...Object.fromEntries(CATEGORY_CATALOG.map((c) => [c.path, { name: c.label }])),
 };
 
-function SectionHeader({ title, subtitle }: { title: string; subtitle: string }) {
-  return (
-    <div className="mb-4">
-      <h2 className="font-semibold text-lg text-zinc-50 tracking-tight">{title}</h2>
-      <p className="text-[13px] text-zinc-500">{subtitle}</p>
-    </div>
-  );
-}
-
-function useNow(ms = 1000) {
-  const [now, setNow] = useState(() => Date.now());
-  useEffect(() => {
-    const t = setInterval(() => setNow(Date.now()), ms);
-    return () => clearInterval(t);
-  }, [ms]);
-  return now;
+function SidebarSection({ title, children }: { title: string; children: ReactNode }) {
+  return <section className="border-b border-zinc-800 pb-6 last:border-0"><h2 className="mb-4 text-base font-bold text-white">{title}</h2>{children}</section>;
 }
 
 export default function Markets() {
   const { pathname } = useLocation();
-  const categoryInfo = CATEGORY_CATALOG.find((c) => c.path === pathname) ?? CATEGORY_CATALOG[0]!;
-  const category = pathname === "/markets" ? null : categoryInfo.id;
-  const now = useNow();
+  const [params] = useSearchParams();
+  const explicitDemo = params.get("demo") === "1";
+  const categoryInfo = CATEGORY_CATALOG.find((c) => c.path === pathname);
+  const category = categoryInfo?.id;
+  const [query, setQuery] = useState("");
+  const [filter, setFilter] = useState("all");
+  const [sort, setSort] = useState("activity");
+  const [now, setNow] = useState(Date.now);
+  const [shown, setShown] = useState(24);
+  const s = useStore(({ conn, me, fighters, matches, openMatchId, liveMatchId, markets, bets, register, openReplay }) =>
+    ({ conn, me, fighters, matches, openMatchId, liveMatchId, markets, bets, register, openReplay }), shallow);
 
-  const conn = useStore((s) => s.conn);
-  const me = useStore((s) => s.me);
-  const fighters = useStore((s) => s.fighters);
-  const matches = useStore((s) => s.matches);
-  const openMatchId = useStore((s) => s.openMatchId);
-  const liveMatchId = useStore((s) => s.liveMatchId);
-  const markets = useStore((s) => s.markets);
-  const bets = useStore((s) => s.bets);
-  const watch = useStore((s) => s.watch);
-  const register = useStore((s) => s.register);
-
-  // No connection and nothing loaded: play the recorded demo match (clearly badged below).
   useEffect(() => {
-    if (needsDemo({ conn, matches })) useStore.getState().openReplay("mock-basic", 4);
-  }, [conn, matches]);
+    if (explicitDemo && needsDemo(s)) s.openReplay("mock-basic", 4);
+  }, [explicitDemo, s.conn, s.matches, s.openReplay]);
+  const hasOpenMarkets = Object.values(s.matches).some((m) => m.status === "open");
+  useEffect(() => { if (!hasOpenMarkets) return; const t = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(t); }, [hasOpenMarkets]);
+  useEffect(() => setShown(24), [pathname, query, filter, sort]);
 
-  const snap = useMemo(
-    () => ({ conn, me, fighters, matches, openMatchId, liveMatchId, markets, bets, watch }),
-    [conn, me, fighters, matches, openMatchId, liveMatchId, markets, bets, watch]
-  );
-  const poster = useMemo(() => selectPoster(snap, category ?? undefined), [snap, category]);
-  const live = useMemo(() => selectLive(snap, category ?? undefined), [snap, category]);
-  const results = useMemo(() => selectResults(snap, 5, category ?? undefined), [snap, category]);
-  const feed = useMemo(() => selectFeed(snap, 6, category ?? undefined), [snap, category]);
-  const meVM = useMemo(() => selectMe(snap), [snap]);
-  const names = useMemo(() => Object.fromEntries(Object.keys(fighters).map((id) => [id, fighterVM(snap, id)])), [fighters, snap]);
-  const posterMarkets = useMemo(() => (poster ? Object.values(markets).filter((m) => m.id.startsWith(`${poster.matchId}:`)) : []), [markets, poster]);
-  const board = useMemo(
-    () => poster?.fighters.map((f) => ({ fighter: f, oddsText: f.oddsText, pct: f.impliedPct })).sort((a, b) => (b.pct ?? 0) - (a.pct ?? 0)) ?? [],
-    [poster]
-  );
-  const isReplay = conn === "replay";
-  const posterKey = poster ? `${poster.matchId}:${poster.status}` : "none";
-  const winner = poster ? winnerMarket(snap, poster.matchId) : undefined;
-
-  const items = useMemo<WidgetGridItem[]>(
-    () => [
-      { id: "poster", title: "Fight night", icon: <Swords className={ICON} />, defaultSpan: 4, render: (size) => <PosterWidget now={now} poster={poster} size={size} /> },
-      { id: "account", title: meVM.signedIn ? "Your account" : "Join the fight", icon: <UserRound className={ICON} />, defaultSpan: 2, render: () => <AccountWidget key={String(meVM.signedIn)} me={meVM} register={register} /> },
-      { id: "live", title: "Live now", icon: <Activity className={ICON} />, defaultSpan: 2, render: () => <LiveWidget live={live} /> },
-      { id: "board", title: winner ? "Winner odds" : "Fighters", icon: <Trophy className={ICON} />, defaultSpan: 2, render: () => <FightersWidget fighters={board} /> },
-      { id: "results", title: "Recent results", icon: <History className={ICON} />, defaultSpan: 2, render: () => <ResultsWidget results={results} /> },
-      { id: "feed", title: "Bet feed", icon: <BarChart3 className={ICON} />, defaultSpan: 2, render: () => <BetFeedWidget feed={feed} /> },
-    ],
-    // posterKey keeps the grid from rebuilding on every unrelated store tick
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [now, poster, meVM, register, live, board, results, feed, winner, posterKey]
-  );
-  const marketItems = useMemo<WidgetGridItem[]>(
-    () => posterMarkets.map((m) => ({ id: `mk-${m.id}`, title: m.kind.replace("_", " "), icon: <BarChart3 className={ICON} />, defaultSpan: m.kind === "winner" ? 3 : 2, render: (size) => <MarketTile market={m} names={names} size={size} teamMarket={poster?.category === 'squads'} /> })),
-    [posterMarkets, names]
-  );
+  const names = useMemo(() => Object.fromEntries(Object.keys(s.fighters).map((id) => [id, fighterVM(s, id)])), [s.fighters]);
+  const matches = Object.values(s.matches).filter((m) => !category || m.category === category);
+  const rows = Object.values(s.markets).flatMap((market) => {
+    const match = matches.find((m) => market.id.startsWith(`${m.id}:`));
+    return match ? [{ market, match, ...marketTotals(market) }] : [];
+  });
+  const volume = rows.reduce((sum, r) => sum + r.volume, 0);
+  const openCount = rows.filter((r) => r.market.status === "open" && r.match.status === "open" && r.match.bettingClosesAt > now).length;
+  const visible = rows.filter(({ market, match }) => {
+    const open = market.status === "open" && match.status === "open" && match.bettingClosesAt > now;
+    return (filter === "all" || (filter === "open" ? open : market.status === "settled")) &&
+      `${market.label} ${match.number} ${match.fighterIds.map((id) => names[id]?.name ?? id).join(" ")}`.toLowerCase().includes(query.toLowerCase());
+  }).sort((a, b) => sort === "newest" ? b.match.number - a.match.number || a.market.label.localeCompare(b.market.label) :
+    Number(b.market.status === "open") - Number(a.market.status === "open") || b.volume - a.volume || b.match.number - a.match.number || a.market.label.localeCompare(b.market.label));
+  const me = selectMe(s);
+  const feed = selectFeed(s, 8, category);
+  const results = selectResults(s, 5, category);
+  const fight = s.conn === "live" ? ongoingFight(s) : null;
 
   return (
     <AppShell wide>
-      <div>
-        <div className="border-zinc-900 border-b">
-          <div className="mx-auto flex max-w-[1280px] overflow-x-auto px-6 py-3 lg:justify-center">
-            <MorphicNavbar className="shrink-0 [&_a]:whitespace-nowrap" defaultPath="/markets" items={NAV_ITEMS} />
+      <nav aria-label="Market categories" className="-mx-4 border-b border-zinc-800 px-4 pb-4 sm:-mx-6 sm:px-6">
+        <div className="flex gap-6 overflow-x-auto">{Object.entries(NAV_ITEMS).map(([href, item]) => <Link aria-current={pathname === href ? "page" : undefined} className={`shrink-0 border-b-2 py-3 text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-white ${pathname === href ? "border-white text-white" : "border-transparent text-zinc-400 hover:text-white"}`} key={href} to={href}>{item.name}</Link>)}</div>
+      </nav>
+      <div className="pt-7">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-white">{categoryInfo?.label ?? "Trending markets"}</h1>
+            <p className="mt-2 max-w-3xl text-sm leading-relaxed text-zinc-400">{categoryInfo?.description ?? "Pick your fighter. Read the odds. Follow every verified result."}</p>
           </div>
+          {s.conn === "replay" && <span className="rounded-md border border-amber-300/30 px-2.5 py-1 text-xs font-semibold text-amber-200">Replay · demo data</span>}
         </div>
-
-        <main className="mx-auto max-w-[1280px] px-6 pt-8 pb-16">
-          <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <p className="text-[13px] text-zinc-500">Prediction markets for AI fighters</p>
-              <h1 className="font-semibold text-3xl text-zinc-50 tracking-tight">{pathname === "/markets" ? "Trending" : categoryInfo.label}</h1>
+        <dl className="my-6 flex flex-wrap gap-x-8 gap-y-3 border-y border-zinc-800 py-4 text-sm">
+          {[["Total volume", formatCents(volume)], ["Open markets", String(openCount)], ["Recorded matches", String(matches.length)], ["Available markets", String(rows.length)]].map(([label, value]) => (
+            <div className="flex items-baseline gap-2" key={label}><dt className="text-zinc-400">{label}</dt><dd className="font-bold tabular-nums text-white">{value}</dd></div>
+          ))}
+        </dl>
+        <div className="grid items-start gap-8 xl:grid-cols-[minmax(0,1fr)_300px]">
+          <section aria-label="Prediction markets" className="min-w-0">
+            <div className="mb-4 flex flex-wrap items-center gap-3">
+              <label className="flex h-11 min-w-0 flex-[1_1_200px] items-center gap-2 rounded-lg border border-zinc-700 bg-black px-3 text-zinc-400 focus-within:border-white">
+                <Search aria-hidden="true" className="size-4 shrink-0" />
+                <input aria-label="Search markets" className="min-w-0 w-full bg-transparent text-sm text-white outline-none placeholder:text-zinc-400" onChange={(e) => setQuery(e.target.value)} placeholder="Search markets or fighters" type="search" value={query} />
+              </label>
+              <select aria-label="Market status" className="h-11 rounded-lg border border-zinc-700 bg-black px-3 text-sm text-zinc-200" onChange={(e) => setFilter(e.target.value)} value={filter}>
+                <option value="all">All markets</option><option value="open">Open</option><option value="settled">Settled</option>
+              </select>
+              <select aria-label="Sort markets" className="h-11 rounded-lg border border-zinc-700 bg-black px-3 text-sm text-zinc-200" onChange={(e) => setSort(e.target.value)} value={sort}>
+                <option value="activity">Most active</option><option value="newest">Newest</option>
+              </select>
             </div>
-            <div className="flex flex-wrap items-center gap-2 text-[11px]">
-              {isReplay && <span className="rounded-full bg-amber-300/10 px-2.5 py-1 font-semibold text-amber-200 uppercase tracking-wider ring-1 ring-amber-300/20">Replay · demo data</span>}
-              <span className="rounded-full bg-zinc-900 px-2.5 py-1 text-zinc-300 ring-1 ring-zinc-800">{meVM.moneyModeText}</span>
-            </div>
-          </div>
-          {category && <p className="mb-6 max-w-3xl text-[13px] leading-relaxed text-zinc-400">{categoryInfo.description}</p>}
-
-          {poster || live || results.length > 0 || feed.length > 0 ? (
-            <section id="arena">
-              <WidgetGrid className="max-w-none" items={items} rowHeight={300} />
-            </section>
-          ) : (
-            <section aria-live="polite" className="rounded-xl bg-zinc-950 px-6 py-10 ring-1 ring-zinc-900" data-testid="category-empty">
-              <h2 className="font-semibold text-lg text-zinc-100">No {categoryInfo.label} matches yet</h2>
-              <p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-zinc-400">{categoryInfo.description} Matches, odds, live fights, settled results, and the bet feed will appear here as soon as this category has activity.</p>
-            </section>
-          )}
-
-          {marketItems.length > 0 && (
-            <section className="mt-14">
-              <SectionHeader subtitle={`Every market on Match #${poster?.number ?? ""}, priced by the pool`} title="Prediction hub" />
-              <WidgetGrid className="max-w-none" items={marketItems} key={posterKey} rowHeight={220} />
-            </section>
-          )}
-        </main>
-
+            {visible.length ? (
+              <><div className="flex flex-wrap gap-4" data-testid="market-board">
+                {visible.slice(0, shown).map(({ market, match }) => (
+                  <article className="flex min-w-0 flex-[1_1_360px] flex-col rounded-xl border border-zinc-800 bg-black p-5 transition-colors hover:border-zinc-600 focus-within:border-zinc-500" data-testid="market-card" key={market.id}>
+                    <div className="mb-3 flex flex-wrap items-center justify-between gap-2 text-xs text-zinc-400">
+                      <span>{CATEGORY_CATALOG.find((c) => c.id === (match.category ?? "integrals"))?.label} · Match #{match.number}</span>
+                      <span>{match.isDemo ? "DEMO" : match.mode === "mock" ? "MOCK" : match.status === "live" || match.status === "review" ? "LIVE" : ""}</span>
+                    </div>
+                    <MarketTile href={`/match/${match.id}#bet-slip`} market={market} names={names} now={now} closesAt={match.bettingClosesAt} size="l" teamMarket={match.category === "squads"} />
+                  </article>
+                ))}
+              </div>
+              {visible.length > shown && <button className="mt-5 min-h-11 w-full rounded-lg border border-zinc-700 px-4 text-sm font-semibold text-white hover:bg-zinc-900 focus-visible:outline-2 focus-visible:outline-white" onClick={() => setShown((n) => n + 24)} type="button">Show more markets ({visible.length - shown} remaining)</button>}</>
+            ) : (
+              <div aria-live="polite" className="rounded-xl border border-zinc-800 px-6 py-12" data-testid="category-empty">
+                <h2 className="text-lg font-bold text-white">{rows.length ? "No matching markets" : `No ${categoryInfo?.label ?? "prediction"} markets yet`}</h2>
+                <p className="mt-2 text-sm text-zinc-400">{rows.length ? "Try another search or market status." : "Markets appear here when the next match is announced."}</p>
+              </div>
+            )}
+          </section>
+          <aside aria-label="Account and market activity" className="space-y-6 border-t border-zinc-800 pt-6 xl:border-t-0 xl:border-l xl:pl-6 xl:pt-0">
+            {fight && <SidebarSection title="In the arena"><Link className="flex min-h-11 items-center justify-between gap-3 text-sm font-semibold text-white hover:text-emerald-300" to={`/match/${fight.id}`}><span className="flex items-center gap-2"><Swords className="size-4" /> Watch Match #{fight.number}</span><ArrowUpRight className="size-4" /></Link></SidebarSection>}
+            <SidebarSection title={me.signedIn ? "Your account" : "Join the market"}><div className="min-h-52"><AccountWidget me={me} register={s.register} /></div></SidebarSection>
+            <SidebarSection title="Recent results"><ResultsWidget results={results} /></SidebarSection>
+            <SidebarSection title="Market activity"><BetFeedWidget feed={feed} /></SidebarSection>
+          </aside>
+        </div>
       </div>
     </AppShell>
   );

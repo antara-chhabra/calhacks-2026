@@ -12,6 +12,8 @@ describe('stage layout', () => {
     expect(matchClockMs(300_000, null, 5)).toBe(300_000);
     expect(matchClockMs(300_000, 1000, 61_000)).toBe(240_000);
     expect(matchClockMs(300_000, 0, 999_999)).toBe(0);
+    // Early completion must agree with the match page instead of leaving time on the arena clock.
+    for (const status of ['review', 'settled', 'void'] as const) expect(matchClockMs(60_000, 0, 24_000, status)).toBe(0);
   });
   it('gems', () => {
     const problems = [1, 2, 3, 4, 5].map((idx) => ({ idx, difficulty: 'easy', points: 10 })) as never;

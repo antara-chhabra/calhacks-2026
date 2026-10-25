@@ -1,4 +1,4 @@
-# Fight Card SpacetimeDB module
+# En Garde SpacetimeDB module
 
 SpacetimeDB 2.13 is the database, transaction boundary and subscription transport.
 H0 uses integer US cents in ledger mode: **Ledger mode · no funds moved**.

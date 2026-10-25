@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Fight Card key setup (PRD §8.11, §17.2 H-01..H-06). No dependencies.
+// En Garde key setup (PRD §8.11, §17.2 H-01..H-06). No dependencies.
 //   node scripts/keys.mjs            fill blanks in .env interactively (Enter skips; input is hidden)
 //   node scripts/keys.mjs --check    print status per service; exit 1 if a MUST key is missing
 //   node scripts/keys.mjs --live     with --check: ping ElevenLabs to validate the key

@@ -12,6 +12,7 @@ export interface AudioDeps {
   storage?: Pick<Storage, 'getItem' | 'setItem'> | null;
   coarsePointer?: () => boolean;
   gestureTarget?: EventTarget | null;
+  activated?: () => boolean;                         // browser remembers an intentional navigation gesture
   now?: () => number;                                  // ms, for rate limiting
 }
 export interface Audio {
@@ -56,7 +57,7 @@ export function pitchFor(id: string): number {
 export function createAudio(deps: AudioDeps = {}): Audio {
   const env = deps.env ?? (() => ({ playing: true, speed: 1 }));
   const now = deps.now ?? (() => Date.now());
-  const g = globalThis as { AudioContext?: new () => AudioContext; webkitAudioContext?: new () => AudioContext; localStorage?: Storage; matchMedia?: (q: string) => { matches: boolean }; window?: EventTarget };
+  const g = globalThis as { AudioContext?: new () => AudioContext; webkitAudioContext?: new () => AudioContext; localStorage?: Storage; matchMedia?: (q: string) => { matches: boolean }; window?: EventTarget; navigator?: { userActivation?: { hasBeenActive: boolean } } };
   const ctxFactory = deps.ctxFactory ?? (() => {
     const C = g.AudioContext ?? g.webkitAudioContext;
     return C ? new C() : null;
@@ -73,6 +74,7 @@ export function createAudio(deps: AudioDeps = {}): Audio {
   let master: GainNode | null = null;
   let started = false;
   let voices = 0;
+  const timers = new Set<ReturnType<typeof setTimeout>>();
   const last = new Map<string, number>();
   const subs = new Set<() => void>();
   const GESTURES = ['pointerdown', 'keydown', 'touchstart'];
@@ -81,7 +83,7 @@ export function createAudio(deps: AudioDeps = {}): Audio {
     if (!ctx) {
       try {
         ctx = ctxFactory();
-        if (ctx) { master = ctx.createGain(); master.gain.value = 0.7; master.connect(ctx.destination); }
+        if (ctx) { master = ctx.createGain(); master.gain.value = muted ? 0 : 0.7; master.connect(ctx.destination); }
       } catch { ctx = null; }
     }
     if (ctx && ctx.state === 'suspended') void ctx.resume?.();
@@ -100,7 +102,8 @@ export function createAudio(deps: AudioDeps = {}): Audio {
     try {
       const dur = SYNTHS[v.id](ctx, master, ctx.currentTime + 0.005, { pitch: v.pitch });
       voices++;
-      setTimeout(() => { voices = Math.max(0, voices - 1); }, Math.ceil(dur * 1000) + 30);
+      const timer = setTimeout(() => { timers.delete(timer); voices = Math.max(0, voices - 1); }, Math.ceil(dur * 1000) + 30);
+      timers.add(timer);
     } catch { /* never let audio break the UI */ }
   };
 
@@ -109,15 +112,18 @@ export function createAudio(deps: AudioDeps = {}): Audio {
       if (started) return;
       started = true;
       GESTURES.forEach((e) => target?.addEventListener(e, unlock));
+      if ((deps.activated ?? (() => !!g.navigator?.userActivation?.hasBeenActive))()) unlock();
     },
     stop() {
       started = false;
       GESTURES.forEach((e) => target?.removeEventListener(e, unlock));
       void ctx?.close?.();
       ctx = null; master = null; voices = 0;
+      timers.forEach(clearTimeout); timers.clear(); last.clear();
     },
     setMuted(b) {
       muted = b;
+      if (master) master.gain.value = b ? 0 : 0.7;
       try { storage?.setItem(MUTE_KEY, b ? '1' : '0'); } catch { /* ignore */ }
       if (!b && started) unlock();           // the toggle click is itself a user gesture
       subs.forEach((f) => f());

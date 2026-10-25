@@ -1,4 +1,4 @@
-// Pixel-art fighter parts for the Fight Card rig. 1 pixel = 4 rig units. Each part is drawn in its bone's local
+// Pixel-art fighter parts for the En Garde rig. 1 pixel = 4 rig units. Each part is drawn in its bone's local
 // frame (pivot at 0,0; limbs hang along +y; head/helm face +x; weapons point up -y).
 (function () {
   const U = 4; // rig units per pixel

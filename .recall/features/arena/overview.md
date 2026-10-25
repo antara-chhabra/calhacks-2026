@@ -5,10 +5,10 @@
 **Last touched:** 2026-10-25
 
 ## What this is
-Workstream O1 of the Fight Card build. Pixi v8 arena: pixel-art cut-out rigs (SVG parts), GSAP clips, cue player, VFX, FighterPortrait (E07, FC-F-130). Owns exactly the paths above (PRD §9.3, §17.5); everything else is read-only for this workstream.
+Workstream O1 of the En Garde build. Pixi v8 arena: pixel-art cut-out rigs (SVG parts), GSAP clips, cue player, VFX, FighterPortrait (E07, FC-F-130). Owns exactly the paths above (PRD §9.3, §17.5); everything else is read-only for this workstream.
 
 ## Current state
-- **Pixel art is live (2026-10-25 ~07:30):** ws/pixel-fighters merged with A3/personas as `ws/pixel-final` → main `36d96f4`. Fixes on top: jumbotron "FIGHT CARD" banner moved to `JX + 430` on the clock row (it overlapped gem 5); speech bubbles that would leave the stage top render beside the head toward stage centre with no tail (`labels/layer.ts`). The previous vector look is preserved on branch `built-with-vector-art` (= main `e08ea40`, before the pixel merge). Deployed at https://ist-colleagues-twisted-variations.trycloudflare.com.
+- **Pixel art is live (2026-10-25 ~07:30):** ws/pixel-fighters merged with A3/personas as `ws/pixel-final` → main `36d96f4`. Fixes on top: jumbotron "EN GARDE" banner moved to `JX + 430` on the clock row (it overlapped gem 5); speech bubbles that would leave the stage top render beside the head toward stage centre with no tail (`labels/layer.ts`). The previous vector look is preserved on branch `built-with-vector-art` (= main `e08ea40`, before the pixel merge). Deployed at https://ist-colleagues-twisted-variations.trycloudflare.com.
 - O1 A-01…A-09 on `main`. **A-11 pixel-art fighters** on branch `ws/pixel-fighters` (8c8fa66, pushed, awaiting DV1277 merge): every part redrawn as pixel art (1 art px = 4 units) on the unchanged skeleton/poses/clips; 4-shade palette ramps (`palette.ts` `ramp`, `RAMP_PLACEHOLDERS`); pixel parts rasterised nearest (`rig.ts`); rigs render through a 480x270 nearest render texture (`ArenaCanvas.tsx`, `ART_PIXEL`).
 - Jumbotron moved to bottom centre under the main platform (`JUMBO` in `stage/layout.ts`); nothing overlaps the fighters any more.
 - Art source + exporter: `apps/web/src/arena/dev/pixel-art/` (art bible §7.5). Verified on /replay/mock-basic; 173 arena tests, 589 total green.

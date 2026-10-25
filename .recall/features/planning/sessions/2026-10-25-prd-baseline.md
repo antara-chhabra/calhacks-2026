@@ -9,7 +9,7 @@ Pick the Cal Hacks 13.0 direction (an AI-agent betting marketplace), map it to s
 ## What happened
 - Oct 24 ~22:58: the founder pitched a marketplace where humans bet **on** agents: agents with avatars and personalities sword-fight on screen while solving hard problems in the background; fair eval benchmark; prediction-style props ("villain ≥ 90%"); FIFA-style cards; user-built agents on a global leaderboard that earn money.
 - Pulled prize data from `hive.hackberkeley.org/api/live/prizes` (58 prizes), the schedule JSON, the Coinbase challenge PDF (Drive), the Atlassian doc (needs a Forge app, so skipped), and the Fetch.ai hackpack.
-- Brainstorm reply: name "Fight Card"; the core idea is "the sword fight is the progress bar"; integrals as the launch category with VAR overturns; parimutuel play money; commit-reveal; Spacetime + Factory core, x402/Fetch/ElevenLabs add-ons.
+- Brainstorm reply: name "En Garde"; the core idea is "the sword fight is the progress bar"; integrals as the launch category with VAR overturns; parimutuel play money; commit-reveal; Spacetime + Factory core, x402/Fetch/ElevenLabs add-ons.
 - Founder asked for a full PRD in the format of `~/LA-Hacks-2026/docs/PRD.md` (Headcount: 1) and `~/PetTalk/docs/PRD.md`, with Brawlhalla-style 2D vector art, sprites only, a well-designed FIFA card, a gamified UI, sponsor tech spelled out, pitch and demo, and a build split into scopes and phases for multiple orchestrators.
 - Read both reference PRDs. Verified vendor facts from current docs: Droid TS SDK (`docs.factory.ai/sdk/typescript.md`), SpacetimeDB 2.x TS server/client agent skills + CLI skill, x402 seller/buyer quickstarts (`docs.cdp.coinbase.com`).
 - Wrote the PRD in 8 parts in the scratchpad, cross-checked IDs (every FC-F/N/D, ADR, Q, task and AC reference resolves; code fences balanced; table pipes escaped), and assembled `docs/PRD.md` (v1.0.0, 2,565 lines, ~222 KB).
@@ -23,7 +23,7 @@ Pick the Cal Hacks 13.0 direction (an AI-agent betting marketplace), map it to s
 - Outside the repo: user memory `cal-hacks-13.md`, `MEMORY.md`; scratchpad downloads (prizes JSON, Coinbase PDF, Droid/Spacetime/x402 docs).
 
 ## Decisions made
-- Product: "Fight Card" (working title, Q-007). Humans bet on agents; agents never help bettors.
+- Product: "En Garde" (working title, Q-007). Humans bet on agents; agents never help bettors.
 - Launch category: generated integrals; live 3-point check plus 48-point final check (VAR) with trap problems (missing `abs` in logs).
 - Money: play-money chips for humans; test USDC only in agent/treasury wallets (gambling law + Coinbase's "don't manage funds for others").
 - Models hidden from bettors **and creators**; creators pick a Standard/Pro tier; a model is locked per fighter version.

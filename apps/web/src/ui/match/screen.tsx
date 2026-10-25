@@ -2,11 +2,12 @@
 import { statusLine, type MatchState } from '@fc/engine';
 import QRCode from 'qrcode';
 import { useEffect, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { ArenaCanvas, FighterPortrait } from '@/arena';
 import { bridge } from '@/bridge';
 import { config } from '@/config';
 import { useStore } from '@/data/store';
+import { arenaMatch } from '@/ui/lobby/market-board';
 import { fixtureNames } from '@/data/replay';
 import { cn } from '@/lib/utils';
 import { getPodium, subscribePodium } from '@/arena/sequences/podium';
@@ -17,20 +18,26 @@ import { ResultsPanel } from './results';
 
 /** Wait through connection hydration, then attach to a known DB match or bundled fixture. */
 export function useMatchSource(id: string | null, speed?: number): void {
+  const replayRequest = useRef<string | null>(null);
   const conn = useStore((s) => s.conn);
   const matches = useStore((s) => s.matches);
-  const liveMatchId = useStore((s) => s.liveMatchId);
+  const selectedId = useStore((s) => arenaMatch(s)?.id ?? null);
+  const replayId = useStore((s) => s.watch.matchId);
   useEffect(() => {
     const st = useStore.getState();
-    const target = id ?? liveMatchId ?? (conn === 'connecting' ? null : st.openMatchId ?? 'mock-basic');
+    const target = id ?? selectedId;
+    if (conn === 'replay' && target === st.watch.matchId && st.watch.mode === 'replay') return;
     const source = matchSourceFor({ target, conn, matches, fixtures: fixtureNames() });
     if (!target || source === 'wait' || source === 'none') return;
     if (source === 'live') {
+      replayRequest.current = null;
       if (st.watch.matchId !== target || st.watch.mode !== 'live') st.watchMatch(target);
       return;
     }
-    if (st.watch.matchId !== target || st.watch.mode !== 'replay' || st.openMatchId !== target) st.openReplay(target, speed ?? 1);
-  }, [id, speed, conn, matches, liveMatchId]);
+    if (replayRequest.current === target && st.watch.mode === 'replay') return;
+    replayRequest.current = target;
+    st.openReplay(target, speed ?? 1);
+  }, [id, speed, conn, matches, selectedId, replayId]);
 }
 
 export const prefersReducedMotion = (): boolean => typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
@@ -52,7 +59,8 @@ function TopBar() {
   const mode = useStore((s) => s.watch.mode);
   const speed = useStore((s) => s.watch.speed);
   const conn = useStore((s) => s.conn);
-  const num = matchNumber(state.matchId);
+  const recordedNumber = useStore((s) => state.matchId ? s.matches[state.matchId]?.number : undefined);
+  const num = recordedNumber === undefined ? matchNumber(state.matchId) : String(recordedNumber);
   return (
     <header className="flex flex-wrap items-center gap-x-5 gap-y-1 border-b border-zinc-800 px-4 py-2.5 text-sm">
       <div className="font-semibold text-zinc-100">MATCH{num ? ` #${num}` : ''} <span className="font-normal text-zinc-500">· {categoryLabel(state.category)}</span></div>
@@ -176,6 +184,15 @@ export function MatchScreen({ id }: { id: string | null }) {
   useMatchSource(id, speed);
   const state = useStore((s) => s.watch.state);
   const mode = useStore((s) => s.watch.mode);
+  const conn = useStore((s) => s.conn);
+  const active = useStore((s) => arenaMatch(s));
+  if (!id && !active) return (
+    <AppShell title="Arena"><section aria-live="polite" className="py-16 text-center" data-testid="no-live-fight">
+      <h1 className="text-2xl font-bold text-white">{conn === 'connecting' ? 'Connecting to the arena…' : conn === 'offline' ? 'Arena connection unavailable' : 'No fight is live right now'}</h1>
+      <p className="mt-3 text-sm text-zinc-400">{conn === 'offline' ? 'Check that the match backend is running. This page reconnects automatically.' : 'This page joins the next fight automatically.'}</p>
+      <Link className="mt-6 inline-flex min-h-11 items-center rounded-lg bg-white px-5 text-sm font-semibold text-black" to="/markets">Browse markets</Link>
+    </section></AppShell>
+  );
   return (
     <AppShell title="Match" wide>
       <div className="flex flex-col">

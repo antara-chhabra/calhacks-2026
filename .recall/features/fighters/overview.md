@@ -5,7 +5,7 @@
 **Last touched:** 2026-10-25
 
 ## What this is
-Workstream O5 of the Fight Card build. Fighter backends: Factory Droid SDK sessions + in-process MCP arena tools, referee permission policy, sandbox wrapper, mock/direct/BYO, house personas. Owns exactly the paths above (PRD §9.3, §17.5); everything else is read-only for this workstream.
+Workstream O5 of the En Garde build. Fighter backends: Factory Droid SDK sessions + in-process MCP arena tools, referee permission policy, sandbox wrapper, mock/direct/BYO, house personas. Owns exactly the paths above (PRD §9.3, §17.5); everything else is read-only for this workstream.
 
 ## Current state
 

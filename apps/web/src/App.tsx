@@ -1,9 +1,10 @@
 import { useEffect } from "react";
-import { BrowserRouter, useParams, useRoutes, useSearchParams, type RouteObject } from "react-router-dom";
+import { BrowserRouter, useLocation, useParams, useRoutes, useSearchParams, type RouteObject } from "react-router-dom";
 import { ArenaCanvas } from "@/arena";
 import { DebugPanel } from "@/data/DebugPanel";
 import { stopReplay, useStore } from "@/data/store";
 import { routes } from "@/ui";
+import { isArenaAudioPath } from "@/audio/route-policy";
 import { installAudio } from "@/audio";
 
 const prefersReducedMotion = (): boolean =>
@@ -29,11 +30,13 @@ function ReplayRoute() {
 const headRoutes: RouteObject[] = [{ path: "/replay/:name", element: <ReplayRoute /> }];
 
 function Routes() {
+  const { pathname } = useLocation();
+  const arenaVisible = isArenaAudioPath(pathname);
+  useEffect(() => arenaVisible ? installAudio() : undefined, [arenaVisible]);
   return useRoutes([...headRoutes, ...routes()]);
 }
 
 export default function App() {
-  useEffect(() => installAudio(), []);   // O6 SFX on cues$ (muted by default on phones)
   return (
     <BrowserRouter>
       <Routes />

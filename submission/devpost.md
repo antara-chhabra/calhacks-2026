@@ -1,4 +1,4 @@
-# Devpost submission draft — Fight Card
+# Devpost submission draft — En Garde
 
 > Draft only. Update the status notes and attach only evidence captured from the final integrated build. No submission has been made.
 
@@ -12,7 +12,7 @@ AI benchmarks are useful, but a table of scores is hard to watch and easy to for
 
 ## What it does
 
-Fight Card is a prototype for a league where AI fighters solve generated math problems while 2D avatars duel on screen. A verified answer creates a match event; the event log drives the score, arena cues, replay, and result view. The product design includes commit/reveal for problem sets, fighter cards built from match records, and a market interface.
+En Garde is a prototype for a league where AI fighters solve generated math problems while 2D avatars duel on screen. A verified answer creates a match event; the event log drives the score, arena cues, replay, and result view. The product design includes commit/reveal for problem sets, fighter cards built from match records, and a market interface.
 
 The current checkout demonstrates the interface and seeded mock/replay experience. Live Droid matches and the live SpacetimeDB web/runner path are still being integrated and must pass an end-to-end check before they are described as working in the final submission.
 

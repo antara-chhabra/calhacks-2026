@@ -42,7 +42,7 @@ D runs in parallel from the start (F-01 needs only the droid CLI + key). E and F
 
 ## Boot prompt for each of your orchestrators (fill the brackets)
 ```
-You are orchestrator <lane letter + name> for Fight Card. Source of truth: docs/PRD.md; also read
+You are orchestrator <lane letter + name> for En Garde. Source of truth: docs/PRD.md; also read
 docs/status/HANDOFF-DV1277.md and CLAUDE.md. Worktree: <path> on branch <branch>.
 WRITE paths: <from the table>. Everything else is read-only.
 Run the cards in dependency order; parallelize sub-agents only when their WRITE files don't overlap.

@@ -43,7 +43,7 @@ export function BetSlip(props: { matchId: string | null; compact?: boolean }) {
   const bets = useStore((s) => s.bets);
   const mineCount = bets.filter((b) => b.mine && (!props.matchId || b.matchId === props.matchId)).length;
   return (
-    <section className={cn('flex w-full flex-col gap-3 rounded-xl border border-zinc-800 bg-black p-4', props.compact && 'p-3')} data-match={props.matchId ?? ''}>
+    <section className={cn('flex w-full flex-col gap-3 rounded-xl border border-zinc-800 bg-black p-4', props.compact && 'p-3')} data-match={props.matchId ?? ''} id="bet-slip">
       <nav className="flex gap-1 border-zinc-800 border-b pb-2 text-[13px]">
         <button className={cn('rounded-md px-2.5 py-1', tab !== 'mine' ? 'bg-zinc-900 text-zinc-100' : 'text-zinc-500 hover:text-zinc-300')}
           onClick={() => setTab('winner')} type="button">Bet slip</button>

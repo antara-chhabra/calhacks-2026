@@ -1,4 +1,4 @@
-# Fight Card — Arena Art Bible
+# En Garde — Arena Art Bible
 
 Owner: O1 (arena). Source of truth for the arena only. Requirement IDs: FC-D-002, FC-D-003, FC-F-120–125, -128, -130. Decision: ADR-026.
 Everything outside the arena canvas (lobby, bet slip, cards screens, Forge UI, mobile page) is a separate UI track and is not specified here.
@@ -29,7 +29,7 @@ Style reference (this file only, never shipped copy): the flat-vector platform-f
 | `--cloud-near` | `#F3C9B5` @ 85% | Foreground clouds |
 | `--stone-lit` | `#8F86A8` | Platform top |
 | `--stone-shade` | `#4A4466` | Platform side and underside |
-| `--gold` | `#F2C14E` | Jumbotron trim, victory sparks, FIGHT CARD banner |
+| `--gold` | `#F2C14E` | Jumbotron trim, victory sparks, EN GARDE banner |
 | `--ok` / `--bad` / `--warn` | `#2EC4A6` / `#E5383B` / `#F2C14E` | Verdicts and cards only |
 
 Fighter palettes live in `HOUSE_ROSTER` (`packages/contracts/src/roster.ts`). Characters use flat fills plus one hard shadow shape (fill darkened 25%, multiply) on the side away from the top-left key light, and one small white highlight (35%) on helmets and blades. No gradients on characters.
@@ -53,7 +53,7 @@ Build order and time boxes follow tasks A-01 → A-10 in the PRD. Each component
 |---|---|---|---|---|
 | 1 | **Stage** | 1920×1080 logical canvas: sky, far clouds, colosseum ring silhouette, server-pillar glow, crowd row, four platform slots, foreground clouds, KO blast zones | static + parallax (0.15 / 0.3 / 0.5 / 1.2) | Slot feet anchors in PRD §10.6; letterbox to fit |
 | 2 | **Platforms** | Main platform (slots 1, 2) and two floats (slots 0, 3), stone with hanging chains | static | Underside art doubles as a bounce surface for knockback clips |
-| 3 | **Jumbotron** | Match number, five problem gems, clock, hand-drawn FIGHT CARD banner | `match.*`, `verdict.*` | Gems show stars and points only until reveal |
+| 3 | **Jumbotron** | Match number, five problem gems, clock, hand-drawn EN GARDE banner | `match.*`, `verdict.*` | Gems show stars and points only until reveal |
 | 4 | **Crowd** | Row of bobbing silhouettes, reacts to hits, overturns, KOs | cues | Cheap: 3 sprite poses, tinted |
 | 5 | **Fighter rig** | One skeleton: hips root, torso, head, two arms (back arm 20% darker), two legs, weapon socket | `FighterPublic.skin` | Parts as SVG rasterised at 2×, recoloured by placeholder fills (`#FF00FF`, `#00FFFF`, `#FFFF00`, `#FFAA88`) |
 | 6 | **Weapon library** | greatsword, katana, sawblade, rapier, cleaver, wooden_sword | skin | Grip at the file's `data-socket` |

@@ -4,7 +4,7 @@
 **Repo state:** main @ 1d030cf, 2 untracked paths (`apps/web/`, `submission/`) before the commit that carries this dump
 
 ## Goal
-Design the Fight Card UI, first in Figma and then (after a founder pivot) as working code built from KokonutUI in a Kalshi/Polymarket-style black theme.
+Design the En Garde UI, first in Figma and then (after a founder pivot) as working code built from KokonutUI in a Kalshi/Polymarket-style black theme.
 
 ## What happened
 - 00:43–00:54: Figma MCP v1 in file `l4pXxI22J9zzAUxfjsdrCz` (https://www.figma.com/design/l4pXxI22J9zzAUxfjsdrCz). Built variables (PRD §10.2), text styles, components, a FIFA card (7 tiers), six fighters (one SVG rig), Sky Colosseum arena (Live/VAR/Results) and the Lobby. Hit the Starter plan's 3-page cap, then the View seat's 20 MCP calls/month.
@@ -22,7 +22,7 @@ Design the Fight Card UI, first in Figma and then (after a founder pivot) as wor
 - `apps/web/src/components/fightcard/primitives.tsx`: AgentAvatar (monogram), Sparkline, ChangeChip, Chips, LiveDot, Button tones, `useLiveValue`.
 - `apps/web/src/ui/mock.ts`: agents, categories, recent bets, hub markets, `chipsHistory`.
 - `apps/web/src/ui/widgets.tsx`: Leaderboard (container queries), Arena, Movers, RecentBets, BuildAgent, AgentTile, HubMarketTile.
-- `apps/web/src/pages/Landing.tsx`: Flow Field hero, "Fight Card", "AI agents fight. You call it."
+- `apps/web/src/pages/Landing.tsx`: Flow Field hero, "En Garde", "AI agents fight. You call it."
 - `apps/web/src/pages/Markets.tsx`: header, navbar, board bento (leaderboard 4 + arena 2 / movers, bets, build), trackers + metric card, agents bento, prediction hub bento with interest filters.
 - `/Users/antara/calhacks/.claude/launch.json` (outside the repo): `web` dev server for the preview pane.
 

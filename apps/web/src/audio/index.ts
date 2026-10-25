@@ -11,12 +11,16 @@ export function getAudio(): Audio {
   return shared ??= createAudio({ env: () => { const w = useStore.getState().watch; return { playing: w.playing, speed: w.speed }; } });
 }
 
-/** Call once at app start: `useEffect(() => installAudio(), [])` in App.tsx. Returns the teardown. */
-export function installAudio(): () => void {
-  const a = getAudio();
-  a.start();
+/** Mounted only by a visible arena route. Hidden tabs stop output without stopping the match. */
+export function installAudio(a: Audio = getAudio()): () => void {
+  const visibility = () => {
+    if (typeof document !== 'undefined' && document.visibilityState === 'hidden') a.stop();
+    else a.start();
+  };
+  visibility();
+  if (typeof document !== 'undefined') document.addEventListener('visibilitychange', visibility);
   const off = useStore.getState().cues$((c) => a.onCue(c));
-  return () => { off(); a.stop(); };
+  return () => { off(); if (typeof document !== 'undefined') document.removeEventListener('visibilitychange', visibility); a.stop(); };
 }
 
 /** ElevenLabs hook (ADR-025, FC-F-321): no-op today; barks plug in here later with the same signature. */

@@ -38,7 +38,7 @@ export interface NavItem {
   name: string;
 }
 
-// Fight Card runs on Vite + react-router rather than Next.js: keep the
+// En Garde runs on Vite + react-router rather than Next.js: keep the
 // original `href` call sites and map them onto react-router's Link.
 function Link({ href, ...rest }: ComponentProps<"a"> & { href: string }) {
   return <RouterLink to={href} {...rest} />;
@@ -54,6 +54,8 @@ export interface MorphicNavbarProps {
    * path matches the current route, that item is active instead.
    */
   defaultPath?: string;
+  /** Route alias for detail pages belonging to a parent navigation item. */
+  currentPath?: string;
   /**
    * After 80px of page scroll, fold the bar down to the active link plus a
    * chevron that opens it again.
@@ -206,7 +208,7 @@ const KEY_MOVES: Record<string, (i: number, n: number) => number> = {
   End: (_, n) => n - 1,
 };
 
-const SURFACE = "bg-zinc-900 dark:bg-zinc-100";
+const SURFACE = "bg-zinc-900";
 const FOCUS_RING =
   "outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-inset";
 
@@ -322,8 +324,8 @@ function Segment({
           SURFACE,
           FOCUS_RING,
           highlighted
-            ? "text-white dark:text-zinc-950"
-            : "text-zinc-400 hover:text-zinc-100 dark:text-zinc-500 dark:hover:text-zinc-800"
+            ? "text-white"
+            : "text-zinc-400 hover:text-zinc-100"
         )}
         draggable={false}
         href={href}
@@ -362,7 +364,7 @@ function Segment({
         <span
           aria-hidden="true"
           className={cn(
-            "absolute bottom-1.5 left-1/2 h-0.5 w-3 -translate-x-1/2 rounded-full bg-orange-500 transition-transform duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none",
+            "absolute bottom-1.5 left-1/2 h-0.5 w-3 -translate-x-1/2 rounded-full bg-white transition-transform duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none",
             highlighted ? "scale-x-100" : "scale-x-0"
           )}
         />
@@ -423,13 +425,15 @@ function useUserOpen(scrolledPast: boolean) {
 export function MorphicNavbar({
   items = DEFAULT_NAV_ITEMS,
   defaultPath,
+  currentPath,
   compact = false,
   className,
 }: MorphicNavbarProps) {
   const entries = Object.entries(items);
   const paths = entries.map(([path]) => path);
   const count = entries.length;
-  const pathname = usePathname();
+  const routePathname = usePathname();
+  const pathname = currentPath ?? routePathname;
   const [activePath, setActivePath] = useState(
     () => findItemPath(paths, pathname) ?? defaultPath ?? paths[0] ?? "/"
   );

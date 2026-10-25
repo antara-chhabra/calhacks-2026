@@ -6,7 +6,7 @@
 
 ## Goal
 
-Integrate and verify the remaining Fight Card workstreams while preserving the user’s instruction to merge later.
+Integrate and verify the remaining En Garde workstreams while preserving the user’s instruction to merge later.
 
 ## What happened
 

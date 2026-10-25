@@ -5,7 +5,7 @@
 **Last touched:** 2026-10-25
 
 ## What this is
-Workstream O4 of the Fight Card build. Runner match runtime: integral generator + mathjs whitelist verifier, match lifecycle, FighterIO, VAR, commit-reveal, season loop, admin/BYO HTTP. Owns exactly the paths above (PRD §9.3, §17.5); everything else is read-only for this workstream.
+Workstream O4 of the En Garde build. Runner match runtime: integral generator + mathjs whitelist verifier, match lifecycle, FighterIO, VAR, commit-reveal, season loop, admin/BYO HTTP. Owns exactly the paths above (PRD §9.3, §17.5); everything else is read-only for this workstream.
 
 ## Current state
 

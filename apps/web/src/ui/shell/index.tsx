@@ -1,5 +1,5 @@
 // App shell (U-01). Every screen wraps its content in <AppShell>; props are a stable contract.
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import type { ReactNode } from "react";
 import { MorphicNavbar } from "@/components/kokonutui/morphic-navbar";
 import { LiveDot, Money, Toaster } from "@/components/fightcard/primitives";
@@ -87,15 +87,16 @@ export function MoneyDisclosure({ className }: { className?: string }) {
 }
 
 export function AppShell(props: { children: ReactNode; title?: string; wide?: boolean }) {
+  const { pathname } = useLocation();
   return (
     <div className="flex min-h-dvh flex-col bg-black text-zinc-100">
       <header className="sticky top-0 z-40 border-zinc-900 border-b bg-black/85 backdrop-blur">
         <div className="mx-auto flex max-w-[1280px] items-center gap-3 px-4 py-2.5 sm:px-6">
           <Link className="shrink-0 rounded-md font-semibold text-[15px] text-zinc-50 tracking-tight focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-zinc-400/60" to="/">
-            Fight Card
+            En Garde
           </Link>
           <nav aria-label="Primary" className="hidden min-w-0 flex-1 justify-center md:flex">
-            <MorphicNavbar className="[&_a]:whitespace-nowrap" items={NAV} />
+            <MorphicNavbar className="[&_a]:whitespace-nowrap" currentPath={pathname.startsWith("/match/") ? "/match/live" : pathname} items={NAV} />
           </nav>
           <div className="ml-auto flex items-center gap-2">
             <MuteToggle className="rounded-md p-1.5 text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-zinc-400/60" />

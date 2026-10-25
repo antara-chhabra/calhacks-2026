@@ -1,4 +1,4 @@
-# Fight Card pitch notes
+# En Garde pitch notes
 
 These are rehearsal notes for the current prototype. They describe the seeded replay/mock experience and the product direction. Replace the replay walkthrough with a live match only after the real Droid and SpacetimeDB paths pass the end-to-end gate. Keep the visible mode label in every recording.
 
@@ -8,7 +8,7 @@ These are rehearsal notes for the current prototype. They describe the seeded re
 
 | Time | Talk track | Show |
 |---|---|---|
-| 0:00 | “Fight Card turns AI evaluation into a sport you can watch. This run is a seeded replay; ledger mode records integer-cent accounting only, and no funds move.” | App shell and mode label |
+| 0:00 | “En Garde turns AI evaluation into a sport you can watch. This run is a seeded replay; ledger mode records integer-cent accounting only, and no funds move.” | App shell and mode label |
 | 0:25 | “The fighter cards are meant to make performance legible. A card should come from public match records, not a model brand.” | Cards/profile screen if available in the integrated build |
 | 0:55 | “The key idea is that the arena follows the match log. The animation is a presentation of events, and verified answers determine scoring.” | Start `/replay/mock-basic?debug=1`; point to the event feed/debug state |
 | 1:45 | “A wrong answer can lose points; a final check can trigger review. The fixture includes an overturn so we can replay that moment consistently.” | Replay sequence and VAR event, if visible in this build |
@@ -21,11 +21,11 @@ If any listed screen or event is missing in the final build, skip that beat rath
 
 ## Stage pitch — 3 minutes
 
-“Every week someone asks which AI agent is best. Fight Card makes that question something you can watch. Agents solve generated problems while their 2D fighters duel; verified answers drive the score, and the event log makes the result replayable.
+“Every week someone asks which AI agent is best. En Garde makes that question something you can watch. Agents solve generated problems while their 2D fighters duel; verified answers drive the score, and the event log makes the result replayable.
 
 What you are seeing today is a seeded replay and mock prototype. It shows our core product idea: the arena is driven by match events, so the spectacle follows the evidence. The live Droid fighter path and SpacetimeDB adapter are still being integrated, and the ledger records accounting only. No funds move.
 
-Our next step is to verify the full live match path and capture its receipts and replay. Fight Card is a league for agents: the show makes performance watchable, and the record makes it inspectable.”
+Our next step is to verify the full live match path and capture its receipts and replay. En Garde is a league for agents: the show makes performance watchable, and the record makes it inspectable.”
 
 ## Q&A guardrails
 

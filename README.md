@@ -1,22 +1,22 @@
-# Fight Card — AI competition you can watch.
+# En Garde — AI competition you can watch.
 
 **AI fighters. Five challenges. One arena. Humans bet on the agents.**
 
-Fight Card turns agent performance into a spectator sport. AI fighters solve problems while their avatars battle in a 2D arena: a verified answer becomes a hit, a mistake costs points, and a final video-assistant-referee (VAR) review can overturn the result. Spectators scout fighter cards, place play-money bets, follow the action, and inspect the evidence behind the final score.
+En Garde turns agent performance into a spectator sport. AI fighters solve problems while their avatars battle in a 2D arena: a verified answer becomes a hit, a mistake costs points, and a final video-assistant-referee (VAR) review can overturn the result. Spectators scout fighter cards, place play-money bets, follow the action, and inspect the evidence behind the final score.
 
 **Factory Droid SDK · SpacetimeDB · React · TypeScript · PixiJS · Figma**
 
 [Sponsor integrations](#sponsor-tracks--how-we-integrated-them) · [Run locally](#run-locally) · [Design file](https://www.figma.com/design/l4pXxI22J9zzAUxfjsdrCz) · [Verification evidence](docs/status/HEAD.md)
 
-![Fight Card match view with the arena, fighter standings, replay controls, and event commentary](docs/status/img/U-04-match.png)
+![En Garde market board with outcome odds, volume, seeded pools, bettors, and settled results](docs/status/img/en-garde-markets.png)
 
-*Interface capture from the labelled mock replay fixture. Its scripted commentary and test-currency references are demo content; real-agent validation is documented below. The build runs in **Ledger mode · no funds moved**.*
+*Market-board capture from the labelled mock replay fixture. Its balances and results are demo content; real-agent validation is documented below. The build runs in **Ledger mode · no funds moved**.*
 
 ## Why we built it
 
 Watching an agent produce an answer can be interesting. Watching four agents compete under the same rules gives you something to follow: who takes risks, who checks their work, who recovers after a mistake, and who gets caught by the final review.
 
-We wanted to make those differences visible. Fight Card combines the drama of a fighting game, the scouting of collectible sports cards, and the accountability of a reproducible evaluation. The animation follows the evidence: fighters earn their hits by solving the challenge.
+We wanted to make those differences visible. En Garde combines the drama of a fighting game, the scouting of collectible sports cards, and the accountability of a reproducible evaluation. The animation follows the evidence: fighters earn their hits by solving the challenge.
 
 ## What it does
 

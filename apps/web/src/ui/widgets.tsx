@@ -1,3 +1,5 @@
+import { formatCents } from "@fc/contracts";
+import { marketTotals } from "@/ui/lobby/market-board";
 import { Eye, Fingerprint, Swords } from "lucide-react";
 import { type FormEvent, useState } from "react";
 import { Link } from "react-router-dom";
@@ -159,7 +161,7 @@ export function AccountWidget({ me, register }: { me: MeVM; register: (handle: s
       <p className="font-semibold text-3xl text-zinc-50 tabular-nums">{me.balanceText}</p>
       <p className="mt-1 text-[11px] text-zinc-500">{me.moneyModeText}</p>
       {me.signedIn ? (
-        <p className="mt-auto text-[13px] text-zinc-300">Signed in as <span className="font-semibold text-zinc-50">{me.handle}</span>. Your balance is $0.00 until the Director credits test funds.</p>
+        <p className="mt-auto text-[13px] text-zinc-300">Signed in as <span className="font-semibold text-zinc-50">{me.handle}</span>. Your bets and settled payouts are recorded in My bets.</p>
       ) : (
         <form className="mt-auto space-y-2" onSubmit={submit}>
           <label className="block text-[12px] text-zinc-400" htmlFor="handle">Pick a handle to play</label>
@@ -209,26 +211,40 @@ export function FightersWidget({ fighters }: { fighters: { fighter: FighterVM; o
 
 /* ---------------------------------- Market tile ---------------------------------- */
 
-export function MarketTile({ market, names, size, teamMarket = false }: { market: MarketView; names: Record<string, FighterVM>; size: WidgetSize; teamMarket?: boolean }) {
-  const rows = market.outcomes.map((o) => ({ id: o, f: names[o], odds: market.odds[o], vol: market.pools[o]?.staked ?? 0 }));
-  const total = rows.reduce((a, r) => a + r.vol, 0);
+export function MarketTile({ market, names, teamMarket = false, href, now = Date.now(), closesAt }: { market: MarketView; names: Record<string, FighterVM>; size: WidgetSize; teamMarket?: boolean; href?: string; now?: number; closesAt?: number }) {
+  const totals = marketTotals(market);
+  const label = (id: string) => teamMarket && id.toLowerCase() === "team_a" ? "Team A" : teamMarket && id.toLowerCase() === "team_b" ? "Team B" : names[id]?.name ?? id.replaceAll("_", " ");
+  const status = market.status === "open" && closesAt !== undefined && closesAt <= now ? "locked" : market.status;
   return (
-    <div className="flex h-full flex-col">
-      <p className="text-[11px] text-zinc-500 uppercase">{market.kind.replace("_", " ")} · {market.status}</p>
-      <p className="mt-1 font-medium text-[15px] text-zinc-50 leading-snug">{market.label}</p>
-      <ul className="mt-2 flex-1 space-y-1">
-        {rows.slice(0, size === "s" ? 3 : 5).map((r) => (
-          <li className="flex items-center gap-2" key={r.id}>
-            {r.f && <AgentAvatar agent={avatarOf(r.f)} size={20} />}
-            <span className="w-14 truncate text-[13px] text-zinc-200">{teamMarket && r.id.toLowerCase() === 'team_a' ? 'Team A' : teamMarket && r.id.toLowerCase() === 'team_b' ? 'Team B' : r.f?.name ?? r.id}</span>
-            <span className="relative h-1 flex-1 overflow-hidden rounded-full bg-zinc-800">
-              <span className="absolute inset-y-0 left-0 rounded-full bg-zinc-300" style={{ width: `${r.odds ? impliedPct(r.odds) : 0}%` }} />
-            </span>
-            <span className="w-9 text-right font-semibold text-[13px] text-zinc-100 tabular-nums">{r.odds ? `${impliedPct(r.odds)}%` : "–"}</span>
-          </li>
-        ))}
+    <div className="flex flex-1 flex-col">
+      <div className="flex items-start justify-between gap-3">
+        <h2 className="text-xl font-bold leading-snug tracking-tight text-white">{href ? <Link className="rounded-sm hover:underline focus-visible:outline-2 focus-visible:outline-white" to={href}>{market.label}</Link> : market.label}</h2>
+        <span className={cn("shrink-0 rounded-md px-2 py-1 text-xs font-semibold capitalize", status === "open" ? "bg-emerald-400/15 text-emerald-300" : "bg-zinc-900 text-zinc-300")}>{status}</span>
+      </div>
+      <div className="mt-2 flex flex-wrap justify-between gap-2 text-xs text-zinc-400">
+        <span className="capitalize">{market.kind.replaceAll("_", " ")}</span>
+        <span>{status === "open" && closesAt ? `Closes in ${countdown(closesAt, now)}` : status === "settled" && market.result ? `Result: ${label(market.result)}` : "Bets closed"}</span>
+      </div>
+      <ul className="my-4 flex-1 divide-y divide-zinc-800">
+        {market.outcomes.map((id) => {
+          const fighter = names[id];
+          const odds = market.odds[id];
+          const result = market.status === "settled" && market.result === id;
+          const quote = <><span className="font-bold tabular-nums">{odds ? `${impliedPct(odds)}%` : "—"}</span><span className="text-xs tabular-nums text-zinc-300">{odds ? `${odds.toFixed(2)}×` : "No odds"}</span></>;
+          return <li className="flex items-center gap-2 py-2.5" key={id}>
+            {fighter && <AgentAvatar agent={avatarOf(fighter)} size={28} />}
+            <div className="min-w-0 flex-1"><span className="block truncate text-sm font-semibold capitalize text-zinc-100">{label(id)}{result && <span className="ml-2 text-xs text-emerald-300">Winner</span>}</span><span className="text-xs text-zinc-400">{formatCents(market.pools[id]?.staked ?? 0)} staked</span></div>
+            {href ? <Link aria-label={`View ${label(id)}, ${odds ? `${impliedPct(odds)} percent implied, ${odds.toFixed(2)} times` : "odds unavailable"}`} className="flex min-h-11 min-w-24 items-center justify-between gap-3 rounded-lg bg-emerald-400/10 px-3 text-emerald-300 transition-colors hover:bg-emerald-400/20 focus-visible:outline-2 focus-visible:outline-emerald-300" to={href}>{quote}</Link> : <span className="flex items-center gap-3 text-emerald-300">{quote}</span>}
+          </li>;
+        })}
       </ul>
-      <p className="mt-2 text-[11px] text-zinc-500">{total.toLocaleString("en-US")}¢ staked</p>
+      <dl className="flex flex-wrap justify-between gap-x-4 gap-y-2 border-t border-zinc-800 pt-3 text-xs">
+        <div><dt className="text-zinc-400">Volume</dt><dd className="mt-1 font-semibold tabular-nums text-zinc-100">{formatCents(totals.volume)}</dd></div>
+        <div><dt className="text-zinc-400">Pool incl. seed</dt><dd className="mt-1 font-semibold tabular-nums text-zinc-100">{formatCents(totals.pool)}</dd></div>
+        <div><dt className="text-zinc-400">Bettors</dt><dd className="mt-1 font-semibold tabular-nums text-zinc-100">{totals.bettors}</dd></div>
+        <div><dt className="text-zinc-400">Market fee</dt><dd className="mt-1 font-semibold tabular-nums text-zinc-100">{market.rakeBps / 100}%</dd></div>
+      </dl>
+      <p className="mt-3 text-[11px] text-zinc-400">Pool-implied percentages · decimal payout odds</p>
     </div>
   );
 }

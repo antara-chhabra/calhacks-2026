@@ -25,7 +25,8 @@ export const PLATFORMS = {
 export const JUMBO = { x: 600, y: 922, w: 720, h: 132 } as const;
 
 /** m:ss remaining. Clamped to [0, limit]; no start yet = full limit. */
-export function matchClockMs(timeLimitMs: number, startedT: number | null, t: number): number {
+export function matchClockMs(timeLimitMs: number, startedT: number | null, t: number, status?: MatchState['status']): number {
+  if (status === 'review' || status === 'settled' || status === 'void') return 0;
   if (startedT === null) return Math.max(0, timeLimitMs);
   return Math.max(0, Math.min(timeLimitMs, timeLimitMs - (t - startedT)));
 }

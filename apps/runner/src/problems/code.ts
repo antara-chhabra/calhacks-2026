@@ -25,7 +25,7 @@ function buildSpecs(seed: string): CodeSpec[] {
   const topXs = Array.from({ length: 8 }, () => rng.int(-20, 30));
 
   const sumInputs = [a, [], [0, -3, 8], [1], [5, 7, 9], [-2, -4], [100, 250, -10], b, [rng.int(-9, 9), rng.int(-9, 9), rng.int(-9, 9)], [3, 3, 3], [12, -12, 0], [1, 2, 3, 4, 5]];
-  const wordInputs = ['', '   ', 'one', 'one two', '  one   two\nthree ', 'fight card arena', 'a\tb\nc', ' spaced  words ', 'four tiny words here', 'x'.repeat(20), 'red blue green gold', ' leading and trailing '];
+  const wordInputs = ['', '   ', 'one', 'one two', '  one   two\nthree ', 'en garde arena', 'a\tb\nc', ' spaced  words ', 'four tiny words here', 'x'.repeat(20), 'red blue green gold', ' leading and trailing '];
   const groupInputs = [
     bucketXs.map((value, i) => ({ category: ['red', 'blue', 'red', 'gold'][i]!, value })), [],
     [{ category: 'blue', value: -3 }, { category: 'red', value: 8 }, { category: 'blue', value: 5 }],

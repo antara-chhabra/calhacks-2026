@@ -5,7 +5,7 @@
 **Last touched:** 2026-10-25
 
 ## What this is
-Workstream O2 of the Fight Card build. React UI: lobby, match HUD, bet slip, results, FIFA cards, profiles, leaderboard, Forge, /m mobile, Director (E08, E09, E11 UI, E12). Owns exactly the paths above (PRD §9.3, §17.5); everything else is read-only for this workstream.
+Workstream O2 of the En Garde build. React UI: lobby, match HUD, bet slip, results, FIFA cards, profiles, leaderboard, Forge, /m mobile, Director (E08, E09, E11 UI, E12). Owns exactly the paths above (PRD §9.3, §17.5); everything else is read-only for this workstream.
 
 ## Current state
 

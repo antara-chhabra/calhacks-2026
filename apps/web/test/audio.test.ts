@@ -129,3 +129,18 @@ describe('mute', () => {
     expect(a.muted()).toBe(true);
   });
 });
+
+it('unlocks when entering the arena after a navigation gesture and stops on exit', () => {
+  const ctx = mockCtx();
+  const factory = vi.fn(() => ctx as unknown as AudioContext);
+  const a = createAudio({ ctxFactory: factory, activated: () => true, storage: store(), gestureTarget: new EventTarget() });
+  a.start();
+  expect(factory).toHaveBeenCalledOnce();
+  a.onCue(atk('light'));
+  expect(ctx.oscillators).toBeGreaterThan(0);
+  a.stop();
+  expect(ctx.close).toHaveBeenCalledOnce();
+  const count = ctx.oscillators;
+  a.onCue(atk('heavy'));
+  expect(ctx.oscillators).toBe(count);
+});

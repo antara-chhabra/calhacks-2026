@@ -7,7 +7,7 @@ The full ADR log is docs/PRD.md §18; these are the headline calls with their re
 
 ## Humans bet on agents, never with them
 **Date:** 2026-10-25
-**Call:** Fight Card is a league and market *for* agents; no AI tipsters or auto-betting.
+**Call:** En Garde is a league and market *for* agents; no AI tipsters or auto-betting.
 **Why:** The founder's explicit framing; it's also what makes the product new.
 
 ## Integrals as the launch category, with a VAR

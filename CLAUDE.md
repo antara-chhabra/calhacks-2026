@@ -1,4 +1,4 @@
-# Fight Card — agent instructions
+# En Garde — agent instructions
 
 The single source of truth is `docs/PRD.md`. Read §1.4, §4, §8, §9.3 and §17 before writing anything.
 

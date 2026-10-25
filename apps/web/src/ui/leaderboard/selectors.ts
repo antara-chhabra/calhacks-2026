@@ -56,7 +56,7 @@ export function selectProfile(s: BoardSnapshot, id: string): ProfileVM | null {
   }));
   const nx = mine.filter(upcoming).sort((a, b) => a.number - b.number)[0];
   return {
-    fighter: f, creator: f.creatorHandle ? `@${f.creatorHandle}` : "Fight Card house", originText: f.origin === "house" ? "House fighter" : "Community fighter",
+    fighter: f, creator: f.creatorHandle ? `@${f.creatorHandle}` : "En Garde house", originText: f.origin === "house" ? "House fighter" : "Community fighter",
     archetype: f.archetype, record: recordText(f.stats), winPct: winPct(f.stats), history,
     next: nx ? { matchId: nx.id, number: nx.number, href: `/match/${nx.id}`, isOpen: nx.status === "open" } : null,
   };

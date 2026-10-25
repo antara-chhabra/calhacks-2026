@@ -1,4 +1,4 @@
-# Fight Card — Figma Stage Log
+# En Garde — Figma Stage Log
 
 Figma track "Idea To Demo" (Cal Hacks 13.0). Prizes in play: Best Figma Workflow, Best Stage Log, Best Design, Most Creative.
 
@@ -74,7 +74,7 @@ Format: `HH:MM–HH:MM PDT · Stage · Tool · Score` then what/why/output/next.
 - **Friction / lesson:** Signing in has to happen *inside the same agent session* (its own `/mcp` server list). Signing in somewhere else (another window or the web connectors page) doesn't carry over. That cost one extra round trip. Reusable tip: sign in from `/mcp` in the session that will do the work, then check the server shows "connected" before giving the agent design tasks.
 
 ### 00:43–00:45 PDT · Prototyping (F-1 foundations) · Figma Design via Figma MCP `use_figma` (Claude Code) · 4/5
-- **What:** Created the file and turned PRD §10.2/§10.3 into Figma foundations in one script: 34 variables (collection `Fight Card`, all with explicit scopes and `var(--…)` WEB code syntax matching `tokens.css` names), 17 text styles (Lilita One / Barlow Condensed / Barlow / JetBrains Mono), 2 hard-shadow effect styles, 8 gradient paint styles (card tiers, special frames, dusk sky).
+- **What:** Created the file and turned PRD §10.2/§10.3 into Figma foundations in one script: 34 variables (collection `En Garde`, all with explicit scopes and `var(--…)` WEB code syntax matching `tokens.css` names), 17 text styles (Lilita One / Barlow Condensed / Barlow / JetBrains Mono), 2 hard-shadow effect styles, 8 gradient paint styles (card tiers, special frames, dusk sky).
 - **Why this tool:** The tokens already existed as text in the PRD. Having the agent write them straight into Figma variables (with code syntax) means design and `tokens.css` share one naming scheme, so handoff later is a lookup, not a translation.
 - **Friction:** The first script failed: the **Starter plan allows only 3 pages** (it rolled back cleanly). We restructured to `01 System`, `02 Arena`, `03 Screens`. We checked the subscribed community libraries (Material 3, iOS 26, Simple DS) with `search_design_system`: no match for a bespoke "Saturday-morning platform fighter" style, so we built from scratch on purpose.
 
@@ -107,7 +107,7 @@ Format: `HH:MM–HH:MM PDT · Stage · Tool · Score` then what/why/output/next.
 
 ### 01:55–02:09 PDT · Code generation · Claude Code + KokonutUI (shadcn registry) · 5/5
 - **What:** Scaffolded `apps/web` (Vite 5.4 + React 19 + Tailwind v4 + react-router 6), added the `@kokonutui` registry to `components.json`, and installed **Flow Field, Widget Grid (bento), Currency Transfer, Metric Card, Morphic Navbar** with `npx shadcn add`. Built:
-  - `/`: entry page on Flow Field. "Fight Card", tagline **"AI agents fight. You call it."**
+  - `/`: entry page on Flow Field. "En Garde", tagline **"AI agents fight. You call it."**
   - `/markets/:category`: Morphic Navbar categories over a bento board (leaderboard 4 cols + Enter-the-arena; then market movers, recent bets, Build-your-agent under the arena), live trackers, an agents bento and a prediction-hub bento with interest filters.
   - `StepTracker`: Currency Transfer generalized into the **bet placed** and **fight in progress** trackers (chips, never currency).
   - Metric Card as **"Your chips earned"** insights.
@@ -124,9 +124,9 @@ All files must be shared as **"Anyone with the link"** before submission.
 
 | File | Product | Purpose | Link | Shared "Anyone"? |
 |---|---|---|---|---|
-| Fight Card — Design System & Screens | Figma Design | Variables (PRD §10.2), type styles (§10.3), components, arena, screens | https://www.figma.com/design/l4pXxI22J9zzAUxfjsdrCz | ☐ |
-| Fight Card — Clickable prototype | Figma Design prototype / Make | Lobby → Match → Results click-through | _TBD_ | ☐ |
-| Fight Card — Pitch | Figma Slides | Required deck: problem, product, workflow, stage log | _TBD_ | ☐ |
+| En Garde — Design System & Screens | Figma Design | Variables (PRD §10.2), type styles (§10.3), components, arena, screens | https://www.figma.com/design/l4pXxI22J9zzAUxfjsdrCz | ☐ |
+| En Garde — Clickable prototype | Figma Design prototype / Make | Lobby → Match → Results click-through | _TBD_ | ☐ |
+| En Garde — Pitch | Figma Slides | Required deck: problem, product, workflow, stage log | _TBD_ | ☐ |
 
 ## 4. Planned Figma work (tracks the stages)
 

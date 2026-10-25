@@ -54,7 +54,7 @@ export function ChangeChip({ value, className }: { value: number; className?: st
 
 export function Chips({ amount, className }: { amount: number; className?: string }) {
   return (
-    <span className={cn("inline-flex items-center gap-1.5 tabular-nums", className)} title="Play money · no cash value">
+    <span className={cn("inline-flex items-center gap-1.5 tabular-nums", className)} title="Ledger balance · no funds moved">
       <span aria-hidden="true" className="size-3 rounded-full bg-amber-300 ring-2 ring-amber-500/40" />
       {amount.toLocaleString("en-US")}
     </span>

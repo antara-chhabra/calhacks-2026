@@ -16,7 +16,7 @@ function Shell({ children, badge }: { children: React.ReactNode; badge?: React.R
   return (
     <div className="min-h-screen w-full overflow-x-hidden bg-black text-zinc-100" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
       <header className="flex items-center justify-between px-4 pt-4 pb-2">
-        <span className="text-[13px] font-bold tracking-[0.18em]">FIGHT CARD</span>
+        <span className="text-[13px] font-bold tracking-[0.18em]">EN GARDE</span>
         <span className="flex items-center gap-2 text-[13px] tabular-nums text-zinc-300">{badge}{me ? formatCents(me.balanceCents) : '$0.00'}</span>
       </header>
       <main className="mx-auto flex w-full max-w-md flex-col gap-4 px-4 pb-6">{children}</main>

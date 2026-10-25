@@ -5,7 +5,7 @@
 **Last touched:** 2026-10-25
 
 ## What this is
-Workstream O6 of the Fight Card build. x402/CDP agent wallets (entry fee, purse, hint shop), SFX + ElevenLabs barks, Fetch.ai bookie (COULD). Owns exactly the paths above (PRD §9.3, §17.5); everything else is read-only for this workstream.
+Workstream O6 of the En Garde build. x402/CDP agent wallets (entry fee, purse, hint shop), SFX + ElevenLabs barks, Fetch.ai bookie (COULD). Owns exactly the paths above (PRD §9.3, §17.5); everything else is read-only for this workstream.
 
 ## Current state
 - Not started. Defined in `docs/PRD.md` only; no code exists yet (repo not initialized).

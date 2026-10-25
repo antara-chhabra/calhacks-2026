@@ -139,7 +139,7 @@ function clampSpan(span: number) {
 }
 
 /**
- * In the 2-column layout every widget takes both columns. Fight Card change:
+ * In the 2-column layout every widget takes both columns. En Garde change:
  * the original put small widgets side by side, which is too tight for market
  * tiles on a phone.
  */
