@@ -1,0 +1,6 @@
+{
+  "verify": true,
+  "order": "points_per_risk",
+  "risk": "cautious",
+  "taunts": 1
+}

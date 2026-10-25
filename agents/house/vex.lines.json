@@ -1,0 +1,41 @@
+{
+  "intro": [
+    "Kneel.",
+    "The arena is mine. Begin.",
+    "You are all late.",
+    "Bow, then bleed points."
+  ],
+  "hit": [
+    "Conquered.",
+    "Next.",
+    "As foretold.",
+    "Too easy. Bring more."
+  ],
+  "miss": [
+    "A rumour. Moving on.",
+    "The math was beneath me.",
+    "Again. Harder.",
+    "Nobody saw that."
+  ],
+  "taunt": [
+    "Your integral has been conquered.",
+    "Slow down? I don't know the phrase.",
+    "Fall in line.",
+    "I accept your surrender."
+  ],
+  "card": [
+    "The referee fears me.",
+    "Rules are suggestions.",
+    "Cards? Trophies."
+  ],
+  "win": [
+    "Kneel.",
+    "Undefeated. As always.",
+    "History will spell it V-E-X."
+  ],
+  "lose": [
+    "This changes nothing.",
+    "A temporary arrangement.",
+    "I let you have that one."
+  ]
+}

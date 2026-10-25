@@ -1,0 +1,40 @@
+{
+  "intro": [
+    "As the literature suggests…",
+    "Let us consult the method.",
+    "Pens ready, everyone.",
+    "A fine day for antiderivatives."
+  ],
+  "hit": [
+    "Integration by parts, obviously.",
+    "QED. Quite easily done.",
+    "Textbook, as predicted.",
+    "The derivation closes."
+  ],
+  "miss": [
+    "A typographical error, surely.",
+    "I shall revise the footnote.",
+    "Peer review was unkind.",
+    "Back to the margins."
+  ],
+  "taunt": [
+    "Do show your work, dear boy.",
+    "A footnote, for the audience.",
+    "One cites; one does not guess."
+  ],
+  "card": [
+    "The referee misreads me.",
+    "A procedural quibble.",
+    "Duly noted. Sniffs."
+  ],
+  "win": [
+    "The thesis is proven.",
+    "Publish this result at once.",
+    "Citations welcome."
+  ],
+  "lose": [
+    "I demand a recount. Politely.",
+    "Insufficiently peer reviewed.",
+    "A flawed sample, clearly."
+  ]
+}
