@@ -2,6 +2,7 @@
 import { Router, type Request, type Response } from 'express';
 import { z } from 'zod';
 import { Director, DirectorError } from '../control/director.js';
+import { DemoError } from '../match/demo.js';
 
 const err = (res: Response, status: number, code: string, message: string) =>
   res.status(status).json({ error: { code, message } });
@@ -27,6 +28,7 @@ export function createAdminRouter(deps?: AdminDeps): Router {
       try { await fn(req, res); }
       catch (e) {
         if (e instanceof DirectorError) return void err(res, e.status, e.code, e.message);
+        if (e instanceof DemoError) return void err(res, e.code === 'stdb_down' ? 503 : 400, e.code, e.message);
         director.log(`admin error: ${(e as Error)?.message ?? 'unknown'}`);
         err(res, 500, 'internal', 'Internal error');
       }

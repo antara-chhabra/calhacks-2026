@@ -7,6 +7,9 @@ import type { FighterIO } from '../fighters/types.js';
 type Session = { token: string; io: FighterIO; ended: boolean };
 const sessions = new Map<string, Map<string, Session>>();   // matchId -> fighterId -> session
 const endedMatches = new Set<string>();
+const submitTimes = new Map<string, number[]>(); // fighterId -> authenticated submits in the rolling minute
+const SUBMIT_LIMIT = 20;
+const SUBMIT_WINDOW_MS = 60_000;
 
 export function registerByoSession(matchId: string, fighterId: string, token: string, io: FighterIO): void {
   endedMatches.delete(matchId);
@@ -22,7 +25,7 @@ export function unregisterByoSession(matchId: string, fighterId?: string): void 
   endedMatches.add(matchId);
   if (endedMatches.size > 200) endedMatches.delete(endedMatches.values().next().value as string);
 }
-export function _resetByoSessions(): void { sessions.clear(); endedMatches.clear(); }
+export function _resetByoSessions(): void { sessions.clear(); endedMatches.clear(); submitTimes.clear(); }
 
 function safeEqual(a: string, b: string): boolean {
   const x = Buffer.from(a), y = Buffer.from(b);
@@ -61,6 +64,17 @@ export function createByoRouter(): Router {
   r.post('/byo/:matchId/submit', async (req, res) => {
     const a = auth(req, res, submitBody); if (!a) return;
     const d = a.data as z.infer<typeof submitBody>;
+    // Authenticate first: an outsider cannot spend a fighter's allowance. Reserve before
+    // awaiting verification so concurrent HTTP calls cannot all pass the same quota check.
+    const now = Date.now();
+    const recent = (submitTimes.get(d.fighterId) ?? []).filter((t) => t > now - SUBMIT_WINDOW_MS);
+    submitTimes.set(d.fighterId, recent);
+    if (recent.length >= SUBMIT_LIMIT) {
+      res.setHeader('Retry-After', Math.max(1, Math.ceil((recent[0]! + SUBMIT_WINDOW_MS - now) / 1000)));
+      err(res, 429, 'rate_limited', 'At most 20 submissions per fighter per minute');
+      return;
+    }
+    recent.push(now);
     try {
       const v = await a.s.io.submit(d.problem as 1 | 2 | 3 | 4 | 5, d.antiderivative);
       res.json({ ok: v.ok, points: v.points, message: v.message });

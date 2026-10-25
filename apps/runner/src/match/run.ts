@@ -2,7 +2,6 @@
 // R-02b continues from the returned MatchRecord (final checks, standings, reveal, settle).
 import { randomBytes } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { FighterId, FighterProblem, Problem, ProblemIdx, ProblemMeta } from '@fc/contracts';
@@ -57,7 +56,7 @@ export async function runMatchUntilReview(deps: MatchDeps, opts: MatchOpts): Pro
   const markets = buildMarkets(matchId, picked, { beatClockRate: opts.beatClockRate, scoreHistory: opts.scoreHistory });
   const fighterIds = picked.map((c) => c.fighter.id);
   const problemMeta: ProblemMeta[] = problemSet.problems.map((p) => ({ idx: p.idx, difficulty: p.difficulty, points: p.points }));
-  const sandboxRoot = join(opts.sandboxRoot ?? tmpdir(), `fc-${matchId}`);
+  const sandboxRoot = join(opts.sandboxRoot ?? fileURLToPath(new URL('../../../../.arena/sandboxes/', import.meta.url)), matchId);
 
   const lockSeen = new Promise<void>((res) => {
     const off = stdb.onEvent(matchId, (e) => { if (e.type === 'betting.locked') { off(); res(); } });

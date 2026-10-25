@@ -12,3 +12,5 @@ export { buildSettlement } from './settle.js';
 export type { FighterHistory, HistoryProvider } from './settle.js';
 export { recoverOrphans } from './recover.js';
 export type { ActiveMatch, ListActiveMatches } from './recover.js';
+export { runDemoMatch, loadDemoFixture, validateDemoFixture, DemoError } from './demo.js';
+export type { DemoDeps, DemoOpts, DemoFixture } from './demo.js';
