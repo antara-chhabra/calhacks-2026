@@ -59,3 +59,6 @@ The `spacetime` CLI is only on DV1277's machine. On `main`:
 6. `FC_ENGINE=mock FC_STDB_DB=fightcard-o3 npm run runner` should log `stdb ok` and the runner identity
 7. Push nothing generated; report results in `docs/requests/HEAD.md`
 Open question for the build: SDK 2.13 may need a `spacetime.json` or a specific `package.json` main/entry — see `docs/requests/O3.md`.
+
+## Handoff
+DV1277 lanes and rules: `docs/status/HANDOFF-DV1277.md`. HEAD (Antara) is finishing O1 A-09, O2 U-06–U-09, O6 I-03; will post "HEAD done" here when merged.
