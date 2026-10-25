@@ -8,5 +8,6 @@ export default defineConfig({
   resolve: {
     alias: { "@": path.resolve(__dirname, "./src") },
   },
-  server: { port: 5173 },
+  envDir: path.resolve(__dirname, "../.."), // .env lives at the repo root (PRD §8.11)
+  server: { port: Number(process.env.FC_WEB_PORT) || 5173 },
 });

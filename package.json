@@ -1,0 +1,30 @@
+{
+  "name": "fight-card",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22.9" },
+  "workspaces": ["packages/contracts", "packages/engine", "apps/web", "apps/runner", "spacetime"],
+  "scripts": {
+    "dev:web": "npm run dev -w @fc/web",
+    "runner": "npm run start -w @fc/runner",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "check": "npm run typecheck && npm test",
+    "gen": "node scripts/gen-bindings.mjs",
+    "smoke": "node --env-file-if-exists=.env --import tsx scripts/smoke.ts",
+    "record": "node --env-file-if-exists=.env --import tsx scripts/record.ts",
+    "recompute": "node --env-file-if-exists=.env --import tsx scripts/recompute.ts",
+    "claim-runner": "node --env-file-if-exists=.env --import tsx scripts/claim-runner.ts",
+    "vendor-engine": "node scripts/vendor-engine.mjs",
+    "scan:secrets": "bash scripts/scan-secrets.sh",
+    "keys": "node scripts/keys.mjs",
+    "keys:check": "node scripts/keys.mjs --check"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "tsx": "~4.23.15",
+    "typescript": "~5.8.3",
+    "vitest": "~2.1.9"
+  }
+}

@@ -1,16 +1,14 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Landing from "@/pages/Landing";
-import Markets from "@/pages/Markets";
+import { BrowserRouter, useRoutes } from "react-router-dom";
+import { routes } from "@/ui";
+
+function Routes() {
+  return useRoutes(routes());
+}
 
 export default function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route element={<Landing />} path="/" />
-        <Route element={<Markets />} path="/markets" />
-        <Route element={<Markets />} path="/markets/:category" />
-        <Route element={<Landing />} path="*" />
-      </Routes>
+      <Routes />
     </BrowserRouter>
   );
 }
