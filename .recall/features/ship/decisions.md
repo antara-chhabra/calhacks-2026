@@ -10,3 +10,8 @@ Project-wide decisions live in docs/PRD.md §18 (ADR-001…022); record only O7-
 **Date:** 2026-10-25
 **Call:** `submission/figma-stage-log.md` is append-only and records non-Figma tools, rework, plan limits and the stop on Figma for UI.
 **Why:** The Figma track judges "honest about friction" and repeatability; summaries are written from the log at G4.
+
+## Design demo pages in submission/design
+**Date:** 2026-10-25
+**Call:** Demo HTML (pixel roster, old vector roster) lives in `submission/design/`.
+**Why:** It is judging/demo material, which O7 owns.
