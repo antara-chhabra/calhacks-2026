@@ -62,3 +62,15 @@ Open question for the build: SDK 2.13 may need a `spacetime.json` or a specific 
 
 ## Handoff
 DV1277 lanes and rules: `docs/status/HANDOFF-DV1277.md`. HEAD (Antara) is finishing O1 A-09, O2 U-06–U-09, O6 I-03; will post "HEAD done" here when merged.
+
+## HEAD done — Antara's session, 2026-10-25 ~04:20
+All of Antara's lanes are merged on `main`: O1 A-01…A-09, O2 U-01…U-09, O3 B-01…B-05, O4 R-01…R-05, O5 F-02/F-05,
+O6 I-03, HEAD K-01…K-07 + wiring + `/m` code split. 540 tests green, typecheck clean, web builds, secrets scan clean.
+**DV1277 is HEAD from here** (merges per `docs/status/HANDOFF-DV1277.md` rule 3).
+
+Open items for the next HEAD:
+- Match screen should listen for the arena's podium handoff (`fc:podium` / `subscribePodium` in `apps/web/src/arena/sequences/podium.ts`) to reveal results.
+- `<MuteToggle/>` (`apps/web/src/audio`) needs a home in `AppShell`.
+- Jumbotron covers the name tags of the two floating slots; Forge preview uses static poses (needs an arena preview export).
+- Recompute `--apply` needs a runner-only reducer that writes `fighter_stats` / `fighter.elo`.
+- PRD amendments pending (§9.2 React 19 + KokonutUI, §8.9 FundingAdapter, §11.8 seed units, Q-001 team) — list above under "HEAD decisions".
