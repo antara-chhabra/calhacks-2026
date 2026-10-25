@@ -3,6 +3,7 @@
 // (or think while its status is `thinking`). Timelines are paused and advanced by tick(dtMs) × speed, so pause/speed/seek are exact.
 import type { ArenaCue } from '@fc/engine';
 import type { Archetype, FighterId } from '@fc/contracts';
+import { KO_FADED_ALPHA } from '../clips/koBlast';
 import { CLIPS, resetPose, type ClipName, type ClipParams, type ClipPower, type ClipTimeline, type PoseDriver } from '../clips';
 
 export type CueKind = ArenaCue['kind'];
@@ -136,7 +137,9 @@ export class CuePlayer {
     const d = f.h.driver, ko = d.poses.ko;
     resetPose(d);
     for (const k of Object.keys(ko.bones)) d.state.bones[k] = ko.bones[k]!;
-    d.state.weapon = ko.weapon; d.state.face = ko.face; d.flush();
+    d.state.weapon = ko.weapon; d.state.face = ko.face;
+    if (this.d.reduced?.()) d.state.alpha = KO_FADED_ALPHA;   // same end state as the reduced koBlast crossfade
+    d.flush();
   }
 
   private finishStep(f: Fighter): void {

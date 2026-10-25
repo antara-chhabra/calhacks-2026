@@ -4,6 +4,13 @@ import type { Clip } from './types';
 
 export const dropIn: Clip = (d, p = {}) => {
   const b = builder(d, p);
+  if (b.reduced) {   // FC-F-128 / bible §6: no fall, no squash: stand in place with a 120 ms fade-in
+    b.tl.set(d.state, { alpha: 0, y: 0 }, 0);
+    b.tl.call(() => d.flush(), [], 0);
+    b.tl.to(d.state, { alpha: 1, duration: 0.12, ease: 'none' }, 0);
+    b.label(120, 'land');
+    return b.done(450);
+  }
   const from = -700;
   b.grounded(0, true);
   b.tl.set(d.state, { y: from, sy: 1.08, sx: 0.96 }, 0);
