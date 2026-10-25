@@ -1,3 +1,5 @@
+
+
 // Match-screen view models (U-04). Pure helpers: no React, no store access, so they are unit-testable.
 import { HOUSE_ROSTER, type FighterId, type SkinSpec } from '@fc/contracts';
 import { verifyReveal, type FeedLine, type FighterLive, type MatchState } from '@fc/engine';
@@ -29,6 +31,63 @@ export function clockText(s: MatchState): string {
 export const STATUS_BADGE: Record<MatchState['status'], string> = {
   scheduled: 'UPCOMING', open: 'BETS OPEN', locked: 'LOCKED', live: 'LIVE', review: 'VAR REVIEW', settled: 'FINAL', void: 'VOID',
 };
+
+export type MatchSource = 'live' | 'replay' | 'wait' | 'none';
+/** Choose only after the connection has settled; replay names must exist in the bundled fixture set. */
+export function matchSourceFor(input: {
+  target: string | null; conn: 'connecting' | 'live' | 'offline' | 'replay'; matches: Record<string, unknown>; fixtures: string[];
+}): MatchSource {
+  if (input.conn === 'connecting') return 'wait';
+  if (!input.target) return 'none';
+  if (input.conn === 'live' && input.matches[input.target]) return 'live';
+  return input.fixtures.includes(input.target) ? 'replay' : 'none';
+}
+
+export type ResultRevealInput = {
+  matchId: string | null; status: MatchState['status']; playbackRevision: number;
+  reducedMotion: boolean; hudOnly: boolean;
+};
+
+/** Tracks a match from its non-settled state through its podium handoff or a silent snap. */
+export class ResultsRevealGate {
+  private matchId: string | null | undefined;
+  private sawState = false;
+  private settled = false;
+  private playbackRevision = 0;
+  private revealed = false;
+
+  update(input: ResultRevealInput): boolean {
+    if (input.matchId !== this.matchId) {
+      this.matchId = input.matchId;
+      this.sawState = false;
+      this.settled = false;
+      this.playbackRevision = input.playbackRevision;
+      this.revealed = false;
+    }
+    this.settled = input.status === 'settled';
+    if (input.status !== 'settled') {
+      this.sawState = true;
+      this.playbackRevision = input.playbackRevision;
+      this.revealed = false;
+      return false;
+    }
+    if (input.reducedMotion || input.hudOnly || !this.sawState) this.revealed = true;
+    else if (this.playbackRevision !== input.playbackRevision) this.revealed = true;
+    this.sawState = true;
+    return this.revealed;
+  }
+
+  podium(matchId: string | null): boolean {
+    if (!this.settled || matchId !== this.matchId) return false;
+    this.revealed = true;
+    return true;
+  }
+
+  fallback(): boolean {
+    if (this.settled) this.revealed = true;
+    return this.revealed;
+  }
+}
 
 export type Gem = { idx: number; points: number; state: 'open' | 'held' | 'pending' | 'overturned' };
 /** Five problem gems: filled once any fighter has a surviving (or pending) hit. */
@@ -102,4 +161,8 @@ export const varOverturns = (s: MatchState): number => (s.standings ?? []).reduc
 export function sourceFor(id: string, conn: string, knownMatches: Record<string, unknown>): 'replay' | 'live' {
   if (conn === 'live' && id in knownMatches) return 'live';
   return 'replay';
+}
+/** A global live board contains many matches; results must stay scoped to the watched match. */
+export function settledMarketsForMatch(markets: import('@/data/store').Store['markets'], matchId: string | null) {
+  return matchId ? Object.values(markets).filter((m) => m.id.startsWith(`${matchId}:`) && (m.status === 'settled' || m.status === 'void')) : [];
 }

@@ -22,6 +22,7 @@ export function PosterWidget({ poster, now, size }: { poster: PosterVM | null; n
       <div className="flex flex-wrap items-center gap-2 text-xs">
         <span className="rounded-full bg-zinc-100 px-2 py-0.5 font-semibold text-[11px] text-zinc-950 uppercase tracking-wider">Fight night</span>
         <span className="font-medium text-zinc-200">Match #{poster.number}</span>
+        <span aria-label={`Match mode: ${poster.badge}`} className={cn("rounded-full px-2 py-0.5 font-semibold text-[10px] uppercase tracking-wider ring-1", poster.badge === "LIVE" ? "bg-red-500/10 text-red-300 ring-red-500/30" : "bg-amber-300/10 text-amber-200 ring-amber-300/30")}>{poster.badge}</span>
         <span className="ml-auto text-zinc-500 tabular-nums">
           {poster.isOpen ? <>Bets close <span className="font-semibold text-zinc-100">{left}</span></> : <span className="uppercase">{poster.status}</span>}
         </span>

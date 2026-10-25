@@ -21,6 +21,7 @@ describe('lobby selectors on mock-basic', () => {
     await flush();
     await vi.advanceTimersByTimeAsync(2000);
     const p = selectPoster(useStore.getState())!;
+    expect(p.badge).toBe('MOCK');
     expect(p.fighters).toHaveLength(4);
     for (const f of p.fighters) { expect(f.oddsText).toMatch(/^\d+\.\d{2}$/); expect(f.impliedPct).toBeGreaterThan(0); expect(f.color).toMatch(/^#/); }
     expect(p.href).toBe(`/match/${p.matchId}`);

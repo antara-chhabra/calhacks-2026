@@ -12,7 +12,7 @@ export interface FighterVM { id: string; name: string; title: string; color: str
 export interface PosterFighter extends FighterVM { odds: number | null; oddsText: string; impliedPct: number | null }
 export interface PosterVM {
   matchId: string; number: number; status: string; fighters: PosterFighter[]; commitHash: string; commitShort: string;
-  closesAt: number; isOpen: boolean; href: string; poolCents: number; poolText: string;
+  closesAt: number; isOpen: boolean; badge: 'LIVE' | 'MOCK' | 'DEMO'; href: string; poolCents: number; poolText: string;
 }
 export interface LiveVM { matchId: string; number: number; statusLine: string; rows: { fighter: FighterVM; points: number }[]; href: string }
 export interface ResultVM { matchId: string; number: number; winner: FighterVM | null; winnerName: string; href: string }
@@ -61,7 +61,8 @@ export function selectPoster(s: LobbySnapshot): PosterVM | null {
   const poolCents = market ? Object.values(market.pools).reduce((a, p) => a + p.staked + p.seed, 0) : 0;
   return {
     matchId: m.id, number: m.number, status: m.status, fighters, commitHash: m.commitHash, commitShort: shortHash(m.commitHash),
-    closesAt: m.bettingClosesAt, isOpen: m.status === "open" || m.status === "scheduled", href: `/match/${m.id}`, poolCents, poolText: formatCents(poolCents),
+    closesAt: m.bettingClosesAt, isOpen: m.status === "open" || m.status === "scheduled",
+    badge: m.isDemo ? 'DEMO' : m.mode === 'mock' ? 'MOCK' : 'LIVE', href: `/match/${m.id}`, poolCents, poolText: formatCents(poolCents),
   };
 }
 
