@@ -48,3 +48,14 @@ Kickoff ran ~1h40 late. Per §17.2, gates shift by the delay; §5.6 cut order ap
 
 ## Next
 - K-06 web data layer after B-01 · PRD patch (Q-001 team, §9.2 React 19, §8.9 FundingAdapter, §10 market UI)
+
+## HUMAN — DV1277: publish the module and generate bindings (unblocks G1, K-06b, K-08)
+The `spacetime` CLI is only on DV1277's machine. On `main`:
+1. `git pull && npm ci`
+2. `spacetime start` (local, port 3000) in its own terminal
+3. `spacetime publish --project-path spacetime fightcard-o3` — the module has never been built; first build = K-08 check (it imports `./vendor/parimutuel.ts`, no workspace packages). Note any build error in `docs/requests/O3.md` verbatim.
+4. `npm run gen` → `apps/web/src/module_bindings` and `apps/runner/src/module_bindings` (gitignored)
+5. `FC_STDB_DB=fightcard-o3 npm run claim-runner` → writes `FC_STDB_TOKEN` to `.env`
+6. `FC_ENGINE=mock FC_STDB_DB=fightcard-o3 npm run runner` should log `stdb ok` and the runner identity
+7. Push nothing generated; report results in `docs/requests/HEAD.md`
+Open question for the build: SDK 2.13 may need a `spacetime.json` or a specific `package.json` main/entry — see `docs/requests/O3.md`.
