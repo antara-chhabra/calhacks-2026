@@ -35,6 +35,11 @@ describe('env', () => {
     expect(() => loadEnv({ FC_ENGINE: 'mock' })).toThrow(/FC_DIRECTOR_TOKEN/);
   });
 
+  it('accepts only low, medium or high per fighter reasoning effort', () => {
+    expect(loadEnv({ ...base, FC_EFFORT_GLITCH: 'high', FC_EFFORT_PIP: 'low' })).toMatchObject({ FC_EFFORT_GLITCH: 'high', FC_EFFORT_PIP: 'low' });
+    expect(() => loadEnv({ ...base, FC_EFFORT_VEX: 'maximum' })).toThrow(/FC_EFFORT_VEX/);
+  });
+
   it('redacts secrets and model values', () => {
     const e = loadEnv({
       ...base, FC_STDB_TOKEN: 'tok-SECRET', FACTORY_API_KEY: 'fk-SECRET', FC_MODEL_VEX: 'model-vex-xyz', FC_TIER_PRO_MODEL: 'tier-pro-xyz',

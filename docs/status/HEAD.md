@@ -1,5 +1,11 @@
 # Status — HEAD (O0)
 
+## DV1277 runner integration — in progress
+- K-07 follow-up: connected registry factories for Droid, Direct and HTTP; candidate effort mapping (`FC_EFFORT_<ID>`); shared single-match control for live/demo/season; golden-var demo starts on fresh `m_demo_*` IDs and uses the O4 replay through reducers; kill switch now blocks manual and demo starts. Demo fixture loading occurs before slot acquisition and preserves `fixture_unavailable` visibly.
+- Demo/mock runs do not update candidate rotation or real season counters. Shutdown aborts and awaits all active runner runs.
+- Added runner tests for effort parsing/mapping, fixture failure, cross-mode concurrency, demo-mode routing, kill switch, history exclusion and demo failure cleanup. Awaiting combined O4/O5 overlay for verification; local branch intentionally lacks those dependency source files.
+- HUMAN config ask: set the local-only GLITCH/PIP model mappings and optional effort values; details are in `docs/requests/HEAD.md`.
+
 ## Gates
 
 | Gate | Planned | Status |

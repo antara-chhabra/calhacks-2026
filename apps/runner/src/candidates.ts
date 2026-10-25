@@ -27,9 +27,10 @@ export function loadHouseCandidates(env: Env, agentsRoot: string = DEFAULT_AGENT
     const strategy = JSON.parse(readFileSync(sp, 'utf8')) as Strategy;
     const persona = [read(join(dir, `${id}.md`)), rules].filter(Boolean).join('\n\n');
     const modelId = (env as unknown as Record<string, string | undefined>)[`FC_MODEL_${id.toUpperCase()}`] ?? null;
+    const reasoningEffort = (env as unknown as Record<string, string | undefined>)[`FC_EFFORT_${id.toUpperCase()}`] ?? null;
     out.push({
       fighter: HOUSE_ROSTER[id], origin: 'house', engine: env.FC_ENGINE, persona, strategy, tier: 'pro',
-      elo: 1000, lastMatchAt: 0, active: true, modelId,
+      elo: 1000, lastMatchAt: 0, active: true, modelId, reasoningEffort,
     });
   }
   return out;
