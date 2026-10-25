@@ -55,7 +55,7 @@ describe('post_events gating', () => {
 });
 
 describe('seeds', () => {
-  it('converts dollars to cents with a 50 cent floor', () => {
+  it('preserves integer cents with a 50 cent floor', () => {
     expect(seedToCents(4000n)).toBe(4000n);
     expect(seedToCents(500n)).toBe(500n);
     expect(seedToCents(0n)).toBe(50n);
