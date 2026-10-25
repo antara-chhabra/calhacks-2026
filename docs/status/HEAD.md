@@ -1,10 +1,10 @@
 # Status — HEAD (O0)
 
 ## DV1277 runner integration — in progress
-- K-07 follow-up: connected registry factories for Droid, Direct and HTTP; candidate effort mapping (`FC_EFFORT_<ID>`); shared single-match control for live/demo/season; golden-var demo starts on fresh `m_demo_*` IDs and uses the O4 replay through reducers; kill switch now blocks manual and demo starts. Demo fixture loading occurs before slot acquisition and preserves `fixture_unavailable` visibly.
+- K-07 follow-up: connected registry factories for Droid, Direct and HTTP; candidate effort mapping (`FC_EFFORT_<ID>`); shared single-match control for live/demo/season; golden-var demo starts on fresh `m_demo_*` IDs and uses the O4 replay through reducers; kill switch now blocks manual and demo starts. Demo fixture loading occurs before slot acquisition and preserves `fixture_unavailable` visibly. When SpacetimeDB is up, startup registers/refreshes all six house fighters with public data, strategy and tier; registration failure stops startup.
 - Demo/mock runs do not update candidate rotation or real season counters. Shutdown aborts and awaits all active runner runs.
-- Added runner tests for effort parsing/mapping, fixture failure, cross-mode concurrency, demo-mode routing, kill switch, history exclusion and demo failure cleanup. Awaiting combined O4/O5 overlay for verification; local branch intentionally lacks those dependency source files.
-- HUMAN config ask: set the local-only GLITCH/PIP model mappings and optional effort values; details are in `docs/requests/HEAD.md`.
+- Added runner tests for effort parsing/mapping, fixture failure, cross-mode concurrency, demo-mode routing, kill switch, history exclusion, demo failure cleanup, and startup registration paths. Combined overlay: full typecheck passes; runner 148 tests pass across 19 files.
+- HUMAN config: all six house mappings and both tiers verified against the catalog; GLITCH/PIP have no existing public module rows, so their first registration starts at version 1. Local values remain private.
 
 ## Gates
 

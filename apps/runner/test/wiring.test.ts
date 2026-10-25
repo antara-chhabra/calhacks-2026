@@ -9,9 +9,15 @@ let app: RunnerApp | undefined;
 let rt: Runtime | undefined;
 afterEach(async () => { await rt?.shutdown(); await app?.stop(); rt?.stdb.close(); app = undefined; rt = undefined; });
 
-async function boot(over: { mode?: 'live' | 'demo'; kill?: boolean; demoFail?: boolean; realDemoClock?: boolean; holdDemo?: boolean } = {}) {
+async function boot(over: { mode?: 'live' | 'demo'; kill?: boolean; demoFail?: boolean; realDemoClock?: boolean; holdDemo?: boolean; stdbDown?: boolean; upsertError?: boolean } = {}) {
   const env = loadEnv({ FC_DIRECTOR_TOKEN: TOKEN, FC_ENGINE: 'mock', FC_MODE: over.mode, FC_KILL: over.kill ? '1' : undefined, FC_RUNNER_PORT: '0', FC_PUBLIC_PORT: '0', FC_SEASON_BET_WINDOW_S: '0.06', FC_MODEL_VEX: 'secret-model-xyz' });
   const stdb = new FakeStdb();
+  const houseUpserts: Parameters<FakeStdb['upsertHouseFighter']>[0][] = [];
+  if (over.stdbDown) stdb.status = () => 'down';
+  stdb.upsertHouseFighter = async (args) => {
+    if (over.upsertError) throw new Error('permission denied');
+    houseUpserts.push(args);
+  };
   if (over.demoFail) stdb.postEvents = async () => { throw new Error('demo write failed'); };
   let demoClock = 1_000_000;
   let demoOpen = false;
@@ -30,10 +36,36 @@ async function boot(over: { mode?: 'live' | 'demo'; kill?: boolean; demoFail?: b
     fetch(`http://127.0.0.1:${ports.adminPort}${path}`, {
       ...init, headers: { Authorization: `Bearer ${TOKEN}`, 'Content-Type': 'application/json' },
     });
-  return { rt, call, releaseDemo: () => { demoOpen = true; unblockDemo?.(); } };
+  return { rt, call, houseUpserts, releaseDemo: () => { demoOpen = true; unblockDemo?.(); } };
 }
 
 describe('runner wiring (mock engine, fake stdb)', () => {
+  it('registers all house fighters with only public data, strategy and tier before wire returns', async () => {
+    const { rt, houseUpserts } = await boot();
+    expect(houseUpserts).toHaveLength(6);
+    expect(houseUpserts.map((x) => x.fighter.id).sort()).toEqual(['brick', 'glitch', 'pip', 'quill', 'sage', 'vex']);
+    expect(houseUpserts[0]?.fighter).toHaveProperty('strategy');
+    expect(houseUpserts[0]?.fighter).toHaveProperty('tier');
+    expect(JSON.stringify(houseUpserts)).not.toMatch(/modelId|persona|FC_MODEL/);
+    expect(rt.stdb.status()).toBe('ok');
+  });
+
+  it('skips house registration when SpacetimeDB is down', async () => {
+    const { houseUpserts, rt } = await boot({ stdbDown: true });
+    expect(houseUpserts).toHaveLength(0);
+    expect(rt.stdb.status()).toBe('down');
+  });
+
+  it('fails wire startup and closes SpacetimeDB when house registration is rejected', async () => {
+    const stdb = new FakeStdb();
+    let closed = false;
+    stdb.close = () => { closed = true; };
+    stdb.upsertHouseFighter = async () => { throw new Error('permission denied'); };
+    const env = loadEnv({ FC_DIRECTOR_TOKEN: TOKEN, FC_ENGINE: 'mock' });
+    await expect(wire(env, { stdb, log: () => {} })).rejects.toThrow(/House fighter registration failed/);
+    expect(closed).toBe(true);
+  });
+
   it('runs a full mock match to settled via the director', async () => {
     const { rt, call } = await boot();
     const stdb = rt.stdb as FakeStdb;

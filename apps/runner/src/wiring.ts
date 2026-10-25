@@ -72,6 +72,17 @@ export async function wire(env: Env = loadEnv(), o: WireOverrides = {}): Promise
   const [stdb, payments] = await Promise.all([o.stdb ? Promise.resolve(o.stdb) : connectStdb(env), o.payments ?? createPayments()]);
   const log = o.log ?? ((m: string) => console.warn(`[runner] ${m}`));
   const candidates = createCandidateSource(env, { agentsRoot: o.agentsRoot });
+  if (stdb.status() === 'ok') {
+    const house = (await candidates.list()).filter((c) => c.origin === 'house');
+    try {
+      await Promise.all(house.map((c) => stdb.upsertHouseFighter({
+        fighter: { ...c.fighter, strategy: c.strategy, tier: c.tier ?? 'standard' },
+      })));
+    } catch {
+      stdb.close();
+      throw new Error('House fighter registration failed; runner cannot start against this SpacetimeDB instance.');
+    }
+  }
 
   // Reference answers for the mock engine: the backend only sees FighterProblem, so keep the problem sets of live matches.
   const liveSets = new Map<string, Problem[]>();
