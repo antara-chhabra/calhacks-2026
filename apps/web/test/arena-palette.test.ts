@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { BACK_TINT, darken, safeHex, substitutePalette, suffixIds, svgInner } from '../src/arena/palette';
+import { BACK_TINT, RAMP_PLACEHOLDERS, darken, ramp, safeHex, substitutePalette, suffixIds, svgInner } from '../src/arena/palette';
 
 const pal = { primary: '#E5383B', secondary: '#22202E', accent: '#F2C14E', skin: '#C98B6B' };
 
@@ -34,7 +34,22 @@ describe('palette substitution', () => {
     const dir = new URL('../public/art/fighters/vex/', import.meta.url);
     for (const f of ['torso', 'head', 'upperArm', 'forearm', 'hand', 'thigh', 'shin', 'foot', 'eyes-neutral', 'mouth-ko', 'brows-smug']) {
       const out = substitutePalette(readFileSync(new URL(`${f}.svg`, dir), 'utf8'), pal);
-      expect(out, f).not.toMatch(/#(FF00FF|00FFFF|FFFF00|FFAA88)(?![0-9A-Fa-f])/);
+      expect(out, f).not.toMatch(/#(FF0[0-3]FF|0[0-3]FFFF|FFFF0[0-3]|FFAA8[89AB])(?![0-9A-Fa-f])/);
+    }
+  });
+  it('pixel ramp tokens take shades derived from their base colour', () => {
+    const r = ramp('#E5383B');
+    const svg = `<a fill="${RAMP_PLACEHOLDERS.primary.light}"/><b fill="${RAMP_PLACEHOLDERS.primary.shadow}"/><c fill="${RAMP_PLACEHOLDERS.primary.deep}"/>`;
+    expect(substitutePalette(svg, pal)).toBe(`<a fill="${r.light}"/><b fill="${r.shadow}"/><c fill="${r.deep}"/>`);
+    expect(substitutePalette(`<a fill="${RAMP_PLACEHOLDERS.skin.shadow}"/>`, pal, BACK_TINT)).toBe(`<a fill="${darken(ramp('#C98B6B').shadow, BACK_TINT)}"/>`);
+  });
+  it('ramps keep light above base above shadow above deep, hue-shifted', () => {
+    const lum = (h: string) => { const n = parseInt(h.slice(1), 16); return 0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255); };
+    for (const c of ['#E5383B', '#2EC4A6', '#8B5CF6', '#3A6FF2', '#FF8A2B', '#FFD23F', '#22202E', '#F1E3C8']) {
+      const r = ramp(c);
+      expect(lum(r.light), c).toBeGreaterThan(lum(r.base));
+      expect(lum(r.base), c).toBeGreaterThan(lum(r.shadow));
+      expect(lum(r.shadow), c).toBeGreaterThan(lum(r.deep));
     }
   });
 });

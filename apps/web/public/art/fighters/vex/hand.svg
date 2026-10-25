@@ -1,9 +1,48 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -6 60 60" width="60" height="60" data-part="hand" data-pivot="0,0" data-socket="0,22">
-<g stroke="#14121F" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" fill="none">
-<circle cx="0" cy="22" r="24" fill="#FFAA88"/>
-<path d="M 8 10 Q 24 10 24 16 M 8 20 Q 26 20 26 26 M 8 30 Q 24 31 22 36" stroke-width="3"/>
-<path d="M -6 0 Q -4 -8 6 -4" fill="#FFAA88" stroke="none"/>
-<path clip-path="url(#hand-clip)" d="M 8 2 C 22 6 24 28 12 40 L 30 44 L 30 2 Z" fill="#14121F" fill-opacity="0.25" stroke="none" />
-<defs><clipPath id="hand-clip"><path d="M 0 -2 A 24 24 0 1 0 0 46 A 24 24 0 1 0 0 -2 Z"/></clipPath></defs>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-24 -4 48 44" width="48" height="44" data-part="hand" data-pivot="0,0" data-pixel="4">
+<g shape-rendering="crispEdges">
+<rect x="-4" y="-4" width="8" height="4" fill="#14121F"/>
+<rect x="-12" y="0" width="8" height="4" fill="#14121F"/>
+<rect x="-4" y="0" width="4" height="4" fill="#FFAA89"/>
+<rect x="0" y="0" width="4" height="4" fill="#FFAA8A"/>
+<rect x="4" y="0" width="8" height="4" fill="#14121F"/>
+<rect x="-16" y="4" width="4" height="4" fill="#14121F"/>
+<rect x="-12" y="4" width="8" height="4" fill="#FFAA89"/>
+<rect x="-4" y="4" width="8" height="4" fill="#FFAA88"/>
+<rect x="4" y="4" width="4" height="4" fill="#FFAA89"/>
+<rect x="8" y="4" width="4" height="4" fill="#FFAA8A"/>
+<rect x="12" y="4" width="4" height="4" fill="#14121F"/>
+<rect x="-20" y="8" width="4" height="4" fill="#14121F"/>
+<rect x="-16" y="8" width="4" height="4" fill="#FFAA89"/>
+<rect x="-12" y="8" width="24" height="4" fill="#FFAA88"/>
+<rect x="12" y="8" width="4" height="4" fill="#FFAA8A"/>
+<rect x="16" y="8" width="4" height="4" fill="#14121F"/>
+<rect x="-20" y="12" width="4" height="4" fill="#14121F"/>
+<rect x="-16" y="12" width="4" height="4" fill="#FFAA89"/>
+<rect x="-12" y="12" width="28" height="4" fill="#FFAA8A"/>
+<rect x="16" y="12" width="4" height="4" fill="#14121F"/>
+<rect x="-24" y="16" width="4" height="4" fill="#14121F"/>
+<rect x="-20" y="16" width="4" height="4" fill="#FFAA8A"/>
+<rect x="-16" y="16" width="32" height="4" fill="#FFAA88"/>
+<rect x="16" y="16" width="4" height="4" fill="#FFAA8A"/>
+<rect x="20" y="16" width="4" height="4" fill="#14121F"/>
+<rect x="-20" y="20" width="4" height="4" fill="#14121F"/>
+<rect x="-16" y="20" width="4" height="4" fill="#FFAA89"/>
+<rect x="-12" y="20" width="24" height="4" fill="#FFAA88"/>
+<rect x="12" y="20" width="8" height="4" fill="#FFAA8A"/>
+<rect x="20" y="20" width="4" height="4" fill="#14121F"/>
+<rect x="-20" y="24" width="4" height="4" fill="#14121F"/>
+<rect x="-16" y="24" width="4" height="4" fill="#FFAA8A"/>
+<rect x="-12" y="24" width="24" height="4" fill="#FFAA88"/>
+<rect x="12" y="24" width="4" height="4" fill="#FFAA8A"/>
+<rect x="16" y="24" width="4" height="4" fill="#14121F"/>
+<rect x="-16" y="28" width="4" height="4" fill="#14121F"/>
+<rect x="-12" y="28" width="8" height="4" fill="#FFAA8A"/>
+<rect x="-4" y="28" width="8" height="4" fill="#FFAA88"/>
+<rect x="4" y="28" width="8" height="4" fill="#FFAA8A"/>
+<rect x="12" y="28" width="4" height="4" fill="#14121F"/>
+<rect x="-12" y="32" width="8" height="4" fill="#14121F"/>
+<rect x="-4" y="32" width="8" height="4" fill="#FFAA8A"/>
+<rect x="4" y="32" width="8" height="4" fill="#14121F"/>
+<rect x="-4" y="36" width="8" height="4" fill="#14121F"/>
 </g>
 </svg>

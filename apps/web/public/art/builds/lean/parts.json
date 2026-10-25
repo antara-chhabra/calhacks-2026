@@ -56,12 +56,7 @@
   "parts": {
     "torso": {
       "src": "torso.svg",
-      "viewBox": [
-        -66,
-        -118,
-        132,
-        136
-      ],
+      "viewBox": [-44, -108, 92, 132],
       "pivot": [
         0,
         0
@@ -77,12 +72,7 @@
     },
     "head": {
       "src": "../common/head.svg",
-      "viewBox": [
-        -44,
-        -76,
-        88,
-        96
-      ],
+      "viewBox": [-44, -96, 100, 108],
       "pivot": [
         0,
         0
@@ -93,12 +83,7 @@
     },
     "eyes-neutral": {
       "src": "../common/eyes-neutral.svg",
-      "viewBox": [
-        -44,
-        -76,
-        88,
-        96
-      ],
+      "viewBox": [12, -60, 28, 12],
       "pivot": [
         0,
         0
@@ -106,12 +91,7 @@
     },
     "brows-neutral": {
       "src": "../common/brows-neutral.svg",
-      "viewBox": [
-        -44,
-        -76,
-        88,
-        96
-      ],
+      "viewBox": [8, -68, 36, 4],
       "pivot": [
         0,
         0
@@ -119,12 +99,7 @@
     },
     "mouth-neutral": {
       "src": "../common/mouth-neutral.svg",
-      "viewBox": [
-        -44,
-        -76,
-        88,
-        96
-      ],
+      "viewBox": [24, -32, 16, 4],
       "pivot": [
         0,
         0
@@ -132,12 +107,7 @@
     },
     "eyes-focus": {
       "src": "../common/eyes-focus.svg",
-      "viewBox": [
-        -44,
-        -76,
-        88,
-        96
-      ],
+      "viewBox": [12, -56, 28, 8],
       "pivot": [
         0,
         0
@@ -145,12 +115,7 @@
     },
     "brows-focus": {
       "src": "../common/brows-focus.svg",
-      "viewBox": [
-        -44,
-        -76,
-        88,
-        96
-      ],
+      "viewBox": [8, -72, 36, 12],
       "pivot": [
         0,
         0
@@ -158,12 +123,7 @@
     },
     "mouth-focus": {
       "src": "../common/mouth-focus.svg",
-      "viewBox": [
-        -44,
-        -76,
-        88,
-        96
-      ],
+      "viewBox": [20, -36, 20, 12],
       "pivot": [
         0,
         0
@@ -171,12 +131,7 @@
     },
     "eyes-smug": {
       "src": "../common/eyes-smug.svg",
-      "viewBox": [
-        -44,
-        -76,
-        88,
-        96
-      ],
+      "viewBox": [12, -56, 28, 8],
       "pivot": [
         0,
         0
@@ -184,12 +139,7 @@
     },
     "brows-smug": {
       "src": "../common/brows-smug.svg",
-      "viewBox": [
-        -44,
-        -76,
-        88,
-        96
-      ],
+      "viewBox": [8, -72, 36, 8],
       "pivot": [
         0,
         0
@@ -197,12 +147,7 @@
     },
     "mouth-smug": {
       "src": "../common/mouth-smug.svg",
-      "viewBox": [
-        -44,
-        -76,
-        88,
-        96
-      ],
+      "viewBox": [20, -36, 20, 12],
       "pivot": [
         0,
         0
@@ -210,12 +155,7 @@
     },
     "eyes-hurt": {
       "src": "../common/eyes-hurt.svg",
-      "viewBox": [
-        -44,
-        -76,
-        88,
-        96
-      ],
+      "viewBox": [12, -60, 28, 12],
       "pivot": [
         0,
         0
@@ -223,12 +163,7 @@
     },
     "brows-hurt": {
       "src": "../common/brows-hurt.svg",
-      "viewBox": [
-        -44,
-        -76,
-        88,
-        96
-      ],
+      "viewBox": [8, -72, 36, 12],
       "pivot": [
         0,
         0
@@ -236,12 +171,7 @@
     },
     "mouth-hurt": {
       "src": "../common/mouth-hurt.svg",
-      "viewBox": [
-        -44,
-        -76,
-        88,
-        96
-      ],
+      "viewBox": [24, -36, 16, 16],
       "pivot": [
         0,
         0
@@ -249,12 +179,7 @@
     },
     "eyes-ko": {
       "src": "../common/eyes-ko.svg",
-      "viewBox": [
-        -44,
-        -76,
-        88,
-        96
-      ],
+      "viewBox": [12, -60, 32, 12],
       "pivot": [
         0,
         0
@@ -262,12 +187,7 @@
     },
     "brows-ko": {
       "src": "../common/brows-ko.svg",
-      "viewBox": [
-        -44,
-        -76,
-        88,
-        96
-      ],
+      "viewBox": [0, 0, 4, 4],
       "pivot": [
         0,
         0
@@ -275,12 +195,7 @@
     },
     "mouth-ko": {
       "src": "../common/mouth-ko.svg",
-      "viewBox": [
-        -44,
-        -76,
-        88,
-        96
-      ],
+      "viewBox": [20, -32, 20, 16],
       "pivot": [
         0,
         0
@@ -288,12 +203,7 @@
     },
     "horned_helm": {
       "src": "../../heads/horned_helm.svg",
-      "viewBox": [
-        -80,
-        -124,
-        160,
-        130
-      ],
+      "viewBox": [-56, -140, 120, 136],
       "pivot": [
         0,
         0
@@ -305,12 +215,7 @@
     },
     "upperArm": {
       "src": "upperArm.svg",
-      "viewBox": [
-        -28.3,
-        -48,
-        56.6,
-        108
-      ],
+      "viewBox": [-20, -16, 40, 76],
       "pivot": [
         0,
         0
@@ -321,12 +226,7 @@
     },
     "forearm": {
       "src": "forearm.svg",
-      "viewBox": [
-        -20.1,
-        -18,
-        40.2,
-        68
-      ],
+      "viewBox": [-16, -16, 32, 80],
       "pivot": [
         0,
         0
@@ -337,12 +237,7 @@
     },
     "hand": {
       "src": "hand.svg",
-      "viewBox": [
-        -26,
-        -6,
-        52,
-        60
-      ],
+      "viewBox": [-20, 0, 40, 36],
       "pivot": [
         0,
         0
@@ -353,12 +248,7 @@
     },
     "thigh": {
       "src": "thigh.svg",
-      "viewBox": [
-        -23,
-        -22,
-        46,
-        96
-      ],
+      "viewBox": [-20, -20, 40, 92],
       "pivot": [
         0,
         0
@@ -369,12 +259,7 @@
     },
     "shin": {
       "src": "shin.svg",
-      "viewBox": [
-        -30,
-        -24,
-        74,
-        80
-      ],
+      "viewBox": [-20, -16, 40, 88],
       "pivot": [
         0,
         0
@@ -385,12 +270,7 @@
     },
     "foot": {
       "src": "foot.svg",
-      "viewBox": [
-        -26,
-        -12,
-        73,
-        38
-      ],
+      "viewBox": [-16, -12, 64, 36],
       "pivot": [
         0,
         0
@@ -401,12 +281,7 @@
     },
     "skull": {
       "src": "../../emblems/skull.svg",
-      "viewBox": [
-        -30,
-        -32,
-        60,
-        64
-      ],
+      "viewBox": [-20, -24, 40, 44],
       "pivot": [
         0,
         0
@@ -417,12 +292,7 @@
     },
     "greatsword": {
       "src": "../../weapons/greatsword.svg",
-      "viewBox": [
-        -50,
-        -412,
-        100,
-        454
-      ],
+      "viewBox": [-36, -404, 76, 444],
       "pivot": [
         0,
         0

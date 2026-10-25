@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { SLOTS, formatClock, gemStates, matchClockMs, matchLabel } from '../src/arena/stage/layout';
+import { JUMBO, PLATFORMS, SLOTS, STAGE_H, STAGE_W, formatClock, gemStates, matchClockMs, matchLabel } from '../src/arena/stage/layout';
 
 describe('stage layout', () => {
   it('slot table matches PRD §10.6', () => {
@@ -21,6 +21,17 @@ describe('stage layout', () => {
       b: f({ 2: { final: 'overturned' }, 3: { final: 'overturned' }, 4: { final: 'overturned' } }),
     } } as never;
     expect(gemStates(st).map((g) => g.state)).toEqual(['solved', 'overturned', 'solved', 'overturned', 'pending']);
+  });
+  it('jumbotron stays clear of every fighter, its labels and its weapon arc', () => {
+    // A fighter (with helm, raised weapon and head label) occupies its slot column from its feet up to the top of the stage.
+    const reach = 360;   // greatsword tip ≈ 100 art px ahead of the grip, plus the body half-width
+    expect(JUMBO.y).toBeGreaterThan(PLATFORMS.main.y + PLATFORMS.main.h);
+    expect(JUMBO.x).toBeGreaterThanOrEqual(0); expect(JUMBO.x + JUMBO.w).toBeLessThanOrEqual(STAGE_W);
+    expect(JUMBO.y + JUMBO.h).toBeLessThanOrEqual(STAGE_H);
+    for (const s of SLOTS) {
+      const x0 = s.x - reach, x1 = s.x + reach, overlapsX = JUMBO.x < x1 && JUMBO.x + JUMBO.w > x0;
+      if (overlapsX) expect(JUMBO.y, `slot ${s.slot}`).toBeGreaterThan(s.y);   // only ever below the feet
+    }
   });
   it('label', () => { expect(matchLabel('m-42')).toBe('MATCH #42'); expect(matchLabel(null)).toBe('MATCH'); });
 });

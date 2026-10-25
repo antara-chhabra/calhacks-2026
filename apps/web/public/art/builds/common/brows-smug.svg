@@ -1,5 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-44 -76 88 96" width="88" height="96" data-part="brows-smug" data-pivot="0,0">
-<g stroke="#14121F" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" fill="none">
-<path d="M 2 -46 L 18 -48" stroke="#14121F" stroke-width="7"/><path d="M 21 -39 L 38 -42" stroke="#14121F" stroke-width="7"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="8 -72 36 8" width="36" height="8" data-part="brows-smug" data-pivot="0,0" data-pixel="4">
+<g shape-rendering="crispEdges">
+<rect x="36" y="-72" width="8" height="4" fill="#14121F"/>
+<rect x="8" y="-68" width="16" height="4" fill="#14121F"/>
+<rect x="32" y="-68" width="4" height="4" fill="#14121F"/>
 </g>
 </svg>

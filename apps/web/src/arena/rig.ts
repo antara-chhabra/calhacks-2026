@@ -7,26 +7,38 @@ import { loadSkinParts, type SkinParts } from './assets';
 import { BACK_TINT, substitutePalette } from './palette';
 import { anchorFor, partKeyFor, resolvePose, worldTransforms, type NodeDef, type PoseDef, type PoseName } from './manifest';
 
-export const RASTER_SCALE = 2;   // PRD §10.7: parts are rasterised at 2x
+export const RASTER_SCALE = 2;   // PRD §10.7: vector parts are rasterised at 2x
 
 const texCache = new Map<string, Promise<Texture>>();
 
-/** Rasterise SVG text to a Texture at 2x. The texture's logical size equals the part's viewBox size. */
+/** Units per art pixel of a pixel-art part (`data-pixel="4"` on its <svg>), or null for a vector part. */
+export function pixelSize(svgText: string): number | null {
+  const m = /<svg[^>]*\sdata-pixel="(\d+)"/.exec(svgText);
+  return m ? Number(m[1]) : null;
+}
+
+/**
+ * Rasterise SVG text to a Texture whose logical size equals the part's viewBox size. Vector parts render at 2x;
+ * pixel-art parts render at exactly one texel per art pixel and sample nearest, so they stay crisp.
+ */
 export function rasterize(svgText: string, vb: [number, number, number, number], key: string): Promise<Texture> {
   let p = texCache.get(key);
   if (!p) {
+    const px = pixelSize(svgText), scale = px ? 1 / px : RASTER_SCALE;
     p = new Promise<Texture>((resolve, reject) => {
       const url = URL.createObjectURL(new Blob([svgText], { type: 'image/svg+xml' }));
       const img = new Image();
       img.onload = () => {
         const canvas = document.createElement('canvas');
-        canvas.width = Math.ceil(vb[2] * RASTER_SCALE); canvas.height = Math.ceil(vb[3] * RASTER_SCALE);
-        canvas.getContext('2d')!.drawImage(img, 0, 0, canvas.width, canvas.height);
+        canvas.width = Math.ceil(vb[2] * scale); canvas.height = Math.ceil(vb[3] * scale);
+        const g = canvas.getContext('2d')!;
+        g.imageSmoothingEnabled = !px;
+        g.drawImage(img, 0, 0, canvas.width, canvas.height);
         URL.revokeObjectURL(url);
-        resolve(new Texture({ source: new ImageSource({ resource: canvas, resolution: RASTER_SCALE }) }));
+        resolve(new Texture({ source: new ImageSource({ resource: canvas, resolution: scale, scaleMode: px ? 'nearest' : 'linear' }) }));
       };
       img.onerror = () => { URL.revokeObjectURL(url); reject(new Error(`arena: cannot rasterise ${key}`)); };
-      img.width = vb[2] * RASTER_SCALE; img.height = vb[3] * RASTER_SCALE;
+      img.width = vb[2] * scale; img.height = vb[3] * scale;
       img.src = url;
     });
     p.catch(() => texCache.delete(key));

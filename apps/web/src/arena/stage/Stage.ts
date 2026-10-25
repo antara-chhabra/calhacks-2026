@@ -2,7 +2,7 @@
 // the jumbotron redraws when its signature changes.
 import { Container, Graphics, Text } from 'pixi.js';
 import { useStore } from '@/data/store';
-import { formatClock, gemStates, matchClockMs, matchLabel, PLATFORMS, STAGE_H, STAGE_W, type GemState } from './layout';
+import { formatClock, gemStates, JUMBO, matchClockMs, matchLabel, PLATFORMS, STAGE_H, STAGE_W, type GemState } from './layout';
 
 const OUTLINE = 0x14121f, GOLD = 0xf2c14e, STONE_LIT = 0x8f86a8, STONE_SHADE = 0x4a4466;
 const GEM_FILL: Record<GemState, number> = { pending: 0x2a2540, solved: 0x2ec4a6, overturned: 0xe5383b };
@@ -81,16 +81,18 @@ export function createStage(): Stage {
   for (const c of [skyL, ringL, platL]) c.cacheAsTexture?.(true);
   far.cacheAsTexture?.(true); near.cacheAsTexture?.(true); crowdL.cacheAsTexture?.(true);
 
-  // Jumbotron: static frame + dynamic gems/text.
+  // Jumbotron: static frame + dynamic gems/text. It sits in the cloud band under the main platform (JUMBO), clear
+  // of every fighter, weapon swing, drop-in and head label.
   const jumbo = new Container({ label: 'jumbotron' });
-  const frame = new Graphics().roundRect(380, 120, 1160, 140, 18).fill(0x0d0a1c).stroke({ width: 6, color: GOLD }).roundRect(392, 132, 1136, 116, 12).stroke({ width: 3, color: OUTLINE });
+  const { x: JX, y: JY, w: JW, h: JH } = JUMBO;
+  const frame = new Graphics().roundRect(JX, JY, JW, JH, 18).fill(0x0d0a1c).stroke({ width: 6, color: GOLD }).roundRect(JX + 12, JY + 12, JW - 24, JH - 24, 12).stroke({ width: 3, color: OUTLINE });
   frame.cacheAsTexture?.(true);
   const gems = new Graphics();
   const mk = (size: number, fill: number, x: number, y: number, anchorX: number): Text => {
     const t = new Text({ text: '', style: { fontFamily: 'Lilita One, Impact, sans-serif', fontSize: size, fill } });
     t.anchor.set(anchorX, 0.5); t.position.set(x, y); return t;
   };
-  const label = mk(34, GOLD, 420, 160, 0), clock = mk(72, 0xffffff, 1500, 190, 1), banner = mk(28, GOLD, 960, 232, 0.5);
+  const label = mk(30, GOLD, JX + 34, JY + 38, 0), clock = mk(64, 0xffffff, JX + JW - 32, JY + JH / 2 + 2, 1), banner = mk(24, GOLD, JX + JW / 2, JY + JH - 26, 0.5);
   label.text = 'MATCH'; banner.text = 'FIGHT CARD';
   jumbo.addChild(frame, gems, label, clock, banner);
 
@@ -105,7 +107,7 @@ export function createStage(): Stage {
     if (nsig !== sig) {
       sig = nsig; label.text = lb; gems.clear();
       gs.forEach((g, i) => {
-        const x = 430 + i * 70, y = 215;
+        const x = JX + 52 + i * 62, y = JY + 84;
         gems.poly([x, y - 26, x + 22, y, x, y + 26, x - 22, y]).fill(GEM_FILL[g.state]).stroke({ width: 3, color: g.state === 'pending' ? 0x6c5ba8 : OUTLINE });
       });
     }
