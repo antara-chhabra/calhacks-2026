@@ -1,5 +1,6 @@
 import { createElement, useEffect, useRef } from 'react';
 import type { JSX } from 'react';
+import type { ArenaCue } from '@fc/engine';
 import { Application } from 'pixi.js';
 import { HOUSE_ROSTER, type FighterId, type SkinSpec } from '@fc/contracts';
 import { useStore } from '@/data/store';
@@ -9,6 +10,7 @@ import { createPoseDriver } from './clips';
 import { CuePlayer, type FighterHandle } from './cues';
 import { createVfx, hexToInt, type Vfx } from './vfx';
 import { createLabelLayer } from './labels';
+import { createSequenceLayer, SequenceDirector } from './sequences';
 import { createStage, SLOTS, STAGE_H as SH, STAGE_W as SW } from './stage';
 
 /** Logical stage (PRD §10.6). A-04 owns the real backdrop; A-02 only places rigs in the four slots. */
@@ -17,11 +19,15 @@ export { SLOTS };
 
 const skinOf = (id: FighterId): SkinSpec => useStore.getState().fighters[id]?.skin ?? (HOUSE_ROSTER as Record<string, { skin: SkinSpec }>)[id]?.skin ?? VEX_SKIN;
 
+/** FC-F-128: the prop or the OS setting. */
+const prefersReduced = (): boolean => typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
 export function ArenaCanvas(props: { reducedMotion: boolean }): JSX.Element {
   const host = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const el = host.current;
     if (!el) return;
+    const reduced = (): boolean => props.reducedMotion || prefersReduced();
     let disposed = false;
     const app = new Application();
     const stage = createStage();
@@ -32,12 +38,12 @@ export function ArenaCanvas(props: { reducedMotion: boolean }): JSX.Element {
       speed: () => useStore.getState().watch.speed || 1,
       playing: () => useStore.getState().watch.playing,
       fighterState: (id) => useStore.getState().watch.state?.fighters[id],
-      reduced: () => props.reducedMotion,
+      reduced,
       hooks: { onCue: (c) => { vfxRef.v?.hooks.onCue(c); labels.onCue(c); }, onImpact: (c, second) => { vfxRef.v?.hooks.onImpact(c, second); } },
     });
     let baseX = 0, baseY = 0;   // world position without shake
     const vfx = createVfx({
-      world, vfx: stage.vfx, reduced: () => props.reducedMotion,
+      world, vfx: stage.vfx, reduced,
       hitStop: (ms, ids) => { player.hitStop(ms, ids); },
       shake: (dx, dy) => { world.position.set(baseX + dx * world.scale.x, baseY + dy * world.scale.x); },
       fighter: (id) => {
@@ -50,13 +56,35 @@ export function ArenaCanvas(props: { reducedMotion: boolean }): JSX.Element {
     vfxRef.v = vfx;
     const headHeight = (id: string): number => { const b = skinOf(id).build; return b === 'heavy' ? 320 : b === 'lean' ? 285 : 300; };
     const labels = createLabelLayer({   // A-08: above the VFX, anchored over each rig's head
-      parent: stage.vfx, reducedMotion: props.reducedMotion,
-      getAnchor: (id) => { const r = rigs.get(id)?.rig; return r ? { x: r.root.x, y: r.root.y - headHeight(id) - 24 } : null; },
+      parent: stage.vfx, reducedMotion: reduced(),
+      getAnchor: (id) => { const r = director.isHidden(id) ? undefined : rigs.get(id)?.rig; return r ? { x: r.root.x, y: r.root.y - headHeight(id) - 24 } : null; },
       getState: () => useStore.getState().watch.state,
       getName: (id) => useStore.getState().fighters[id]?.name ?? id.toUpperCase(),
       getSpeed: () => useStore.getState().watch.speed || 1,
       getColor: (id) => hexToInt(skinOf(id).palette.primary),
     });
+    // A-09 intro/outro: the director re-times intro/outro cues before they reach the player; the layer draws spotlight/banners/confetti.
+    const seqLayer = createSequenceLayer({
+      world, fighters: stage.fighters, front: stage.vfx, reduced,
+      getAnchor: (id) => { const r = rigs.get(id)?.rig; return r ? { x: r.root.x, y: r.root.y, height: headHeight(id) } : null; },
+      getName: (id) => useStore.getState().fighters[id]?.name ?? id.toUpperCase(),
+      getColor: (id) => hexToInt(skinOf(id).palette.primary),
+    });
+    const devSeq = (what: string, kind: string): void => {   // dev evidence: window.__arenaSeqLog = [[ms since mount, 'emit|beat', kind], ...]
+      if (!import.meta.env.DEV) return;
+      const w = window as unknown as { __arenaSeqLog?: [number, string, string][] };
+      (w.__arenaSeqLog ??= []).push([Math.round(performance.now() - t0), what, kind]);
+    };
+    const t0 = performance.now();
+    const director = new SequenceDirector({
+      reduced, emit: (c) => { devSeq('emit', c.kind); player.handle(c); }, onBeat: (b) => { devSeq('beat', b.kind); seqLayer.beat(b); },
+      matchId: () => useStore.getState().watch.matchId,
+    });
+    const snapSequences = (): void => {   // catch-up: no intro replay; jump to the end state implied by the match state
+      const w = useStore.getState().watch;
+      const winner = w.state ? Object.values(w.state.fighters).find((f) => f.status === 'winner')?.id ?? null : null;
+      director.snap({ winner, matchId: w.matchId });
+    };
     const handles = new Map<string, FighterHandle>();
     const handleFor = (id: string, rig: Rig, i: number): FighterHandle => {
       const old = handles.get(id), sl = SLOTS[i]!;
@@ -69,6 +97,7 @@ export function ArenaCanvas(props: { reducedMotion: boolean }): JSX.Element {
       return h;
     };
     let token = 0;
+    let preRigs: ArenaCue[] | null = [];   // cues received before the first rig build finished
 
     const fit = (): void => {
       const s = Math.min(app.screen.width / STAGE_W, app.screen.height / STAGE_H);
@@ -100,7 +129,7 @@ export function ArenaCanvas(props: { reducedMotion: boolean }): JSX.Element {
       });
       for (const id of handles.keys()) if (!rigs.has(id)) handles.delete(id);
       player.setFighters(built.map((b, i) => handleFor(b.id, b.rig, i)));
-      if (snap) { player.snap(); vfx.clear(); labels.snap(); }   // catch-up rule (PRD §8.7): kill timelines, clear queues, state-derived pose
+      if (snap) { player.snap(); vfx.clear(); labels.snap(); snapSequences(); }   // catch-up rule (PRD §8.7): kill timelines, clear queues, state-derived pose
     };
 
     const ready = app.init({ resizeTo: el, background: 0x000000, antialias: true, autoDensity: true, resolution: Math.min(window.devicePixelRatio || 1, 2) }).then(() => {
@@ -108,25 +137,32 @@ export function ArenaCanvas(props: { reducedMotion: boolean }): JSX.Element {
       el.appendChild(app.canvas);
       app.canvas.style.display = 'block';
       app.stage.addChild(world, stage.bars);
-      stage.setReducedMotion(props.reducedMotion);
+      stage.setReducedMotion(reduced());
       app.ticker.add((t) => { 
         stage.tick(t.deltaMS); player.tick(t.deltaMS);
         const st = useStore.getState().watch;
-        vfx.tick(st.playing ? Math.min(t.deltaMS, 100) * (st.speed || 1) : 0);   // same clock as the cue player: pause/speed apply
+        const gdt = st.playing ? Math.min(t.deltaMS, 100) * (st.speed || 1) : 0;   // same clock as the cue player: pause/speed apply
+        director.update(gdt); seqLayer.update(gdt);
+        for (const [id, r] of rigs) r.rig.root.visible = !director.isHidden(id);   // waiting for its drop-in
+        vfx.tick(gdt);
         labels.update(st.playing ? t.deltaMS : 0);
       });
       fit();
       app.renderer.on('resize', fit);
-      void sync(true);
+      void sync(true).then(() => {   // rigs are ready: replay the cues that arrived while they loaded (so a replay still gets its intro)
+        if (disposed) return;
+        const early = preRigs?.splice(0) ?? []; preRigs = null;
+        for (const c of early) director.push(c);
+      });
     });
 
     const unsubOrder = useStore.subscribe((s, prev) => {
       if (s.watch.state?.order !== prev.watch.state?.order || s.fighters !== prev.fighters) void sync(false);
-      if (s.watch.playbackRevision !== prev.watch.playbackRevision) void sync(true);   // snap rule (PRD §8.7)
+      if (s.watch.playbackRevision !== prev.watch.playbackRevision) { snapSequences(); void sync(true); }   // snap rule (PRD §8.7)
     });
     let report: ReturnType<typeof setTimeout> | undefined;
     const unsubCues = useStore.getState().cues$((c) => {
-      player.handle(c);
+      if (preRigs && preRigs.length < 64) preRigs.push(c); else if (!preRigs) director.push(c);
       if (import.meta.env.DEV) {   // per-kind cue counts, logged 2 s after the last cue (AC-07.1 evidence)
         (window as unknown as { __arenaCues?: unknown; __arenaPlayer?: unknown }).__arenaCues = player.stats;
         (window as unknown as { __arenaPlayer?: unknown }).__arenaPlayer = player;
@@ -137,14 +173,14 @@ export function ArenaCanvas(props: { reducedMotion: boolean }): JSX.Element {
 
     return () => {
       disposed = true;
-      clearTimeout(report); vfx.destroy(); labels.destroy(); player.setFighters([]);
+      clearTimeout(report); director.destroy(); seqLayer.destroy(); vfx.destroy(); labels.destroy(); player.setFighters([]);
       stage.destroy();
       unsubOrder(); unsubCues();
       void ready.then(() => { app.destroy(true, { children: true }); }).catch(() => undefined);
     };
   }, []);
   return createElement('div', {
-    ref: host, 'data-arena': '', 'data-reduced-motion': props.reducedMotion ? '1' : '0',
+    ref: host, 'data-arena': '', 'data-reduced-motion': props.reducedMotion || prefersReduced() ? '1' : '0',
     style: { width: '100%', aspectRatio: '16 / 9', background: '#000', overflow: 'hidden' },
   });
 }
