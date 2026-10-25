@@ -42,6 +42,17 @@ export const settle_match = spacetimedb.reducer({ name: 'settle_match' }, {
     ctx.db.market.id.update({ ...mk, status: 'settled', result: r.outcome });
   }
 
+  // 1b. A market of this match with no result is voided: its open bets are refunded, so no stake is left stranded.
+  for (const mk of ctx.db.market.matchId.filter(matchId)) {
+    if (seen.has(mk.id) || mk.status === 'settled' || mk.status === 'void') continue;
+    for (const b of ctx.db.bet.marketId.filter(mk.id)) {
+      if (b.status !== 'open') continue;
+      applyLedger(ctx, b.bettor, b.stake, 'refund', mk.id);
+      ctx.db.bet.id.update({ ...b, status: 'refunded' });
+    }
+    ctx.db.market.id.update({ ...mk, status: 'void' });
+  }
+
   // 2. Credits through the ledger (one row per bettor), treasury gets rake + seed return + dust.
   for (const [hex, cents] of creditsByBettor(plans)) {
     applyLedger(ctx, identities.get(hex)!, cents, 'payout', matchId);
