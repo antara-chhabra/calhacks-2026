@@ -17,7 +17,7 @@ export function matchRow(fx: MockBasicFixture, s: MatchState): MatchRow {
   const c = created && created.type === 'match.created' ? created.data : null;
   const winner = s.standings?.find((x) => x.rank === 1)?.fighterId ?? null;
   return {
-    id: fx.matchId, number: fx.number, status: s.status, mode: c?.mode ?? 'mock', isDemo: c?.isDemo ?? false,
+    slots: c?.slots, category: c?.category ?? 'integrals', id: fx.matchId, number: fx.number, status: s.status, mode: c?.mode ?? 'mock', isDemo: c?.isDemo ?? false,
     fighterIds: c?.fighters ?? fx.fighters.map((f) => f.id), problems: c?.problems ?? [], commitHash: c?.commitHash ?? '',
     bettingClosesAt: c?.bettingClosesAt ?? 0, startedAt: s.startedT, timeLimitMs: c?.timeLimitMs ?? 0, winnerId: winner,
   };

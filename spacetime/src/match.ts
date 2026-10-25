@@ -57,10 +57,11 @@ export const create_match = spacetimedb.reducer({ name: 'create_match' }, {
 
   a.fighterIds.forEach((fighterId, i) => {
     ctx.db.entry.insert({
-      id: entryId(a.id, fighterId), matchId: a.id, fighterId, slot: a.slots[i]!, teamId: undefined,
+      id: entryId(a.id, fighterId), matchId: a.id, fighterId, slot: a.slots[i]!, teamId: a.category === 'squads' ? (a.slots[i]! < 2 ? 'team_a' : 'team_b') : undefined,
       rank: undefined, points: 0, scorePct: 0, hits: 0, misses: 0, overturned: 0, yellow: 0, red: 0,
       firstHitMs: undefined, lastScoreMs: undefined, clutchPoints: 0, missesRecovered: 0,
-      eloBefore: ctx.db.fighter.id.find(fighterId)?.elo ?? 1000, eloAfter: undefined, wonAtOdds: undefined,
+      eloBefore: ctx.db.fighterCategoryStats.id.find(`${fighterId}:${a.category}`)?.elo
+        ?? (a.category === 'integrals' ? ctx.db.fighter.id.find(fighterId)?.elo ?? 1000 : 1000), eloAfter: undefined, wonAtOdds: undefined,
     });
   });
 

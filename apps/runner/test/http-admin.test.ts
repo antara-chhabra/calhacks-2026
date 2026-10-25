@@ -56,6 +56,14 @@ describe('admin routes', () => {
     expect((await b.json()).error.code).toBe('match_active');
     expect((await call('POST', '/admin/matches', { betWindowS: 'x' })).status).toBe(400);
   });
+  it('forwards valid categories and rejects unknown category names before starting', async () => {
+    let selected: unknown;
+    const { call } = await boot({ runMatch: async (opts: unknown) => { selected = opts; return { matchId: 'm_cat' }; } });
+    expect((await call('POST', '/admin/matches', { category: 'not-real' })).status).toBe(400);
+    expect(selected).toBeUndefined();
+    expect((await call('POST', '/admin/matches', { category: 'code' })).status).toBe(201);
+    expect(selected).toEqual({ category: 'code' });
+  });
   it('lock/hold/void map to the director; unknown id 404', async () => {
     const { call, calls } = await boot();
     await call('POST', '/admin/matches', {});

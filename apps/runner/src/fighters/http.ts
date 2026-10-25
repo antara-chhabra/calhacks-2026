@@ -2,6 +2,8 @@ import { lookup } from 'node:dns/promises';
 import { request } from 'node:https';
 import { isIP } from 'node:net';
 import type { FighterBackend } from './types.js';
+import { categoryInfo } from '@fc/contracts';
+import { publicProblemPayload } from './droid/prompts.js';
 
 /** Conservative global-unicast check; reject IPv4-mapped IPv6 and transition ranges. */
 export function publicAddress(ip: string): boolean {
@@ -45,6 +47,16 @@ export async function postByo(endpoint: string, body: object, signal: AbortSigna
   });
 }
 
+export function buildByoPayload(input: Parameters<FighterBackend['run']>[0], deadlineAt: number): object {
+  const category = input.category ?? input.problems[0]?.category ?? 'integrals';
+  return {
+    protocol: 'fightcard/1', matchId: input.matchId, fighterId: input.fighter.id, token: input.token,
+    category, problems: publicProblemPayload(input), deadlineAt, submitUrl: input.submitUrl,
+    sayUrl: input.submitUrl?.replace(/\/submit$/, '/say'),
+    rules: `Solve each ${categoryInfo(category).label.toLowerCase()} prompt and submit the requested answer format. Maximum 3 attempts per problem, 20 submissions per minute. Wrong answers cost 5 points. Taunts: 80 characters, maximum 3. Accepted answers receive category-specific final review.`,
+  };
+}
+
 export function createHttpBackend(): FighterBackend {
   return {
     engine: 'http',
@@ -57,12 +69,7 @@ export function createHttpBackend(): FighterBackend {
       if (signal.aborted) ctrl.abort();
       try {
         const deadline = Math.min(input.deadlineAt, Date.now() + io.remainingMs());
-        const send = postByo(input.endpointUrl, {
-          protocol: 'fightcard/1', matchId: input.matchId, fighterId: input.fighter.id, token: input.token,
-          problems: input.problems, deadlineAt: deadline, submitUrl: input.submitUrl,
-          sayUrl: input.submitUrl.replace(/\/submit$/, '/say'),
-          rules: 'Submit mathjs antiderivatives. Maximum 3 attempts per problem, 20 submissions per minute. Wrong answers cost 5 points. Taunts: 80 characters, maximum 3. Final review checks the full domain.',
-        }, ctrl.signal);
+        const send = postByo(input.endpointUrl, buildByoPayload(input, deadline), ctrl.signal);
         // Cover DNS as well as TLS/response time; postByo checks abort before any request.
         await Promise.race([send, new Promise<never>((_, reject) => {
           if (ctrl.signal.aborted) reject(new Error('aborted'));

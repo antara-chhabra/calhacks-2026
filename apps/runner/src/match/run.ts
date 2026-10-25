@@ -4,10 +4,11 @@ import { randomBytes } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { FighterId, FighterProblem, Problem, ProblemIdx, ProblemMeta } from '@fc/contracts';
+import { problemSetSchema, type FighterId, type FighterProblem, type Problem, type ProblemIdx, type ProblemMeta } from '@fc/contracts';
 import { commitHash } from '@fc/engine';
 import type { FighterRunInput } from '../fighters/types.js';
 import { generateProblemSet } from '../problems/index.js';
+import { loadWebSnapshot } from '../problems/web.js';
 import { createRng } from '../problems/rng.js';
 import { registerByoSession, unregisterByoSession } from '../http/byo.js';
 import { EventBatcher } from './batcher.js';
@@ -51,9 +52,11 @@ export async function runMatchUntilReview(deps: MatchDeps, opts: MatchOpts): Pro
   const matchId = opts.matchId ?? `m_${hex(5)}`;
   const seed = opts.seed ?? hex(16);
   const salt = opts.salt ?? hex(16);
-  const problemSet = generateProblemSet(seed);
+  const snapshot = category === 'web' ? await (deps.webSnapshot ?? loadWebSnapshot)() : undefined;
+  const problemSet = problemSetSchema.parse(generateProblemSet(seed, category, snapshot));
+  deps.onProblemSet?.(matchId, problemSet);
   const commit = await commitHash(problemSet, salt);
-  const markets = buildMarkets(matchId, picked, { beatClockRate: opts.beatClockRate, scoreHistory: opts.scoreHistory });
+  const markets = buildMarkets(matchId, picked, { beatClockRate: opts.beatClockRate, scoreHistory: opts.scoreHistory, category, slots });
   const fighterIds = picked.map((c) => c.fighter.id);
   const problemMeta: ProblemMeta[] = problemSet.problems.map((p) => ({ idx: p.idx, difficulty: p.difficulty, points: p.points }));
   const sandboxRoot = join(opts.sandboxRoot ?? fileURLToPath(new URL('../../../../.arena/sandboxes/', import.meta.url)), matchId);
@@ -72,6 +75,7 @@ export async function runMatchUntilReview(deps: MatchDeps, opts: MatchOpts): Pro
   try {
     await stdb.createMatch({ id: matchId, category, mode, isDemo, fighterIds, slots, problems: problemMeta, commitHash: commit,
       bettingWindowMs: opts.bettingWindowMs, timeLimitMs: opts.timeLimitMs, markets });
+    opts.onCreated?.();
 
     // --- wait for lock (module auto_lock, or lock it ourselves) ------------
     if (opts.lockEarly) await stdb.lockMatch({ matchId });
@@ -82,11 +86,12 @@ export async function runMatchUntilReview(deps: MatchDeps, opts: MatchOpts): Pro
     await Promise.race([lockSeen, sleep(3000)]);
 
     // --- prewarm + intro ---------------------------------------------------
-    const fprobs: FighterProblem[] = problemSet.problems.map((p) => ({ idx: p.idx, difficulty: p.difficulty, points: p.points, statementTex: p.statementTex, integrand: p.integrand }));
+    const fprobs: FighterProblem[] = problemSet.problems.map((p) => ({ idx: p.idx, difficulty: p.difficulty, points: p.points, statementTex: p.statementTex, integrand: p.integrand, category,
+      ...(p.evaluation ? { prompt: p.evaluation.prompt, answerFormat: p.evaluation.format } : { answerFormat: 'expression' as const }) }));
     const mkInput = (c: Candidate, startedAt: number): FighterRunInput => {
       const dir = join(sandboxRoot, c.fighter.id);
       return {
-        matchId, fighter: c.fighter, origin: c.origin, persona: c.persona, strategy: c.strategy,
+        matchId, category, fighter: c.fighter, origin: c.origin, persona: c.persona, strategy: c.strategy,
         modelId: c.modelId ?? null, reasoningEffort: c.reasoningEffort ?? null,
         problems: fprobs, timeLimitMs: opts.timeLimitMs, deadlineAt: startedAt + opts.timeLimitMs, sandboxDir: dir,
         endpointUrl: c.endpointUrl ?? null, submitUrl: c.submitUrl ?? null, token: c.token ?? null,

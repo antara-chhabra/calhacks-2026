@@ -53,7 +53,7 @@ export function createAdminClient(baseUrl: string, token: string, fetchFn: Fetch
   return {
     health: () => call<Health>('GET', '/admin/health'),
     log: async (lines = 50) => (await call<{ lines: string[] }>('GET', `/admin/log?lines=${lines}`)).lines.slice(-lines),
-    createMatch: (o: { fighters?: string[]; betWindowS?: number } = {}) => call<{ matchId: string }>('POST', '/admin/matches', o),
+    createMatch: (o: { fighters?: string[]; betWindowS?: number; category?: string } = {}) => call<{ matchId: string }>('POST', '/admin/matches', o),
     lock: (id: string) => call<void>('POST', `/admin/matches/${enc(id)}/lock`, {}),
     hold: (id: string, seconds: number) => call<void>('POST', `/admin/matches/${enc(id)}/hold`, { seconds }),
     voidMatch: (id: string, reason: string) => call<void>('POST', `/admin/matches/${enc(id)}/void`, { reason }),

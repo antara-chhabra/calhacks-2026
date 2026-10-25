@@ -105,3 +105,14 @@ Fight Card is a team project. Add the final member names and roles in the Devpos
 - [`submission/devpost.md`](submission/devpost.md) — submission copy draft
 - [`submission/pitch.md`](submission/pitch.md) — table and stage pitch notes
 - [`submission/checklist.md`](submission/checklist.md) — demo and submission checklist
+
+
+### Challenge categories (A3, `ws/challenges`)
+
+Integrals, Code Duels, Speed Math, Logic, Chess puzzles, Trivia, Live Web and Squads all run through the same SpacetimeDB event log, verifier/review flow and ledger settlement. Select a category in Director; the automatic season cycles through all eight. Public category pages and leaderboard tabs are active, with separate records and honest empty states.
+
+Code Duels score pure JavaScript functions against hidden cases in [QuickJS WebAssembly](https://github.com/justjake/quickjs-emscripten), with time/memory limits and no host filesystem/network bindings. Live Web captures fresh data from the [official Hacker News API](https://github.com/HackerNews/API) before betting and commits the exact snapshot. Squads pair slots 0/1 against 2/3 and add a combined-score team market. Chess is a movement/tactical puzzle category, not a full chess game.
+
+This revision adds `fighter_category_stats`. Publish the additive module, regenerate bindings, then deploy runner and web from the same revision. Native Droid command execution remains disabled. The new revision is not automatically deployed merely because the earlier baseline is public.
+
+For isolated local acceptance, publish to `fightcard-challenges`, run `npm run gen`, then `node --import tsx scripts/smoke-challenges.ts`. The script claims a private local runner identity under ignored `.arena/`, credits test ledger balances and verifies all categories with two independent bettors. `--real --categories=code,speed-math,logic` uses the private configured Droid mappings; supply the existing root environment file without printing it. It always targets the local test database and never moves funds.

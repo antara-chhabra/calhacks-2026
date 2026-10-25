@@ -33,7 +33,7 @@ export function PosterWidget({ poster, now, size }: { poster: PosterVM | null; n
             <div className="flex items-center gap-2">
               <AgentAvatar agent={avatarOf(f)} size={size === "s" ? 22 : 26} />
               <span className="min-w-0 leading-tight">
-                <span className="block truncate font-semibold text-sm text-zinc-50">{f.name}</span>
+                <span className="block truncate font-semibold text-sm text-zinc-50">{f.name}{f.team && <span className="ml-1 rounded bg-zinc-800 px-1 py-0.5 text-[9px] text-zinc-400">TEAM {f.team}</span>}</span>
                 <span className="hidden truncate text-[11px] text-zinc-500 @[560px]:block">{f.title}</span>
               </span>
             </div>
@@ -70,10 +70,10 @@ export function LiveWidget({ live }: { live: LiveVM | null }) {
       </div>
       <p className="mt-2 text-[12px] text-zinc-400">{live.statusLine}</p>
       <ul className="mt-3 flex-1 space-y-2.5">
-        {live.rows.map(({ fighter, points }) => (
+        {live.rows.map(({ fighter, points, team }) => (
           <li className="flex items-center gap-2.5" key={fighter.id}>
             <AgentAvatar agent={avatarOf(fighter)} size={22} />
-            <span className="w-14 truncate font-medium text-xs text-zinc-200">{fighter.name}</span>
+            <span className="w-14 truncate font-medium text-xs text-zinc-200">{fighter.name}{team && <span className="ml-1 text-[9px] text-zinc-500">T{team}</span>}</span>
             <span className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-zinc-800">
               <span className="absolute inset-y-0 left-0 rounded-full transition-[width] duration-700 ease-out" style={{ width: `${(points / max) * 100}%`, backgroundColor: fighter.color }} />
             </span>
@@ -209,7 +209,7 @@ export function FightersWidget({ fighters }: { fighters: { fighter: FighterVM; o
 
 /* ---------------------------------- Market tile ---------------------------------- */
 
-export function MarketTile({ market, names, size }: { market: MarketView; names: Record<string, FighterVM>; size: WidgetSize }) {
+export function MarketTile({ market, names, size, teamMarket = false }: { market: MarketView; names: Record<string, FighterVM>; size: WidgetSize; teamMarket?: boolean }) {
   const rows = market.outcomes.map((o) => ({ id: o, f: names[o], odds: market.odds[o], vol: market.pools[o]?.staked ?? 0 }));
   const total = rows.reduce((a, r) => a + r.vol, 0);
   return (
@@ -220,7 +220,7 @@ export function MarketTile({ market, names, size }: { market: MarketView; names:
         {rows.slice(0, size === "s" ? 3 : 5).map((r) => (
           <li className="flex items-center gap-2" key={r.id}>
             {r.f && <AgentAvatar agent={avatarOf(r.f)} size={20} />}
-            <span className="w-14 truncate text-[13px] text-zinc-200">{r.f?.name ?? r.id}</span>
+            <span className="w-14 truncate text-[13px] text-zinc-200">{teamMarket && r.id.toLowerCase() === 'team_a' ? 'Team A' : teamMarket && r.id.toLowerCase() === 'team_b' ? 'Team B' : r.f?.name ?? r.id}</span>
             <span className="relative h-1 flex-1 overflow-hidden rounded-full bg-zinc-800">
               <span className="absolute inset-y-0 left-0 rounded-full bg-zinc-300" style={{ width: `${r.odds ? impliedPct(r.odds) : 0}%` }} />
             </span>

@@ -1,7 +1,7 @@
 
 
 // Match-screen view models (U-04). Pure helpers: no React, no store access, so they are unit-testable.
-import { HOUSE_ROSTER, type FighterId, type SkinSpec } from '@fc/contracts';
+import { CATEGORY_CATALOG, HOUSE_ROSTER, squadTeam, type FighterId, type SkinSpec } from '@fc/contracts';
 import { verifyReveal, type FeedLine, type FighterLive, type MatchState } from '@fc/engine';
 
 export const nameOf = (id: string, fighters?: Record<string, { name: string }>): string =>
@@ -27,6 +27,8 @@ export function clockText(s: MatchState): string {
   if (s.status === 'review' || s.status === 'settled') return '0:00';
   return mmss(s.timeLimitMs);
 }
+
+export const categoryLabel = (category: MatchState['category']): string => CATEGORY_CATALOG.find((c) => c.id === category)?.label ?? category;
 
 export const STATUS_BADGE: Record<MatchState['status'], string> = {
   scheduled: 'UPCOMING', open: 'BETS OPEN', locked: 'LOCKED', live: 'LIVE', review: 'VAR REVIEW', settled: 'FINAL', void: 'VOID',
@@ -110,17 +112,18 @@ const STATUS_LABEL: Record<FighterLive['status'], string> = {
 };
 export type Plate = {
   id: FighterId; name: string; points: number; hits: number; misses: number; yellow: number; red: number;
-  status: FighterLive['status']; statusLabel: string; activity: string | null; skin: SkinSpec | null; leading: boolean;
+  status: FighterLive['status']; statusLabel: string; activity: string | null; skin: SkinSpec | null; leading: boolean; team: 'A' | 'B' | null;
 };
 export function plates(s: MatchState, fighters?: Record<string, { name: string; skin: SkinSpec }>): Plate[] {
   const best = Math.max(0, ...s.order.map((id) => s.fighters[id]?.points ?? 0));
-  return s.order.flatMap((id) => {
+  return s.order.flatMap((id, index) => {
     const f = s.fighters[id];
     if (!f) return [];
+    const slot = f.slot ?? index;
     return [{
       id, name: nameOf(id, fighters), points: f.points, hits: f.hits, misses: f.misses, yellow: f.yellow, red: f.red,
       status: f.status, statusLabel: STATUS_LABEL[f.status], activity: f.lastSay?.text ?? null, skin: skinOf(id, fighters),
-      leading: best > 0 && f.points === best,
+      leading: best > 0 && f.points === best, team: s.category === 'squads' ? (squadTeam(slot) === 'team_a' ? 'A' : 'B') : null,
     }];
   });
 }

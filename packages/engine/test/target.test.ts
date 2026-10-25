@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { pickTarget } from '../src/index.js';
+import { initialMatchState, reduceMatch, pickTarget } from '../src/index.js';
 import { buildLog, reduceAll } from './helpers/log.js';
 
 const base = () => reduceAll(buildLog().slice(0, 5));      // created, locked, 4 entries? -> ensure fighters exist
@@ -25,4 +25,14 @@ describe('pickTarget', () => {
     s = set(s, 'quill', { points: 20 });
     expect(pickTarget(s, 'vex')).toBe('glitch');
   });
+});
+
+it('squad fighters never target their teammate, including the out-opponent fallback', () => {
+  const s = initialMatchState();
+  const ev = { v: 1 as const, seq: 1, t: 0, matchId: 'squad', type: 'match.created' as const, data: { category: 'squads' as const, mode: 'mock' as const, isDemo: false, fighters: ['a','b','c','d'], slots: [2,0,3,1] as (0|1|2|3)[], problems: [], commitHash: 'h', bettingClosesAt: 1, timeLimitMs: 1 } };
+  const next = reduceMatch(s, ev);
+  next.fighters.c!.points = 999;
+  expect(pickTarget(next, 'a')).not.toBe('c');
+  next.fighters.b!.status = 'out'; next.fighters.d!.status = 'out';
+  expect(['b', 'd']).toContain(pickTarget(next, 'a'));
 });
