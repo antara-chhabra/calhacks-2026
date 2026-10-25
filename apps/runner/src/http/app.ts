@@ -50,9 +50,11 @@ export function createApp(env: Env, opts: AppOptions = {}): RunnerApp {
   adminApp.disable('x-powered-by');
   const allowed = new Set(['http://localhost:5173']);
   if (env.FC_PUBLIC_WEB_URL) allowed.add(new URL(env.FC_PUBLIC_WEB_URL).origin);
+  // Any loopback dev port (each workstream runs web on 5173+n); the listener is 127.0.0.1-only and bearer-protected.
+  const loopback = /^http:\/\/(localhost|127\.0\.0\.1):\d+$/;
   adminApp.use((req: Request, res: Response, next: NextFunction) => {
     const origin = req.headers.origin;
-    if (origin && allowed.has(origin)) {
+    if (origin && (allowed.has(origin) || loopback.test(origin))) {
       res.setHeader('Access-Control-Allow-Origin', origin);
       res.setHeader('Vary', 'Origin');
       res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');
