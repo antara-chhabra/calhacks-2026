@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-80 -124 160 130" width="160" height="130" data-part="big_helmet" data-pivot="0,0" data-head="neck-base" data-anchor="head-pivot">
+<g stroke="#14121F" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" fill="none">
+<defs><clipPath id="bighelmet-clip"><path d="M -52 -30 C -62 -80 -34 -102 0 -102 C 36 -102 60 -80 56 -52 L 52 -46 L 8 -50 L -8 -30 L -10 -24 Z"/></clipPath></defs>
+<path d="M -52 -30 C -62 -80 -34 -102 0 -102 C 36 -102 60 -80 56 -52 L 52 -46 L 8 -50 L -8 -30 L -10 -24 Z" fill="#FF00FF"/>
+<g clip-path="url(#bighelmet-clip)">
+<path d="M -4 -106 L 8 -106 L 12 -50 L 0 -50 Z" fill="#00FFFF" stroke-width="3"/>
+<path d="M 30 -104 C 54 -90 62 -66 54 -40 L 70 -40 L 70 -104 Z" fill="#14121F" fill-opacity="0.25" stroke="none"/>
+</g>
+<path d="M -52 -30 C -62 -80 -34 -102 0 -102 C 36 -102 60 -80 56 -52 L 52 -46 L 8 -50 L -8 -30 L -10 -24 Z" fill="none"/>
+<path d="M -54 -42 L 56 -48 L 56 -58 L -56 -52 Z" fill="#00FFFF" stroke-width="3"/>
+<circle cx="0" cy="-106" r="7" fill="#FFFF00" stroke-width="3"/>
+<path d="M -44 -76 C -38 -90 -22 -98 -6 -98 C -20 -92 -30 -82 -36 -68 Z" fill="#FFFFFF" fill-opacity="0.35" stroke="none"/>
+</g>
+</svg>

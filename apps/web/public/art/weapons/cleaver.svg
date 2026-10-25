@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -272 120 316" width="120" height="316" data-part="cleaver" data-pivot="0,0" data-socket="0,0" data-length="290" data-tip="0,-262" data-blade="up">
+<g stroke="#14121F" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" fill="none">
+<defs><clipPath id="cl-clip"><path d="M -18 -36 L -50 -70 L -50 -240 L -36 -262 L 36 -262 L 50 -240 L 52 -70 L 18 -36 Z"/></clipPath></defs>
+<path d="M -18 -36 L -50 -70 L -50 -240 L -36 -262 L 36 -262 L 50 -240 L 52 -70 L 18 -36 Z" fill="#C9CEDB"/>
+<g clip-path="url(#cl-clip)">
+<path d="M 14 -270 L 60 -270 L 60 -30 L 10 -30 Z" fill="#14121F" fill-opacity="0.25" stroke="none"/>
+<path d="M -50 -240 L -36 -262 L -26 -262 L -26 -70 L -50 -70 Z" fill="#14121F" fill-opacity="0.25" stroke="none"/>
+<path d="M -44 -236 L -38 -250 L -38 -80 L -44 -80 Z" fill="#FFFFFF" fill-opacity="0.35" stroke="none"/>
+</g>
+<path d="M -18 -36 L -50 -70 L -50 -240 L -36 -262 L 36 -262 L 50 -240 L 52 -70 L 18 -36 Z"/>
+<circle cx="0" cy="-212" r="13" fill="#14121F" fill-opacity="0.45"/>
+<path d="M -50 -104 L 52 -104" stroke-width="3"/>
+<path d="M -24 -48 L 24 -48 L 20 -32 L -20 -32 Z" fill="#FFFF00"/>
+<rect x="-10" y="-34" width="20" height="62" rx="6" fill="#FF00FF"/>
+<path d="M -10 -18 L 10 -18 M -10 -6 L 10 -6 M -10 6 L 10 6 M -10 18 L 10 18" stroke-width="3"/>
+<path d="M 3 -34 L 10 -34 L 10 28 L 3 28 Z" fill="#14121F" fill-opacity="0.25" stroke="none"/>
+<rect x="-14" y="26" width="28" height="14" rx="5" fill="#FFFF00"/>
+</g>
+</svg>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-27 -22 54 94" width="54" height="94" data-part="thigh" data-pivot="0,0" data-length="54">
+<g stroke="#14121F" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" fill="none">
+<defs><clipPath id="thigh-clip"><path d="M -19 -14 L 19 -14 L 17 58 L -17 58 Z"/></clipPath></defs>
+<rect x="-19" y="-14" width="38" height="72" rx="12.7" fill="#00FFFF"/>
+<path d="M -21 -4 L 21 -4 L 16 36 L -16 36 Z" fill="#FF00FF"/>
+<path d="M -17 46 L 17 46" stroke="#FFFF00" stroke-width="5"/>
+<g clip-path="url(#thigh-clip)"><path d="M 8 -16 C 14.3 10 11 40 9.5 62 L 29 62 L 29 -16 Z" fill="#14121F" fill-opacity="0.25" stroke="none"/></g>
+</g>
+</svg>

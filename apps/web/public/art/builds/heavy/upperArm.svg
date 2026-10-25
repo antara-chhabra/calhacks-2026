@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-36 -48 72 108" width="72" height="108" data-part="upperArm" data-pivot="0,0" data-length="44">
+<g stroke="#14121F" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" fill="none">
+<defs><clipPath id="uarm-clip"><path d="M -24 6 C -26 -16 -8 -24 4 -22 C 20 -20 28 -6 24 8 C 12 13 -12 13 -24 6 Z"/></clipPath></defs>
+<path d="M -4 -22 L 4 -42 L 12 -20 Z" fill="#FFFF00"/>
+<rect x="-17" y="-4" width="34" height="54" rx="13" fill="#00FFFF"/>
+<path d="M -24 6 C -26 -16 -8 -24 4 -22 C 20 -20 28 -6 24 8 C 12 13 -12 13 -24 6 Z" fill="#FF00FF"/>
+<g clip-path="url(#uarm-clip)"><path d="M 12 -26 C 22 -10 18 4 8 16 L 40 16 L 40 -26 Z" fill="#14121F" fill-opacity="0.25" stroke="none" /></g>
+</g>
+</svg>

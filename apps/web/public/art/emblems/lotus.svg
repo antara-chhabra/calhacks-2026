@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -32 60 64" width="60" height="64" data-part="lotus" data-pivot="0,0" data-anchor="torso:emblem">
+<g stroke="#14121F" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" fill="none">
+<defs><clipPath id="lotus-clip"><path d="M 0 -26 C 10 -14 12 -4 0 14 C -12 -4 -10 -14 0 -26 Z M -4 12 C -16 12 -26 2 -28 -12 C -16 -10 -8 -2 -4 12 Z M 4 12 C 16 12 26 2 28 -12 C 16 -10 8 -2 4 12 Z"/></clipPath></defs>
+<path d="M -4 14 C -20 16 -30 6 -30 -8 C -16 -8 -8 0 -4 14 Z" fill="#FFFF00" stroke-width="3"/>
+<path d="M 4 14 C 20 16 30 6 30 -8 C 16 -8 8 0 4 14 Z" fill="#FFFF00" stroke-width="3"/>
+<path d="M 0 -26 C 12 -14 14 0 0 18 C -14 0 -12 -14 0 -26 Z" fill="#00FFFF" stroke-width="3"/>
+<g clip-path="url(#lotus-clip)"><path d="M 0 -30 L 30 -30 L 30 24 L 0 24 Z" fill="#14121F" fill-opacity="0.25" stroke="none"/></g>
+<path d="M -14 22 C -6 26 6 26 14 22" stroke-width="3"/>
+</g>
+</svg>

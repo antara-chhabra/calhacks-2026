@@ -1,15 +1,15 @@
 import { createElement, useEffect, useRef } from 'react';
 import type { JSX } from 'react';
-import { Application, Container, Graphics } from 'pixi.js';
+import { Application } from 'pixi.js';
 import { HOUSE_ROSTER, type FighterId, type SkinSpec } from '@fc/contracts';
 import { useStore } from '@/data/store';
 import { VEX_SKIN } from './assets';
 import { buildRig, type Rig } from './rig';
+import { createStage, SLOTS, STAGE_H as SH, STAGE_W as SW } from './stage';
 
 /** Logical stage (PRD §10.6). A-04 owns the real backdrop; A-02 only places rigs in the four slots. */
-export const STAGE_W = 1920, STAGE_H = 1080;
-export const SLOT_X = [330, 770, 1150, 1590] as const;   // 0 left float · 1 main-left · 2 main-right · 3 right float
-export const GROUND_Y = 880;
+export const STAGE_W = SW, STAGE_H = SH;
+export { SLOTS };
 
 const skinOf = (id: FighterId): SkinSpec => useStore.getState().fighters[id]?.skin ?? (HOUSE_ROSTER as Record<string, { skin: SkinSpec }>)[id]?.skin ?? VEX_SKIN;
 
@@ -20,7 +20,8 @@ export function ArenaCanvas(props: { reducedMotion: boolean }): JSX.Element {
     if (!el) return;
     let disposed = false;
     const app = new Application();
-    const world = new Container({ label: 'world' });
+    const stage = createStage();
+    const world = stage.world;
     const rigs = new Map<string, { sig: string; rig: Rig }>();   // by fighter id
     let token = 0;
 
@@ -28,6 +29,7 @@ export function ArenaCanvas(props: { reducedMotion: boolean }): JSX.Element {
       const s = Math.min(app.screen.width / STAGE_W, app.screen.height / STAGE_H);
       world.scale.set(s);
       world.position.set((app.screen.width - STAGE_W * s) / 2, (app.screen.height - STAGE_H * s) / 2);
+      stage.layoutBars(app.screen.width, app.screen.height);
     };
 
     const sync = async (snap: boolean): Promise<void> => {
@@ -45,10 +47,11 @@ export function ArenaCanvas(props: { reducedMotion: boolean }): JSX.Element {
       for (const [id, r] of rigs) if (!built.some((b) => b.id === id && b.rig === r.rig)) { r.rig.destroy(); rigs.delete(id); }
       built.forEach((b, i) => {
         rigs.set(b.id, { sig: b.sig, rig: b.rig });
-        b.rig.root.position.set(SLOT_X[i]!, GROUND_Y);
-        b.rig.setFacing(i < 2 ? 1 : -1);
+        const sl = SLOTS[i]!;
+        b.rig.root.position.set(sl.x, sl.y);
+        b.rig.setFacing(sl.facing);
         if (snap || !b.rig.root.parent) b.rig.setPose('idle');
-        if (!b.rig.root.parent) world.addChild(b.rig.root);
+        if (!b.rig.root.parent) stage.fighters.addChild(b.rig.root);
       });
     };
 
@@ -56,10 +59,9 @@ export function ArenaCanvas(props: { reducedMotion: boolean }): JSX.Element {
       if (disposed) return;
       el.appendChild(app.canvas);
       app.canvas.style.display = 'block';
-      const plates = new Graphics();
-      SLOT_X.forEach((x) => plates.roundRect(x - 150, GROUND_Y, 300, 28, 8).fill(0x1a1a22));
-      world.addChild(plates);
-      app.stage.addChild(world);
+      app.stage.addChild(world, stage.bars);
+      stage.setReducedMotion(props.reducedMotion);
+      app.ticker.add((t) => { stage.tick(t.deltaMS); });
       fit();
       app.renderer.on('resize', fit);
       void sync(true);
@@ -73,6 +75,7 @@ export function ArenaCanvas(props: { reducedMotion: boolean }): JSX.Element {
 
     return () => {
       disposed = true;
+      stage.destroy();
       unsubOrder(); unsubCues();
       void ready.then(() => { app.destroy(true, { children: true }); }).catch(() => undefined);
     };

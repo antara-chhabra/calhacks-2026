@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-40 -262 80 306" width="80" height="306" data-part="wooden_sword" data-pivot="0,0" data-socket="0,0" data-length="290" data-tip="0,-252" data-blade="up">
+<g stroke="#14121F" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" fill="none">
+<path d="M -15 -36 L -17 -226 C -17 -246 -6 -252 0 -252 C 6 -252 17 -246 17 -226 L 15 -36 Z" fill="#FFAA88"/>
+<path d="M 0 -38 L 15 -36 L 17 -226 C 17 -246 6 -252 0 -252 Z" fill="#14121F" fill-opacity="0.25" stroke="none"/>
+<path d="M -9 -60 C -4 -90 -12 -120 -7 -150 M 6 -80 C 10 -120 4 -160 8 -200" stroke-width="3" stroke-opacity="0.45"/>
+<path d="M -12 -56 L -9 -56 L -9 -214 C -11 -222 -12 -222 -12 -222 Z" fill="#FFFFFF" fill-opacity="0.35" stroke="none"/>
+<path d="M -34 -40 L 34 -40 L 34 -26 L -34 -26 Z" fill="#FFFF00"/>
+<path d="M 4 -40 L 34 -40 L 34 -26 L 4 -26 Z" fill="#14121F" fill-opacity="0.25" stroke="none"/>
+<rect x="-8" y="-26" width="16" height="48" rx="5" fill="#FF00FF"/>
+<path d="M -8 -14 L 8 -8 M -8 -2 L 8 4 M -8 10 L 8 16" stroke-width="3"/>
+<circle cx="0" cy="30" r="10" fill="#00FFFF"/>
+<path d="M 1 20 C 9 22 11 36 2 40 C 13 35 13 23 1 20 Z" fill="#14121F" fill-opacity="0.25" stroke="none"/>
+</g>
+</svg>

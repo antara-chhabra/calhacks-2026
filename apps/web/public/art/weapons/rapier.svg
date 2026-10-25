@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-44 -402 88 446" width="88" height="446" data-part="rapier" data-pivot="0,0" data-socket="0,0" data-length="430" data-tip="0,-396" data-blade="up">
+<g stroke="#14121F" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" fill="none">
+<path d="M -6 -52 L -3 -380 L 0 -396 L 3 -380 L 6 -52 Z" fill="#C9CEDB"/>
+<path d="M 0 -52 L 6 -52 L 3 -380 L 0 -396 Z" fill="#14121F" fill-opacity="0.25" stroke="none"/>
+<path d="M -3 -70 L -1.5 -350" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="2"/>
+<path d="M -34 -34 C -34 -62 -12 -64 0 -60 C 12 -64 34 -62 34 -34 C 30 -22 10 -20 0 -22 C -10 -20 -30 -22 -34 -34 Z" fill="#FF00FF"/>
+<path d="M 0 -60 C 12 -64 34 -62 34 -34 C 30 -22 10 -20 0 -22 Z" fill="#14121F" fill-opacity="0.25" stroke="none"/>
+<path d="M -22 -40 C -14 -46 -6 -46 0 -40 M 0 -40 C 6 -46 14 -46 22 -40" stroke="#FFFF00" stroke-width="3"/>
+<path d="M -4 -22 C -30 -14 -40 6 -34 22 C -30 30 -22 24 -24 14 C -22 2 -12 -4 -4 -2" fill="#FFFF00"/>
+<rect x="-6" y="-24" width="12" height="46" rx="3" fill="#00FFFF"/>
+<path d="M -6 -12 L 6 -4 M -6 0 L 6 8 M -6 12 L 6 20" stroke-width="3"/>
+<circle cx="0" cy="30" r="10" fill="#FFFF00"/>
+<path d="M 1 20 C 8 22 10 36 2 40 C 12 34 12 22 1 20 Z" fill="#14121F" fill-opacity="0.25" stroke="none"/>
+</g>
+</svg>
