@@ -86,6 +86,18 @@ Build order and time boxes follow tasks A-01 → A-10 in the PRD. Each component
 
 Generated art (image models) is allowed only for the stage backdrop painting, poster backgrounds and Devpost art. Fighters, animation, labels and cards are SVG and code.
 
+### 7.1 Part conventions (recorded in A-01, VEX)
+
+- **Origin = pivot.** Every part SVG places its pivot at the SVG origin (0,0); the `viewBox` starts at negative coordinates. Anchor in Pixi = `-viewBox.x / width, -viewBox.y / height`. Rig space: px at 1×, y down, +x is facing, feet midpoint = (0,0), rotation in degrees clockwise.
+- **Manifest.** `fighters/<skinKey>/parts.json` lists each part's `viewBox`/`pivot`/`anchors`, every rig node (`id`, `part`, `parent`, `pos` in the parent's space, `z`, `tint`) and three reference poses. Part names follow PRD §10.7; `eyes|mouth|brows` resolve to `<part>-<expression>.svg`.
+- **Placeholders.** Exactly four fills, upper-case, whole-token, case-sensitive string replace: `#FF00FF` primary, `#00FFFF` secondary, `#FFFF00` accent, `#FFAA88` skin. They appear only as `fill` values, never in comments or ids. Fixed (never substituted): outline `#14121F`, white `#FFFFFF`, blade steel `#C9CEDB`, KO tongue `#FF6F7D`.
+- **Shading is palette-independent.** Hard shadow = `#14121F` at `fill-opacity` 0.25, clipped to the part; highlight = `#FFFFFF` at 0.35 (helm and blade only). Back arm and leg nodes (`tint: back`) multiply the four substituted colours by 0.8.
+- **Strokes.** 4 px, round joins, on every closed shape; facial features and emblem details use 3 px (they are small and scale with the part).
+- **Stage size.** Heavy build is 320 units to the helm top (horn tips about +12). Greatsword is 440 units long (1.375x). Head about 71 units (1/4.5).
+- **Z-order (back to front).** footB, shinB, thighB, upperArmB, forearmB, handB, footF, shinF, thighF, torso, emblem, head, helm, eyes, mouth, brows, upperArmF, forearmF, weapon, handF (the fist wraps the grip).
+- **Slots.** Weapon `data-socket="0,0"` is the grip centre, blade along -y; the rig sets weapon rotation so the blade reaches a wanted world angle. Helm is drawn over `head.svg` at the same pivot; emblem is placed at the torso's `data-emblem` anchor.
+- **Reference evidence.** `public/art/reference/vex-{idle,attack,ko}.svg`, PNGs in `docs/status/img/A-01-vex-*.png`.
+
 ## 8. Reference and acceptance
 
 - **Drawn reference: VEX** (heavy brawler, horned helm, greatsword, skull emblem). Draw him fully first; every other fighter inherits his template.
