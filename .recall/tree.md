@@ -1,4 +1,4 @@
-# Fight Card (Cal Hacks 13.0)
+# En Garde (Cal Hacks 13.0)
 
 Last touched: 2026-10-25
 
@@ -31,4 +31,4 @@ Last touched: 2026-10-25
 
 ## Resume warning
 
-main = origin/main = `36d96f4` (A3 categories + mode-aware personas + pixel fighters). Vector art snapshot: branch `built-with-vector-art`. Live deploy from `.arena/worktrees/fc-merge` (detached main): runner :8797/:8798 on Maincloud `fightcard`, web https://ist-colleagues-twisted-variations.trycloudflare.com (quick tunnel; changes on restart). All 7 non-integral modes verified with real Droid matches (local). Integrations summary is older than merged I-03 work.
+main = origin/main = `36d96f4` (A3 categories + mode-aware personas + pixel fighters). Vector art snapshot: branch `built-with-vector-art`. Live deploy from `.arena/worktrees/fc-merge` (detached main): runner :8797/:8798 on Maincloud `fightcard`, web https://ist-colleagues-twisted-variations.trycloudflare.com (quick tunnel; changes on restart). All 7 non-integral modes verified with real Droid matches (local), then seeded on Maincloud (one real settled match each, 07:23–07:32) and the season loop turned on (rotates all 8 categories; `FC_SEASON=on` in fc-merge `.env`). Integrations summary is older than merged I-03 work.

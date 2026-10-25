@@ -5,10 +5,11 @@
 **Last touched:** 2026-10-25
 
 ## What this is
-Workstream O3 of the Fight Card build. SpacetimeDB 2.x TypeScript module: tables, reducers, scheduled auto_lock, atomic parimutuel settlement (§8.8). Owns exactly the paths above (PRD §9.3, §17.5); everything else is read-only for this workstream.
+Workstream O3 of the En Garde build. SpacetimeDB 2.x TypeScript module: tables, reducers, scheduled auto_lock, atomic parimutuel settlement (§8.8). Owns exactly the paths above (PRD §9.3, §17.5); everything else is read-only for this workstream.
 
 ## Current state
 
+- **Empty category tabs fixed (2026-10-25 07:32):** tabs other than Integrals were empty because no non-integral match had ever run on Maincloud and the season loop was off. Seeded one real Droid match per category via Director `POST /admin/matches {category}` (all settled), then `POST /admin/season {on:true}`; season now rotates integrals→code→…→squads. Script: scratchpad `seed-modes.sh`.
 - A3 challenge implementation is now merged into main at6f90ac8; merged-main typecheck,624 tests and production build pass. The pre-merge session remains historical evidence.
 - A3 adds public fighter_category_stats keyed by fighter/category with per-category Elo and stats. Legacy fighter_stats and fighter.elo remain the integral card/rating for compatibility. New categories start at1000.
 - Settlement writes competitive category rows only for live non-demo results. Create-match entries use the chosen category rating; runner reads persisted entries/stats after reconnect. Slots serialize explicitly; squad entries record teamId from actual slots.
