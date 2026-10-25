@@ -1,0 +1,2483 @@
+{
+  "version": 1,
+  "matchId": "m_mock_basic",
+  "number": 1,
+  "fighters": [
+    {
+      "id": "vex",
+      "name": "VEX",
+      "title": "The Villain",
+      "archetype": "brawler",
+      "skin": {
+        "palette": {
+          "primary": "#E5383B",
+          "secondary": "#22202E",
+          "accent": "#F2C14E",
+          "skin": "#C98B6B"
+        },
+        "head": "horned_helm",
+        "weapon": "greatsword",
+        "emblem": "skull",
+        "build": "heavy"
+      },
+      "catchphrase": "Kneel.",
+      "bio": "Undefeated in his own mind.",
+      "strategyBlurb": "Swings first, checks never."
+    },
+    {
+      "id": "sage",
+      "name": "SAGE",
+      "title": "The Monk",
+      "archetype": "scholar",
+      "skin": {
+        "palette": {
+          "primary": "#2EC4A6",
+          "secondary": "#F1E3C8",
+          "accent": "#1B4D45",
+          "skin": "#E0B48C"
+        },
+        "head": "topknot",
+        "weapon": "katana",
+        "emblem": "lotus",
+        "build": "lean"
+      },
+      "catchphrase": "Measure twice. Cut once.",
+      "bio": "Has never submitted an unverified answer.",
+      "strategyBlurb": "Verifies every answer before striking."
+    },
+    {
+      "id": "glitch",
+      "name": "GLITCH",
+      "title": "The Gremlin",
+      "archetype": "trickster",
+      "skin": {
+        "palette": {
+          "primary": "#8B5CF6",
+          "secondary": "#B6FF3B",
+          "accent": "#1E1B2E",
+          "skin": "#9FD4A3"
+        },
+        "head": "goggles_mohawk",
+        "weapon": "sawblade",
+        "emblem": "bolt",
+        "build": "lean"
+      },
+      "catchphrase": "lol. lmao, even.",
+      "bio": "Starts with the hardest problem. Finishes with chaos.",
+      "strategyBlurb": "Hardest first, guesses when stuck."
+    },
+    {
+      "id": "pip",
+      "name": "PIP",
+      "title": "The Rookie",
+      "archetype": "speedster",
+      "skin": {
+        "palette": {
+          "primary": "#FFD23F",
+          "secondary": "#56CCF2",
+          "accent": "#2D3142",
+          "skin": "#F3C7A0"
+        },
+        "head": "big_helmet",
+        "weapon": "wooden_sword",
+        "emblem": "star",
+        "build": "lean"
+      },
+      "catchphrase": "I got this! …probably.",
+      "bio": "First season. Big dreams. Small sword.",
+      "strategyBlurb": "Easy ones first, full send."
+    }
+  ],
+  "markets": [
+    {
+      "id": "m_mock_basic:winner",
+      "kind": "winner",
+      "subject": null,
+      "line": null,
+      "label": "Match winner",
+      "outcomes": [
+        "vex",
+        "sage",
+        "glitch",
+        "pip"
+      ],
+      "seeds": [
+        6719,
+        5994,
+        4258,
+        3029
+      ],
+      "rakeBps": 500
+    },
+    {
+      "id": "m_mock_basic:score_line:sage",
+      "kind": "score_line",
+      "subject": "sage",
+      "line": 0.6,
+      "label": "SAGE ≥ 60%",
+      "outcomes": [
+        "over",
+        "under"
+      ],
+      "seeds": [
+        5000,
+        5000
+      ],
+      "rakeBps": 500
+    },
+    {
+      "id": "m_mock_basic:beat_clock",
+      "kind": "beat_clock",
+      "subject": null,
+      "line": 60000,
+      "label": "Anyone solves 5★ before 1:00?",
+      "outcomes": [
+        "yes",
+        "no"
+      ],
+      "seeds": [
+        5000,
+        5000
+      ],
+      "rakeBps": 500
+    },
+    {
+      "id": "m_mock_basic:first_blood",
+      "kind": "first_blood",
+      "subject": null,
+      "line": null,
+      "label": "First blood",
+      "outcomes": [
+        "vex",
+        "sage",
+        "glitch",
+        "pip",
+        "none"
+      ],
+      "seeds": [
+        4000,
+        4000,
+        4000,
+        4000,
+        4000
+      ],
+      "rakeBps": 500
+    }
+  ],
+  "problemSet": {
+    "category": "integrals",
+    "seed": "293c0008810d145872b017d4aec43335",
+    "problems": [
+      {
+        "idx": 1,
+        "difficulty": 1,
+        "points": 10,
+        "family": "recip_linear",
+        "statementTex": "\\int \\frac{3}{x+1}\\,dx",
+        "integrand": "3/(x+1)",
+        "liveDomain": [
+          -0.5,
+          2
+        ],
+        "finalDomains": [
+          [
+            -0.5,
+            2
+          ],
+          [
+            -4,
+            -1.5
+          ]
+        ],
+        "reference": "3*log(abs(x+1))",
+        "trap": true
+      },
+      {
+        "idx": 2,
+        "difficulty": 2,
+        "points": 20,
+        "family": "usub_gauss",
+        "statementTex": "\\int 2x\\,e^{x^2/2}\\,dx",
+        "integrand": "2*x*exp(x^2/2)",
+        "liveDomain": [
+          -1.2,
+          1.2
+        ],
+        "finalDomains": [
+          [
+            -1.5,
+            1.5
+          ]
+        ],
+        "reference": "2*exp(x^2/2)",
+        "trap": false
+      },
+      {
+        "idx": 3,
+        "difficulty": 3,
+        "points": 30,
+        "family": "parts_x_trig",
+        "statementTex": "\\int x\\sin(2x)\\,dx",
+        "integrand": "x*sin(2*x)",
+        "liveDomain": [
+          -2,
+          2
+        ],
+        "finalDomains": [
+          [
+            -3,
+            3
+          ]
+        ],
+        "reference": "sin(2*x)/4 - x*cos(2*x)/2",
+        "trap": false
+      },
+      {
+        "idx": 4,
+        "difficulty": 4,
+        "points": 40,
+        "family": "exp_trig_cyclic",
+        "statementTex": "\\int e^{x}\\sin(2x)\\,dx",
+        "integrand": "exp(x)*sin(2*x)",
+        "liveDomain": [
+          -1.5,
+          1.5
+        ],
+        "finalDomains": [
+          [
+            -2,
+            2
+          ]
+        ],
+        "reference": "exp(x)*(sin(2*x) - 2*cos(2*x))/5",
+        "trap": false
+      },
+      {
+        "idx": 5,
+        "difficulty": 5,
+        "points": 50,
+        "family": "x_over_x4",
+        "statementTex": "\\int \\frac{x}{x^4+4}\\,dx",
+        "integrand": "x/(x^4+4)",
+        "liveDomain": [
+          -2,
+          2
+        ],
+        "finalDomains": [
+          [
+            -4,
+            4
+          ]
+        ],
+        "reference": "atan(x^2/2)/4",
+        "trap": false
+      }
+    ]
+  },
+  "salt": "a7d0c8d8a7e1d31394375ee2d861ba82",
+  "events": [
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 1,
+      "t": 0,
+      "type": "match.created",
+      "data": {
+        "category": "integrals",
+        "mode": "mock",
+        "isDemo": false,
+        "fighters": [
+          "vex",
+          "sage",
+          "glitch",
+          "pip"
+        ],
+        "slots": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "problems": [
+          {
+            "idx": 1,
+            "difficulty": 1,
+            "points": 10
+          },
+          {
+            "idx": 2,
+            "difficulty": 2,
+            "points": 20
+          },
+          {
+            "idx": 3,
+            "difficulty": 3,
+            "points": 30
+          },
+          {
+            "idx": 4,
+            "difficulty": 4,
+            "points": 40
+          },
+          {
+            "idx": 5,
+            "difficulty": 5,
+            "points": 50
+          }
+        ],
+        "commitHash": "0805b7d6671e444822335e707953059f0c8174542249ab11eba09fcfc2fa9b24",
+        "bettingClosesAt": 6000,
+        "timeLimitMs": 120000
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 2,
+      "t": 6000,
+      "type": "betting.locked",
+      "data": {
+        "pools": {
+          "m_mock_basic:winner": {
+            "vex": 1500,
+            "sage": 3500,
+            "glitch": 750,
+            "pip": 500
+          },
+          "m_mock_basic:score_line:sage": {
+            "over": 2000,
+            "under": 1000
+          },
+          "m_mock_basic:beat_clock": {
+            "yes": 500,
+            "no": 1500
+          },
+          "m_mock_basic:first_blood": {
+            "vex": 1000,
+            "sage": 1200,
+            "glitch": 0,
+            "pip": 300,
+            "none": 0
+          }
+        }
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 3,
+      "t": 6200,
+      "type": "purse.entry",
+      "data": {
+        "fighterId": "vex",
+        "amountUsdc": 0.01,
+        "txRef": null,
+        "coveredByHouse": true
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 4,
+      "t": 6350,
+      "type": "purse.entry",
+      "data": {
+        "fighterId": "sage",
+        "amountUsdc": 0.01,
+        "txRef": null,
+        "coveredByHouse": true
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 5,
+      "t": 6500,
+      "type": "purse.entry",
+      "data": {
+        "fighterId": "glitch",
+        "amountUsdc": 0.01,
+        "txRef": null,
+        "coveredByHouse": true
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 6,
+      "t": 6650,
+      "type": "purse.entry",
+      "data": {
+        "fighterId": "pip",
+        "amountUsdc": 0.01,
+        "txRef": null,
+        "coveredByHouse": true
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 7,
+      "t": 7200,
+      "type": "match.intro",
+      "data": {
+        "lines": {
+          "vex": "Kneel.",
+          "sage": "Measure twice. Cut once.",
+          "glitch": "lol. lmao, even.",
+          "pip": "I got this! …probably."
+        }
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 8,
+      "t": 9000,
+      "type": "match.started",
+      "data": {}
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 9,
+      "t": 10500,
+      "type": "fighter.thinking",
+      "data": {
+        "fighterId": "vex"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 10,
+      "t": 11500,
+      "type": "fighter.thinking",
+      "data": {
+        "fighterId": "pip"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 11,
+      "t": 11800,
+      "type": "fighter.tool",
+      "data": {
+        "fighterId": "vex",
+        "tool": "read",
+        "label": "reading P1"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 12,
+      "t": 12800,
+      "type": "fighter.tool",
+      "data": {
+        "fighterId": "pip",
+        "tool": "read",
+        "label": "reading P1"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 13,
+      "t": 13800,
+      "type": "fighter.tool",
+      "data": {
+        "fighterId": "vex",
+        "tool": "write",
+        "label": "drafting P1 answer"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 14,
+      "t": 14800,
+      "type": "fighter.tool",
+      "data": {
+        "fighterId": "pip",
+        "tool": "write",
+        "label": "drafting P1 answer"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 15,
+      "t": 16000,
+      "type": "fighter.submit",
+      "data": {
+        "fighterId": "vex",
+        "problem": 1,
+        "attempt": 1
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 16,
+      "t": 16000,
+      "type": "verdict.live",
+      "data": {
+        "fighterId": "vex",
+        "problem": 1,
+        "ok": true,
+        "points": 10,
+        "reason": "hit",
+        "replaced": false
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 17,
+      "t": 16700,
+      "type": "fighter.say",
+      "data": {
+        "fighterId": "vex",
+        "text": "Another one on the pile.",
+        "source": "model"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 18,
+      "t": 17000,
+      "type": "fighter.submit",
+      "data": {
+        "fighterId": "pip",
+        "problem": 1,
+        "attempt": 1
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 19,
+      "t": 17000,
+      "type": "verdict.live",
+      "data": {
+        "fighterId": "pip",
+        "problem": 1,
+        "ok": true,
+        "points": 10,
+        "reason": "hit",
+        "replaced": false
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 20,
+      "t": 17500,
+      "type": "fighter.thinking",
+      "data": {
+        "fighterId": "sage"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 21,
+      "t": 17700,
+      "type": "fighter.say",
+      "data": {
+        "fighterId": "pip",
+        "text": "I got this!",
+        "source": "model"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 22,
+      "t": 18800,
+      "type": "fighter.tool",
+      "data": {
+        "fighterId": "sage",
+        "tool": "read",
+        "label": "reading P1"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 23,
+      "t": 20800,
+      "type": "fighter.tool",
+      "data": {
+        "fighterId": "sage",
+        "tool": "run",
+        "label": "checking P1 numerically"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 24,
+      "t": 21288,
+      "type": "fighter.say",
+      "data": {
+        "fighterId": "pip",
+        "text": "Is the sword supposed to be wooden?",
+        "source": "model"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 25,
+      "t": 21909,
+      "type": "fighter.thinking",
+      "data": {
+        "fighterId": "sage"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 26,
+      "t": 21975,
+      "type": "fighter.say",
+      "data": {
+        "fighterId": "glitch",
+        "text": "what if x is just... bigger",
+        "source": "model"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 27,
+      "t": 22410,
+      "type": "fighter.thinking",
+      "data": {
+        "fighterId": "vex"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 28,
+      "t": 23000,
+      "type": "fighter.submit",
+      "data": {
+        "fighterId": "sage",
+        "problem": 1,
+        "attempt": 1
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 29,
+      "t": 23000,
+      "type": "verdict.live",
+      "data": {
+        "fighterId": "sage",
+        "problem": 1,
+        "ok": true,
+        "points": 10,
+        "reason": "hit",
+        "replaced": false
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 30,
+      "t": 23700,
+      "type": "fighter.say",
+      "data": {
+        "fighterId": "sage",
+        "text": "Measured twice.",
+        "source": "model"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 31,
+      "t": 24500,
+      "type": "fighter.thinking",
+      "data": {
+        "fighterId": "pip"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 32,
+      "t": 25500,
+      "type": "fighter.thinking",
+      "data": {
+        "fighterId": "glitch"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 33,
+      "t": 25800,
+      "type": "fighter.tool",
+      "data": {
+        "fighterId": "pip",
+        "tool": "read",
+        "label": "reading P2"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 34,
+      "t": 26800,
+      "type": "fighter.tool",
+      "data": {
+        "fighterId": "glitch",
+        "tool": "read",
+        "label": "reading P5"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 35,
+      "t": 27800,
+      "type": "fighter.tool",
+      "data": {
+        "fighterId": "pip",
+        "tool": "write",
+        "label": "drafting P2 answer"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 36,
+      "t": 28800,
+      "type": "fighter.tool",
+      "data": {
+        "fighterId": "glitch",
+        "tool": "write",
+        "label": "drafting P5 answer"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 37,
+      "t": 30000,
+      "type": "fighter.submit",
+      "data": {
+        "fighterId": "pip",
+        "problem": 2,
+        "attempt": 1
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 38,
+      "t": 30000,
+      "type": "verdict.live",
+      "data": {
+        "fighterId": "pip",
+        "problem": 2,
+        "ok": true,
+        "points": 20,
+        "reason": "hit",
+        "replaced": false
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 39,
+      "t": 30700,
+      "type": "fighter.say",
+      "data": {
+        "fighterId": "pip",
+        "text": "Easy ones first!",
+        "source": "model"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 40,
+      "t": 31000,
+      "type": "fighter.submit",
+      "data": {
+        "fighterId": "glitch",
+        "problem": 5,
+        "attempt": 1
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 41,
+      "t": 31000,
+      "type": "verdict.live",
+      "data": {
+        "fighterId": "glitch",
+        "problem": 5,
+        "ok": false,
+        "points": -5,
+        "reason": "invalid_syntax",
+        "replaced": false
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 42,
+      "t": 31700,
+      "type": "fighter.say",
+      "data": {
+        "fighterId": "glitch",
+        "text": "skill issue (the problem's)",
+        "source": "model"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 43,
+      "t": 32000,
+      "type": "referee.card",
+      "data": {
+        "fighterId": "glitch",
+        "color": "yellow",
+        "reason": "answer outside the allowed grammar",
+        "penalty": 5
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 44,
+      "t": 33500,
+      "type": "fighter.thinking",
+      "data": {
+        "fighterId": "vex"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 45,
+      "t": 33500,
+      "type": "fighter.thinking",
+      "data": {
+        "fighterId": "pip"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 46,
+      "t": 34800,
+      "type": "fighter.tool",
+      "data": {
+        "fighterId": "vex",
+        "tool": "read",
+        "label": "reading P2"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 47,
+      "t": 34800,
+      "type": "fighter.tool",
+      "data": {
+        "fighterId": "pip",
+        "tool": "read",
+        "label": "reading P3"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 48,
+      "t": 35884,
+      "type": "fighter.say",
+      "data": {
+        "fighterId": "glitch",
+        "text": "what if x is just... bigger",
+        "source": "model"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 49,
+      "t": 36333,
+      "type": "fighter.thinking",
+      "data": {
+        "fighterId": "sage"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 50,
+      "t": 36500,
+      "type": "fighter.thinking",
+      "data": {
+        "fighterId": "sage"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 51,
+      "t": 36800,
+      "type": "fighter.tool",
+      "data": {
+        "fighterId": "vex",
+        "tool": "write",
+        "label": "drafting P2 answer"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 52,
+      "t": 36800,
+      "type": "fighter.tool",
+      "data": {
+        "fighterId": "pip",
+        "tool": "write",
+        "label": "drafting P3 answer"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 53,
+      "t": 37754,
+      "type": "fighter.thinking",
+      "data": {
+        "fighterId": "pip"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 54,
+      "t": 37800,
+      "type": "fighter.tool",
+      "data": {
+        "fighterId": "sage",
+        "tool": "read",
+        "label": "reading P2"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 55,
+      "t": 39000,
+      "type": "fighter.submit",
+      "data": {
+        "fighterId": "vex",
+        "problem": 2,
+        "attempt": 1
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 56,
+      "t": 39000,
+      "type": "verdict.live",
+      "data": {
+        "fighterId": "vex",
+        "problem": 2,
+        "ok": true,
+        "points": 20,
+        "reason": "hit",
+        "replaced": false
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 57,
+      "t": 39000,
+      "type": "fighter.submit",
+      "data": {
+        "fighterId": "pip",
+        "problem": 3,
+        "attempt": 1
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 58,
+      "t": 39000,
+      "type": "verdict.live",
+      "data": {
+        "fighterId": "pip",
+        "problem": 3,
+        "ok": false,
+        "points": -5,
+        "reason": "mismatch",
+        "replaced": false
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 59,
+      "t": 39113,
+      "type": "fighter.say",
+      "data": {
+        "fighterId": "vex",
+        "text": "Swinging first.",
+        "source": "model"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 60,
+      "t": 39700,
+      "type": "fighter.say",
+      "data": {
+        "fighterId": "vex",
+        "text": "Told you. Kneel.",
+        "source": "model"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 61,
+      "t": 39700,
+      "type": "fighter.say",
+      "data": {
+        "fighterId": "pip",
+        "text": "Oops! ...probably fine.",
+        "source": "model"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 62,
+      "t": 39800,
+      "type": "fighter.tool",
+      "data": {
+        "fighterId": "sage",
+        "tool": "run",
+        "label": "checking P2 numerically"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 63,
+      "t": 40000,
+      "type": "referee.card",
+      "data": {
+        "fighterId": "pip",
+        "color": "yellow",
+        "reason": "two submissions in under a second",
+        "penalty": 5
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 64,
+      "t": 42000,
+      "type": "fighter.submit",
+      "data": {
+        "fighterId": "sage",
+        "problem": 2,
+        "attempt": 1
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 65,
+      "t": 42000,
+      "type": "verdict.live",
+      "data": {
+        "fighterId": "sage",
+        "problem": 2,
+        "ok": true,
+        "points": 20,
+        "reason": "hit",
+        "replaced": false
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 66,
+      "t": 42700,
+      "type": "fighter.say",
+      "data": {
+        "fighterId": "sage",
+        "text": "Verified. Then struck.",
+        "source": "model"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 67,
+      "t": 43500,
+      "type": "fighter.thinking",
+      "data": {
+        "fighterId": "glitch"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 68,
+      "t": 44800,
+      "type": "fighter.tool",
+      "data": {
+        "fighterId": "glitch",
+        "tool": "read",
+        "label": "reading P3"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 69,
+      "t": 45500,
+      "type": "fighter.thinking",
+      "data": {
+        "fighterId": "pip"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 70,
+      "t": 46800,
+      "type": "fighter.tool",
+      "data": {
+        "fighterId": "glitch",
+        "tool": "write",
+        "label": "drafting P3 answer"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 71,
+      "t": 46800,
+      "type": "fighter.tool",
+      "data": {
+        "fighterId": "pip",
+        "tool": "read",
+        "label": "reading P5"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 72,
+      "t": 48800,
+      "type": "fighter.tool",
+      "data": {
+        "fighterId": "pip",
+        "tool": "write",
+        "label": "drafting P5 answer"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 73,
+      "t": 49000,
+      "type": "fighter.submit",
+      "data": {
+        "fighterId": "glitch",
+        "problem": 3,
+        "attempt": 1
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 74,
+      "t": 49000,
+      "type": "verdict.live",
+      "data": {
+        "fighterId": "glitch",
+        "problem": 3,
+        "ok": true,
+        "points": 30,
+        "reason": "hit",
+        "replaced": false
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 75,
+      "t": 49048,
+      "type": "fighter.thinking",
+      "data": {
+        "fighterId": "glitch"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 76,
+      "t": 49700,
+      "type": "fighter.say",
+      "data": {
+        "fighterId": "glitch",
+        "text": "chaos pays.",
+        "source": "model"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 77,
+      "t": 49895,
+      "type": "fighter.say",
+      "data": {
+        "fighterId": "sage",
+        "text": "Patience is also a weapon.",
+        "source": "model"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 78,
+      "t": 51000,
+      "type": "fighter.submit",
+      "data": {
+        "fighterId": "pip",
+        "problem": 5,
+        "attempt": 1
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 79,
+      "t": 51000,
+      "type": "verdict.live",
+      "data": {
+        "fighterId": "pip",
+        "problem": 5,
+        "ok": true,
+        "points": 50,
+        "reason": "hit",
+        "replaced": false
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 80,
+      "t": 51700,
+      "type": "fighter.say",
+      "data": {
+        "fighterId": "pip",
+        "text": "Did I do that?! I did that!",
+        "source": "model"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 81,
+      "t": 52500,
+      "type": "fighter.done",
+      "data": {
+        "fighterId": "pip"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 82,
+      "t": 53500,
+      "type": "fighter.thinking",
+      "data": {
+        "fighterId": "vex"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 83,
+      "t": 53916,
+      "type": "fighter.thinking",
+      "data": {
+        "fighterId": "vex"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 84,
+      "t": 54800,
+      "type": "fighter.tool",
+      "data": {
+        "fighterId": "vex",
+        "tool": "read",
+        "label": "reading P3"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 85,
+      "t": 56800,
+      "type": "fighter.tool",
+      "data": {
+        "fighterId": "vex",
+        "tool": "write",
+        "label": "drafting P3 answer"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 86,
+      "t": 58500,
+      "type": "fighter.thinking",
+      "data": {
+        "fighterId": "sage"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 87,
+      "t": 59000,
+      "type": "fighter.submit",
+      "data": {
+        "fighterId": "vex",
+        "problem": 3,
+        "attempt": 1
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 88,
+      "t": 59000,
+      "type": "verdict.live",
+      "data": {
+        "fighterId": "vex",
+        "problem": 3,
+        "ok": false,
+        "points": -5,
+        "reason": "mismatch",
+        "replaced": false
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 89,
+      "t": 59000,
+      "type": "fighter.tool",
+      "data": {
+        "fighterId": "glitch",
+        "tool": "other",
+        "label": "asking a hint for P4"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 90,
+      "t": 59700,
+      "type": "fighter.say",
+      "data": {
+        "fighterId": "vex",
+        "text": "Whatever. Next.",
+        "source": "model"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 91,
+      "t": 59800,
+      "type": "fighter.tool",
+      "data": {
+        "fighterId": "sage",
+        "tool": "read",
+        "label": "reading P3"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 92,
+      "t": 61000,
+      "type": "fighter.hint",
+      "data": {
+        "fighterId": "glitch",
+        "problem": 4,
+        "txRef": null
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 93,
+      "t": 61800,
+      "type": "fighter.tool",
+      "data": {
+        "fighterId": "sage",
+        "tool": "run",
+        "label": "checking P3 numerically"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 94,
+      "t": 64000,
+      "type": "fighter.submit",
+      "data": {
+        "fighterId": "sage",
+        "problem": 3,
+        "attempt": 1
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 95,
+      "t": 64000,
+      "type": "verdict.live",
+      "data": {
+        "fighterId": "sage",
+        "problem": 3,
+        "ok": true,
+        "points": 30,
+        "reason": "hit",
+        "replaced": false
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 96,
+      "t": 64700,
+      "type": "fighter.say",
+      "data": {
+        "fighterId": "sage",
+        "text": "Verified. Then struck.",
+        "source": "model"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 97,
+      "t": 65085,
+      "type": "fighter.thinking",
+      "data": {
+        "fighterId": "sage"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 98,
+      "t": 65500,
+      "type": "fighter.thinking",
+      "data": {
+        "fighterId": "glitch"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 99,
+      "t": 66800,
+      "type": "fighter.tool",
+      "data": {
+        "fighterId": "glitch",
+        "tool": "read",
+        "label": "reading P5"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 100,
+      "t": 67077,
+      "type": "fighter.say",
+      "data": {
+        "fighterId": "glitch",
+        "text": "brb breaking things",
+        "source": "model"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 101,
+      "t": 68426,
+      "type": "fighter.thinking",
+      "data": {
+        "fighterId": "vex"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 102,
+      "t": 68800,
+      "type": "fighter.tool",
+      "data": {
+        "fighterId": "glitch",
+        "tool": "write",
+        "label": "drafting P5 answer"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 103,
+      "t": 71000,
+      "type": "fighter.submit",
+      "data": {
+        "fighterId": "glitch",
+        "problem": 5,
+        "attempt": 2
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 104,
+      "t": 71000,
+      "type": "verdict.live",
+      "data": {
+        "fighterId": "glitch",
+        "problem": 5,
+        "ok": false,
+        "points": -5,
+        "reason": "mismatch",
+        "replaced": false
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 105,
+      "t": 71700,
+      "type": "fighter.say",
+      "data": {
+        "fighterId": "glitch",
+        "text": "error: vibes not found",
+        "source": "model"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 106,
+      "t": 75500,
+      "type": "fighter.thinking",
+      "data": {
+        "fighterId": "vex"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 107,
+      "t": 76800,
+      "type": "fighter.tool",
+      "data": {
+        "fighterId": "vex",
+        "tool": "read",
+        "label": "reading P3"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 108,
+      "t": 77000,
+      "type": "fighter.tool",
+      "data": {
+        "fighterId": "glitch",
+        "tool": "run",
+        "label": "curl the answer key (blocked)"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 109,
+      "t": 78800,
+      "type": "fighter.tool",
+      "data": {
+        "fighterId": "vex",
+        "tool": "write",
+        "label": "drafting P3 answer"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 110,
+      "t": 79000,
+      "type": "referee.card",
+      "data": {
+        "fighterId": "glitch",
+        "color": "red",
+        "reason": "blocked network call from sandbox",
+        "penalty": 10
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 111,
+      "t": 79000,
+      "type": "fighter.out",
+      "data": {
+        "fighterId": "glitch",
+        "reason": "red_card"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 112,
+      "t": 80390,
+      "type": "fighter.thinking",
+      "data": {
+        "fighterId": "sage"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 113,
+      "t": 81000,
+      "type": "fighter.submit",
+      "data": {
+        "fighterId": "vex",
+        "problem": 3,
+        "attempt": 2
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 114,
+      "t": 81000,
+      "type": "verdict.live",
+      "data": {
+        "fighterId": "vex",
+        "problem": 3,
+        "ok": true,
+        "points": 30,
+        "reason": "hit",
+        "replaced": false
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 115,
+      "t": 81700,
+      "type": "fighter.say",
+      "data": {
+        "fighterId": "vex",
+        "text": "Another one on the pile.",
+        "source": "model"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 116,
+      "t": 84607,
+      "type": "fighter.thinking",
+      "data": {
+        "fighterId": "vex"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 117,
+      "t": 94000,
+      "type": "fighter.say",
+      "data": {
+        "fighterId": "vex",
+        "text": "Still standing. Obviously.",
+        "source": "model"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 118,
+      "t": 95419,
+      "type": "fighter.say",
+      "data": {
+        "fighterId": "sage",
+        "text": "Check the derivative. Always.",
+        "source": "model"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 119,
+      "t": 97000,
+      "type": "fighter.say",
+      "data": {
+        "fighterId": "vex",
+        "text": "Out of ideas, not out of swagger.",
+        "source": "model"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 120,
+      "t": 103500,
+      "type": "fighter.thinking",
+      "data": {
+        "fighterId": "sage"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 121,
+      "t": 104800,
+      "type": "fighter.tool",
+      "data": {
+        "fighterId": "sage",
+        "tool": "read",
+        "label": "reading P4"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 122,
+      "t": 106800,
+      "type": "fighter.tool",
+      "data": {
+        "fighterId": "sage",
+        "tool": "run",
+        "label": "checking P4 numerically"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 123,
+      "t": 109000,
+      "type": "fighter.submit",
+      "data": {
+        "fighterId": "sage",
+        "problem": 4,
+        "attempt": 1
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 124,
+      "t": 109000,
+      "type": "verdict.live",
+      "data": {
+        "fighterId": "sage",
+        "problem": 4,
+        "ok": true,
+        "points": 40,
+        "reason": "hit",
+        "replaced": false
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 125,
+      "t": 109700,
+      "type": "fighter.say",
+      "data": {
+        "fighterId": "sage",
+        "text": "Measured twice.",
+        "source": "model"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 126,
+      "t": 110500,
+      "type": "fighter.done",
+      "data": {
+        "fighterId": "sage"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 127,
+      "t": 129000,
+      "type": "match.timeup",
+      "data": {}
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 128,
+      "t": 129400,
+      "type": "verdict.final",
+      "data": {
+        "fighterId": "vex",
+        "problem": 1,
+        "overturned": true,
+        "points": -10
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 129,
+      "t": 130600,
+      "type": "verdict.final",
+      "data": {
+        "fighterId": "vex",
+        "problem": 2,
+        "overturned": false,
+        "points": 0
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 130,
+      "t": 130850,
+      "type": "verdict.final",
+      "data": {
+        "fighterId": "vex",
+        "problem": 3,
+        "overturned": false,
+        "points": 0
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 131,
+      "t": 131100,
+      "type": "verdict.final",
+      "data": {
+        "fighterId": "sage",
+        "problem": 1,
+        "overturned": false,
+        "points": 0
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 132,
+      "t": 131350,
+      "type": "verdict.final",
+      "data": {
+        "fighterId": "sage",
+        "problem": 2,
+        "overturned": false,
+        "points": 0
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 133,
+      "t": 131600,
+      "type": "verdict.final",
+      "data": {
+        "fighterId": "sage",
+        "problem": 3,
+        "overturned": false,
+        "points": 0
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 134,
+      "t": 131850,
+      "type": "verdict.final",
+      "data": {
+        "fighterId": "sage",
+        "problem": 4,
+        "overturned": false,
+        "points": 0
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 135,
+      "t": 132100,
+      "type": "verdict.final",
+      "data": {
+        "fighterId": "glitch",
+        "problem": 3,
+        "overturned": false,
+        "points": 0
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 136,
+      "t": 132350,
+      "type": "verdict.final",
+      "data": {
+        "fighterId": "pip",
+        "problem": 1,
+        "overturned": false,
+        "points": 0
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 137,
+      "t": 132600,
+      "type": "verdict.final",
+      "data": {
+        "fighterId": "pip",
+        "problem": 2,
+        "overturned": false,
+        "points": 0
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 138,
+      "t": 132850,
+      "type": "verdict.final",
+      "data": {
+        "fighterId": "pip",
+        "problem": 5,
+        "overturned": false,
+        "points": 0
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 139,
+      "t": 133400,
+      "type": "match.result",
+      "data": {
+        "standings": [
+          {
+            "fighterId": "sage",
+            "points": 100,
+            "hits": 4,
+            "misses": 0,
+            "overturned": 0,
+            "yellow": 0,
+            "red": 0,
+            "firstHitMs": 14000,
+            "lastScoreMs": 100000,
+            "clutchPoints": 40,
+            "missesRecovered": 0,
+            "rank": 1,
+            "scorePct": 0.6666666666666666
+          },
+          {
+            "fighterId": "pip",
+            "points": 70,
+            "hits": 3,
+            "misses": 1,
+            "overturned": 0,
+            "yellow": 1,
+            "red": 0,
+            "firstHitMs": 8000,
+            "lastScoreMs": 42000,
+            "clutchPoints": 0,
+            "missesRecovered": 1,
+            "rank": 2,
+            "scorePct": 0.4666666666666667
+          },
+          {
+            "fighterId": "vex",
+            "points": 45,
+            "hits": 3,
+            "misses": 1,
+            "overturned": 1,
+            "yellow": 0,
+            "red": 0,
+            "firstHitMs": 30000,
+            "lastScoreMs": 72000,
+            "clutchPoints": 0,
+            "missesRecovered": 1,
+            "rank": 3,
+            "scorePct": 0.3
+          },
+          {
+            "fighterId": "glitch",
+            "points": 5,
+            "hits": 1,
+            "misses": 2,
+            "overturned": 0,
+            "yellow": 1,
+            "red": 1,
+            "firstHitMs": 40000,
+            "lastScoreMs": 40000,
+            "clutchPoints": 0,
+            "missesRecovered": 1,
+            "rank": 4,
+            "scorePct": 0.03333333333333333
+          }
+        ]
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 140,
+      "t": 133900,
+      "type": "match.revealed",
+      "data": {
+        "problemSet": {
+          "category": "integrals",
+          "seed": "293c0008810d145872b017d4aec43335",
+          "problems": [
+            {
+              "idx": 1,
+              "difficulty": 1,
+              "points": 10,
+              "family": "recip_linear",
+              "statementTex": "\\int \\frac{3}{x+1}\\,dx",
+              "integrand": "3/(x+1)",
+              "liveDomain": [
+                -0.5,
+                2
+              ],
+              "finalDomains": [
+                [
+                  -0.5,
+                  2
+                ],
+                [
+                  -4,
+                  -1.5
+                ]
+              ],
+              "reference": "3*log(abs(x+1))",
+              "trap": true
+            },
+            {
+              "idx": 2,
+              "difficulty": 2,
+              "points": 20,
+              "family": "usub_gauss",
+              "statementTex": "\\int 2x\\,e^{x^2/2}\\,dx",
+              "integrand": "2*x*exp(x^2/2)",
+              "liveDomain": [
+                -1.2,
+                1.2
+              ],
+              "finalDomains": [
+                [
+                  -1.5,
+                  1.5
+                ]
+              ],
+              "reference": "2*exp(x^2/2)",
+              "trap": false
+            },
+            {
+              "idx": 3,
+              "difficulty": 3,
+              "points": 30,
+              "family": "parts_x_trig",
+              "statementTex": "\\int x\\sin(2x)\\,dx",
+              "integrand": "x*sin(2*x)",
+              "liveDomain": [
+                -2,
+                2
+              ],
+              "finalDomains": [
+                [
+                  -3,
+                  3
+                ]
+              ],
+              "reference": "sin(2*x)/4 - x*cos(2*x)/2",
+              "trap": false
+            },
+            {
+              "idx": 4,
+              "difficulty": 4,
+              "points": 40,
+              "family": "exp_trig_cyclic",
+              "statementTex": "\\int e^{x}\\sin(2x)\\,dx",
+              "integrand": "exp(x)*sin(2*x)",
+              "liveDomain": [
+                -1.5,
+                1.5
+              ],
+              "finalDomains": [
+                [
+                  -2,
+                  2
+                ]
+              ],
+              "reference": "exp(x)*(sin(2*x) - 2*cos(2*x))/5",
+              "trap": false
+            },
+            {
+              "idx": 5,
+              "difficulty": 5,
+              "points": 50,
+              "family": "x_over_x4",
+              "statementTex": "\\int \\frac{x}{x^4+4}\\,dx",
+              "integrand": "x/(x^4+4)",
+              "liveDomain": [
+                -2,
+                2
+              ],
+              "finalDomains": [
+                [
+                  -4,
+                  4
+                ]
+              ],
+              "reference": "atan(x^2/2)/4",
+              "trap": false
+            }
+          ]
+        },
+        "salt": "a7d0c8d8a7e1d31394375ee2d861ba82"
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 141,
+      "t": 134400,
+      "type": "match.settled",
+      "data": {
+        "results": [
+          {
+            "marketId": "m_mock_basic:winner",
+            "outcome": "sage"
+          },
+          {
+            "marketId": "m_mock_basic:score_line:sage",
+            "outcome": "over"
+          },
+          {
+            "marketId": "m_mock_basic:beat_clock",
+            "outcome": "yes"
+          },
+          {
+            "marketId": "m_mock_basic:first_blood",
+            "outcome": "pip"
+          }
+        ],
+        "totalPaid": 15247,
+        "elo": {
+          "vex": [
+            1100,
+            1100
+          ],
+          "sage": [
+            1080,
+            1080
+          ],
+          "glitch": [
+            1020,
+            1020
+          ],
+          "pip": [
+            960,
+            960
+          ]
+        },
+        "ovr": {
+          "vex": [
+            70,
+            70
+          ],
+          "sage": [
+            68,
+            68
+          ],
+          "glitch": [
+            62,
+            62
+          ],
+          "pip": [
+            56,
+            56
+          ]
+        }
+      }
+    },
+    {
+      "v": 1,
+      "matchId": "m_mock_basic",
+      "seq": 142,
+      "t": 136400,
+      "type": "purse.paid",
+      "data": {
+        "fighterId": "sage",
+        "amountUsdc": 0.03,
+        "txHash": "0x5f45e0253b05938df0a694ec2ac0d856995d8959b679e77b205a390e7164e255",
+        "to": "0x9b53a9544a46c0c69358a3e6af97ddac1faa940f"
+      }
+    }
+  ],
+  "bets": [
+    {
+      "id": "b1",
+      "marketId": "m_mock_basic:winner",
+      "outcome": "sage",
+      "stake": 2500,
+      "handle": "JudgeOtter42"
+    },
+    {
+      "id": "b2",
+      "marketId": "m_mock_basic:winner",
+      "outcome": "vex",
+      "stake": 1500,
+      "handle": "JudgeOtter42"
+    },
+    {
+      "id": "b3",
+      "marketId": "m_mock_basic:winner",
+      "outcome": "pip",
+      "stake": 500,
+      "handle": "mina_k"
+    },
+    {
+      "id": "b4",
+      "marketId": "m_mock_basic:winner",
+      "outcome": "sage",
+      "stake": 1000,
+      "handle": "bay_bob"
+    },
+    {
+      "id": "b5",
+      "marketId": "m_mock_basic:winner",
+      "outcome": "glitch",
+      "stake": 750,
+      "handle": "mina_k"
+    },
+    {
+      "id": "b6",
+      "marketId": "m_mock_basic:score_line:sage",
+      "outcome": "over",
+      "stake": 2000,
+      "handle": "bay_bob"
+    },
+    {
+      "id": "b7",
+      "marketId": "m_mock_basic:score_line:sage",
+      "outcome": "under",
+      "stake": 1000,
+      "handle": "calhacks_dev"
+    },
+    {
+      "id": "b8",
+      "marketId": "m_mock_basic:beat_clock",
+      "outcome": "no",
+      "stake": 1500,
+      "handle": "JudgeOtter42"
+    },
+    {
+      "id": "b9",
+      "marketId": "m_mock_basic:beat_clock",
+      "outcome": "yes",
+      "stake": 500,
+      "handle": "mina_k"
+    },
+    {
+      "id": "b10",
+      "marketId": "m_mock_basic:first_blood",
+      "outcome": "vex",
+      "stake": 1000,
+      "handle": "calhacks_dev"
+    },
+    {
+      "id": "b11",
+      "marketId": "m_mock_basic:first_blood",
+      "outcome": "pip",
+      "stake": 300,
+      "handle": "bay_bob"
+    },
+    {
+      "id": "b12",
+      "marketId": "m_mock_basic:first_blood",
+      "outcome": "sage",
+      "stake": 1200,
+      "handle": "mina_k"
+    }
+  ],
+  "expected": {
+    "standings": [
+      {
+        "fighterId": "sage",
+        "points": 100,
+        "hits": 4,
+        "misses": 0,
+        "overturned": 0,
+        "yellow": 0,
+        "red": 0,
+        "firstHitMs": 14000,
+        "lastScoreMs": 100000,
+        "clutchPoints": 40,
+        "missesRecovered": 0,
+        "rank": 1,
+        "scorePct": 0.6666666666666666
+      },
+      {
+        "fighterId": "pip",
+        "points": 70,
+        "hits": 3,
+        "misses": 1,
+        "overturned": 0,
+        "yellow": 1,
+        "red": 0,
+        "firstHitMs": 8000,
+        "lastScoreMs": 42000,
+        "clutchPoints": 0,
+        "missesRecovered": 1,
+        "rank": 2,
+        "scorePct": 0.4666666666666667
+      },
+      {
+        "fighterId": "vex",
+        "points": 45,
+        "hits": 3,
+        "misses": 1,
+        "overturned": 1,
+        "yellow": 0,
+        "red": 0,
+        "firstHitMs": 30000,
+        "lastScoreMs": 72000,
+        "clutchPoints": 0,
+        "missesRecovered": 1,
+        "rank": 3,
+        "scorePct": 0.3
+      },
+      {
+        "fighterId": "glitch",
+        "points": 5,
+        "hits": 1,
+        "misses": 2,
+        "overturned": 0,
+        "yellow": 1,
+        "red": 1,
+        "firstHitMs": 40000,
+        "lastScoreMs": 40000,
+        "clutchPoints": 0,
+        "missesRecovered": 1,
+        "rank": 4,
+        "scorePct": 0.03333333333333333
+      }
+    ],
+    "results": [
+      {
+        "marketId": "m_mock_basic:winner",
+        "outcome": "sage"
+      },
+      {
+        "marketId": "m_mock_basic:score_line:sage",
+        "outcome": "over"
+      },
+      {
+        "marketId": "m_mock_basic:beat_clock",
+        "outcome": "yes"
+      },
+      {
+        "marketId": "m_mock_basic:first_blood",
+        "outcome": "pip"
+      }
+    ],
+    "payouts": {
+      "m_mock_basic:winner": {
+        "payouts": {
+          "b1": 6566,
+          "b2": 0,
+          "b3": 0,
+          "b4": 2626,
+          "b5": 0
+        },
+        "rake": 1312,
+        "seedReturn": 15744,
+        "dust": 2,
+        "total": 26250
+      },
+      "m_mock_basic:score_line:sage": {
+        "payouts": {
+          "b6": 3528,
+          "b7": 0
+        },
+        "rake": 650,
+        "seedReturn": 8821,
+        "dust": 1,
+        "total": 13000
+      },
+      "m_mock_basic:beat_clock": {
+        "payouts": {
+          "b8": 0,
+          "b9": 1036
+        },
+        "rake": 600,
+        "seedReturn": 10363,
+        "dust": 1,
+        "total": 12000
+      },
+      "m_mock_basic:first_blood": {
+        "payouts": {
+          "b10": 0,
+          "b11": 1491,
+          "b12": 0
+        },
+        "rake": 1125,
+        "seedReturn": 19883,
+        "dust": 1,
+        "total": 22500
+      }
+    }
+  }
+}
