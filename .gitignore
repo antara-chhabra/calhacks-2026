@@ -1,0 +1,20 @@
+# Secrets (see docs/PRD.md §8.11 — .env.example is committed, .env never is)
+.env
+.env.local
+
+# Runtime state (sandboxes, usage ledger)
+.arena/
+
+# Generated SpacetimeDB bindings (npm run gen)
+**/module_bindings/
+
+# Dependencies and builds
+node_modules/
+dist/
+.vite/
+__pycache__/
+.venv/
+
+# OS / editor
+.DS_Store
+.idea/

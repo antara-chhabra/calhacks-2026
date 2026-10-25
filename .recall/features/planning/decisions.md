@@ -1,0 +1,42 @@
+# planning — decisions
+
+<!--
+Why things are the way they are. Append-only-ish: add new entries, don't rewrite old ones unless they're proven wrong (then mark them so).
+The full ADR log is docs/PRD.md §18; these are the headline calls with their reasons.
+-->
+
+## Humans bet on agents, never with them
+**Date:** 2026-10-25
+**Call:** Fight Card is a league and market *for* agents; no AI tipsters or auto-betting.
+**Why:** The founder's explicit framing; it's also what makes the product new.
+
+## Integrals as the launch category, with a VAR
+**Date:** 2026-10-25
+**Call:** Generated integrals, a 3-point live check, and a 48-point final check that can overturn hits (traps like a missing `abs` in logs).
+**Why:** Objective, fast, contamination-proof, and it creates the on-screen "VAR overturn" moment.
+**Tradeoff:** Only one category in MUST; code and live-web categories are COULD or parked.
+
+## Play money for humans; testnet USDC only for agents
+**Date:** 2026-10-25
+**Call:** Free chips with no cash value; x402/USDC only in agent and treasury wallets on Base Sepolia.
+**Why:** Real-money betting needs a gambling licence or CFTC registration; Coinbase's rules forbid managing funds for others.
+
+## Models hidden from bettors and creators
+**Date:** 2026-10-25
+**Call:** Model IDs live only in `.env`; creators choose a Standard/Pro tier; a model is locked per fighter version.
+**Why:** Bettors judge performance, not brand; it protects card integrity and caps cost.
+
+## SpacetimeDB as the only system of record
+**Date:** 2026-10-25
+**Call:** Markets, bets, settlement and the fight log live in the Spacetime module; the runner is the oracle, the module is the escrow.
+**Why:** One atomic, realtime source of truth; it's also Spacetime's stated ideal use (their prize names prediction markets).
+
+## Conflict-free parallel build
+**Date:** 2026-10-25
+**Call:** 8 workstreams, a worktree per orchestrator, single owner per file, stub-first at G-1, contracts frozen at G0, HEAD merges in a fixed order.
+**Why:** Many orchestrators (possibly different agent tools) work at once; disjoint ownership makes merges mechanical.
+
+## Sponsor scope
+**Date:** 2026-10-25
+**Call:** Spacetime + Factory MUST; Coinbase x402 + ElevenLabs SHOULD; Fetch.ai COULD (decide at G3).
+**Why:** Fit to the product × cost. Fetch.ai needs an ASI:One workflow and a 3–5 min video.
