@@ -1,24 +1,8 @@
 # En Garde — Figma Stage Log
 
-Figma track "Idea To Demo" (Cal Hacks 13.0). Prizes in play: Best Figma Workflow, Best Stage Log, Best Design, Most Creative.
-
-This file has three parts:
-
-1. **Stage summaries**: the submitted log, at most 200 words per stage. Written from the running log at G4.
-2. **Running log**: timestamped entries added *as the work happens*, never rewritten afterwards. This is the evidence trail. It must record rework, dead ends and abandoned tools.
-3. **Figma file register and submission checklist.**
-
-Rules for whoever adds an entry (human or agent):
-- Log the tool, why it was chosen *for this step*, start/end time, what came out, and where that output went next (file path, Figma node, commit).
-- Log friction honestly: failures, retries, things thrown away.
-- Score each step from 1 to 5 for how well the tool worked, with one line of why.
-- Non-Figma tools go in too. The judges want the real path, not a Figma-only story.
-
----
+Figma track "Idea To Demo" (Cal Hacks 13.0).
 
 ## 1. Stage summaries (submitted; ≤ 200 words each)
-
-> Draft these at G4 (07:45) from the running log. Every claim should point to a running-log entry.
 
 ### Ideation: exploring and shaping the idea
 - **Tools & why:** _TBD_
@@ -141,12 +125,3 @@ All files must be shared as **"Anyone with the link"** before submission.
 | F-6 | Handoff | Figma MCP (design context, variables) | Agent reads frames and variables → code | O1/O2 implementation |
 | F-7 | Code generation | Claude Code + Figma MCP | React components and tokens generated from frames, diffed against the design | `apps/web/src/**` |
 | F-8 | Presentation | Figma Slides | Required pitch deck | Devpost |
-
-## 5. Submission checklist (from the track spec)
-
-- [ ] Demo video, ≤ 3 min
-- [ ] This stage log: ≤ 200 words per stage; names the Figma product used per stage and why
-- [ ] Figma Slides deck showing the work and the workflow (required)
-- [ ] Devpost embeds the Figma files (Make and/or prototype) plus a link to the repo
-- [ ] Every Figma file shared to "Anyone"
-- [ ] Each team member is Edu-verified on Figma
