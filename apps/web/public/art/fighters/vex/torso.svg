@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-90 -124 180 142" width="180" height="142" data-part="torso" data-pivot="0,0" data-emblem="8,-56" data-neck="8,-108" data-shoulder-front="48,-80" data-shoulder-back="-44,-80" data-hip-front="22,0" data-hip-back="-22,0">
+<g stroke="#14121F" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" fill="none">
+<defs><clipPath id="torso-clip"><path d="M -46 6 L 46 6 C 54 -30 74 -60 70 -92 C 62 -106 36 -110 0 -110 C -36 -110 -62 -106 -70 -92 C -74 -60 -54 -30 -46 6 Z"/></clipPath></defs>
+<path d="M -46 6 L 46 6 C 54 -30 74 -60 70 -92 C 62 -106 36 -110 0 -110 C -36 -110 -62 -106 -70 -92 C -74 -60 -54 -30 -46 6 Z" fill="#FF00FF"/>
+<g clip-path="url(#torso-clip)">
+<path d="M -80 -114 L 80 -114 L 80 -94 C 40 -82 -40 -82 -80 -94 Z" fill="#00FFFF"/>
+<path d="M -60 -12 L 60 -12 L 60 10 L -60 10 Z" fill="#00FFFF"/>
+<path d="M 36 -114 C 56 -70 40 -30 28 10 L 90 10 L 90 -114 Z" fill="#14121F" fill-opacity="0.25" stroke="none" />
+</g>
+<path d="M -46 6 L 46 6 C 54 -30 74 -60 70 -92 C 62 -106 36 -110 0 -110 C -36 -110 -62 -106 -70 -92 C -74 -60 -54 -30 -46 6 Z" fill="none"/>
+<rect x="0" y="-9" width="20" height="14" rx="3" fill="#FFFF00"/>
+<circle cx="-44" cy="-74" r="4" fill="#FFFF00" stroke-width="3"/><circle cx="-34" cy="-34" r="4" fill="#FFFF00" stroke-width="3"/><circle cx="52" cy="-74" r="4" fill="#FFFF00" stroke-width="3"/><circle cx="40" cy="-34" r="4" fill="#FFFF00" stroke-width="3"/>
+</g>
+</svg>

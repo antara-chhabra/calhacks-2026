@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-44 -76 88 96" width="88" height="96" data-part="head" data-pivot="0,0" data-neck="0,0">
+<g stroke="#14121F" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" fill="none">
+<defs><clipPath id="head-clip"><path d="M -30 -34 C -34 -58 -16 -68 4 -68 C 26 -68 36 -56 37 -40 L 41 -30 L 36 -26 C 36 -20 32 -10 22 -5 L 4 -2 C -14 0 -26 -8 -30 -34 Z"/></clipPath></defs>
+<rect x="-14" y="-12" width="28" height="28" rx="8" fill="#FFAA88"/>
+<path d="M -30 -34 C -34 -58 -16 -68 4 -68 C 26 -68 36 -56 37 -40 L 41 -30 L 36 -26 C 36 -20 32 -10 22 -5 L 4 -2 C -14 0 -26 -8 -30 -34 Z" fill="#FFAA88"/>
+<g clip-path="url(#head-clip)"><path d="M 24 -80 C 12 -50 18 -20 -8 8 L 60 20 L 60 -80 Z" fill="#14121F" fill-opacity="0.25" stroke="none" /></g>
+</g>
+</svg>
