@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -32 60 64" width="60" height="64" data-part="flame" data-pivot="0,0" data-anchor="torso:emblem">
+<g stroke="#14121F" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" fill="none">
+<defs><clipPath id="flame-clip"><path d="M 2 -30 C 6 -16 24 -10 22 8 C 20 22 10 28 0 28 C -12 28 -22 20 -20 6 C -19 -2 -14 -6 -10 -12 C -8 -6 -4 -4 -2 -6 C 2 -12 -2 -20 2 -30 Z"/></clipPath></defs>
+<path d="M 2 -30 C 6 -16 24 -10 22 8 C 20 22 10 28 0 28 C -12 28 -22 20 -20 6 C -19 -2 -14 -6 -10 -12 C -8 -6 -4 -4 -2 -6 C 2 -12 -2 -20 2 -30 Z" fill="#FFFF00" stroke-width="3"/>
+<g clip-path="url(#flame-clip)"><path d="M 8 -32 L 30 -32 L 30 32 L 2 32 C 12 18 14 4 4 -8 Z" fill="#14121F" fill-opacity="0.25" stroke="none"/></g>
+<path d="M 0 26 C -10 26 -12 16 -8 10 C -6 6 -2 4 0 -2 C 4 4 10 8 10 16 C 10 22 6 26 0 26 Z" fill="#00FFFF" stroke-width="3"/>
+</g>
+</svg>

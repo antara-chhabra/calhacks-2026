@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-80 -124 160 130" width="160" height="130" data-part="hood" data-pivot="0,0" data-head="neck-base" data-anchor="head-pivot">
+<g stroke="#14121F" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" fill="none">
+<defs><clipPath id="hood-clip"><path d="M -44 -2 C -62 -44 -48 -92 -4 -100 C 26 -104 48 -86 46 -58 L 46 -52 L 4 -52 L -4 -40 L -8 -2 Z"/></clipPath></defs>
+<path d="M -44 -2 C -62 -44 -48 -92 -4 -100 C 26 -104 48 -86 46 -58 L 46 -52 L 4 -52 L -4 -40 L -8 -2 Z" fill="#FF00FF"/>
+<g clip-path="url(#hood-clip)">
+<path d="M 22 -108 C 44 -90 46 -64 38 -36 L 66 -36 L 66 -108 Z" fill="#14121F" fill-opacity="0.25" stroke="none"/>
+<path d="M -40 -22 L 2 -22 L 2 -8 L -40 -8 Z" fill="#00FFFF" stroke-width="3"/>
+</g>
+<path d="M -44 -2 C -62 -44 -48 -92 -4 -100 C 26 -104 48 -86 46 -58 L 46 -52 L 4 -52 L -4 -40 L -8 -2 Z" fill="none"/>
+<path d="M -42 -76 C -34 -90 -18 -96 0 -96 C 20 -96 38 -88 44 -66" fill="none" stroke-width="3"/>
+<path d="M 46 -58 L 46 -52 L 4 -52 C 14 -56 30 -60 46 -58 Z" fill="#FFFF00" stroke-width="3"/>
+<path d="M -30 -80 C -22 -90 -10 -94 0 -94 C -8 -90 -16 -82 -22 -70 Z" fill="#FFFFFF" fill-opacity="0.35" stroke="none"/>
+</g>
+</svg>
