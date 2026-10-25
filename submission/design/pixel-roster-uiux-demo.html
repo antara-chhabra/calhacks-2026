@@ -1,0 +1,781 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fight Card Pixel Roster</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: arena-black review sheet; a hero lineup on the sunset sky, then one card per fighter in a 2-up grid. Single dark theme by choice (matches the Fight Card app). */
+:root {
+  --bg: #08070d; --panel: #121019; --line: #262233; --fg: #ece8f4; --muted: #9a93ad; --gold: #f2c14e; --sky-top: #2b1b5a; --sky-mid: #8a4f7d; --sky-low: #ff8a5b; --stone: #4a4466; --stone-lit: #8f86a8;
+  --display: 'Silkscreen', ui-monospace, monospace; --body: 'Instrument Sans', system-ui, sans-serif; --mono: 'JetBrains Mono', ui-monospace, monospace;
+  color-scheme: dark;
+}
+body { background: var(--bg); color: var(--fg); font: 15px/1.55 var(--body); }
+.wrap { max-width: 1180px; margin: 0 auto; padding-block: 28px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 28px; }
+canvas { image-rendering: pixelated; display: block; max-width: 100%; }
+h1 { font: 700 clamp(26px, 4vw, 40px)/1.1 var(--display); margin: 0; letter-spacing: 0.02em; text-wrap: balance; }
+h2 { font: 700 22px/1.1 var(--display); margin: 0; letter-spacing: 0.03em; }
+.eyebrow { font: 500 12px/1 var(--mono); color: var(--gold); letter-spacing: 0.12em; text-transform: uppercase; }
+.lede { color: var(--muted); max-width: 68ch; margin: 0; }
+header { display: grid; gap: 10px; }
+.stagebox { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--sky-top); }
+.stagebox canvas { width: 100%; height: auto; }
+.caption { font: 12px/1.4 var(--mono); color: var(--muted); padding: 8px 12px; background: var(--panel); border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 6px 16px; justify-content: space-between; }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+@media (max-width: 820px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; display: grid; min-width: 0; }
+.card .view { background: linear-gradient(var(--sky-top), var(--sky-mid) 72%, var(--sky-low)); position: relative; }
+.card .view canvas { width: 100%; height: auto; }
+.card .body { padding: 14px 16px 16px; display: grid; gap: 12px; }
+.namebar { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.namebar .title { color: var(--muted); font-size: 13px; }
+.kit { font: 12px/1.5 var(--mono); color: var(--muted); }
+.kit b { color: var(--fg); font-weight: 500; }
+.poses { display: flex; flex-wrap: wrap; gap: 6px; }
+.poses button { font: 600 12px/1 var(--body); color: var(--fg); background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 7px 11px; cursor: pointer; }
+.poses button[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.poses button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
+.face { display: grid; gap: 4px; justify-items: center; font: 11px/1 var(--mono); color: var(--muted); }
+.face canvas { width: 64px; height: 64px; border-radius: 6px; background: linear-gradient(var(--sky-top), var(--sky-mid)); }
+.ramps { display: grid; gap: 4px; }
+.ramp { display: grid; grid-template-columns: 72px repeat(4, 22px); gap: 3px; align-items: center; font: 11px/1 var(--mono); color: var(--muted); }
+.ramp i { width: 22px; height: 14px; border-radius: 2px; display: block; }
+.note { font-size: 13px; color: var(--muted); margin: 0; }
+section.notes { display: grid; gap: 14px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 820px) { section.notes { grid-template-columns: minmax(0, 1fr); } }
+.notes article { border-top: 2px solid var(--line); padding-top: 12px; display: grid; gap: 6px; }
+.notes h3 { margin: 0; font: 600 14px/1.3 var(--body); }
+.notes p, .notes li { margin: 0; color: var(--muted); font-size: 13.5px; }
+.notes ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+.status { display: inline-flex; align-items: center; gap: 6px; font: 500 12px/1 var(--mono); color: var(--gold); border: 1px solid #5a4a20; border-radius: 999px; padding: 5px 10px; width: max-content; }
+.status::before { content: ""; width: 7px; height: 7px; background: var(--gold); border-radius: 1px; }
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="status">Approved · in the arena</span>
+    <h1>Fight Card Pixel Roster</h1>
+    <p class="lede">The six house fighters redrawn as pixel art. Every frame below is rendered live from the arena's own skeleton, poses and colours, so this is what the fight will look like. Nothing about matches, scoring or wiring changes.</p>
+  </header>
+
+  <div class="stagebox">
+    <canvas id="lineup" width="480" height="150" aria-label="All six fighters in their idle pose on the main platform"></canvas>
+    <div class="caption"><span>Idle lineup on the main platform</span><span>1 art pixel = 4 stage px · about 80 px tall per fighter</span></div>
+  </div>
+
+  <div class="grid" id="cards"></div>
+
+  <section class="notes" aria-label="Design notes">
+    <article>
+      <h3>What the guide changed</h3>
+      <ul>
+        <li>Faces are the brightest area, with a dark band under the chin.</li>
+        <li>Four-shade ramps per colour: shadows lean violet to match the arena sky, highlights lean warm.</li>
+        <li>Clean clusters: few colours per part, folds on the tunic and skirt.</li>
+        <li>Weight-shifted stance, angled boots, weapon held forward.</li>
+      </ul>
+    </article>
+    <article>
+      <h3>How they plug in</h3>
+      <p>Each body part is drawn separately (torso, arms, legs, head, face, helmet, weapon, emblem) at the same pivots the current art uses, so every existing animation drives them unchanged. Limbs rotate on the same pixel grid, so edges stay crisp in motion.</p>
+    </article>
+    <article>
+      <h3>Overlap fix (with this change)</h3>
+      <p>Today the scoreboard covers the heads, names and speech bubbles of the two fighters on the floating platforms. The scoreboard moves into the clear sky band between them, so nothing overlaps the fighters.</p>
+    </article>
+  </section>
+</div>
+
+<script>window.BUILDS={"lean": {"nodes": [{"id": "hips", "parent": null, "pos": [0, 0], "note": "root; origin = feet midpoint on the ground"}, {"id": "footB", "part": "foot", "parent": "shinB", "pos": [0, 50], "z": 1, "tint": "back"}, {"id": "shinB", "part": "shin", "parent": "thighB", "pos": [0, 56], "z": 2, "tint": "back"}, {"id": "thighB", "part": "thigh", "parent": "hips", "pos": [-15, -128], "z": 3, "tint": "back"}, {"id": "upperArmB", "part": "upperArm", "parent": "torso", "pos": [-29, -74], "z": 4, "tint": "back"}, {"id": "forearmB", "part": "forearm", "parent": "upperArmB", "pos": [0, 44], "z": 5, "tint": "back"}, {"id": "handB", "part": "hand", "parent": "forearmB", "pos": [0, 46], "z": 6, "tint": "back"}, {"id": "footF", "part": "foot", "parent": "shinF", "pos": [0, 50], "z": 10}, {"id": "shinF", "part": "shin", "parent": "thighF", "pos": [0, 56], "z": 11}, {"id": "thighF", "part": "thigh", "parent": "hips", "pos": [15, -128], "z": 12}, {"id": "torso", "part": "torso", "parent": "hips", "pos": [0, -128], "z": 20}, {"id": "emblem", "part": "emblem", "parent": "torso", "pos": [8, -53], "z": 25}, {"id": "head", "part": "head", "parent": "torso", "pos": [8, -102], "z": 30}, {"id": "helm", "part": "helm", "parent": "head", "pos": [0, 0], "z": 31}, {"id": "eyes", "part": "eyes", "parent": "head", "pos": [0, 0], "z": 32, "partPattern": "eyes-{expression}.svg"}, {"id": "mouth", "part": "mouth", "parent": "head", "pos": [0, 0], "z": 33, "partPattern": "mouth-{expression}.svg"}, {"id": "brows", "part": "brows", "parent": "head", "pos": [0, 0], "z": 34, "partPattern": "brows-{expression}.svg"}, {"id": "upperArmF", "part": "upperArm", "parent": "torso", "pos": [32, -74], "z": 40}, {"id": "forearmF", "part": "forearm", "parent": "upperArmF", "pos": [0, 44], "z": 41}, {"id": "weapon", "part": "weapon", "parent": "handF", "pos": [0, 22], "z": 42}, {"id": "handF", "part": "hand", "parent": "forearmF", "pos": [0, 46], "z": 43}], "poses": {"idle": {"root": {"x": 0, "y": 0, "rot": 0}, "face": "neutral", "grounded": true, "weaponWorld": 36, "rot": {"torso": -2, "head": -3, "upperArmF": -30, "forearmF": -50, "upperArmB": 22, "forearmB": 8, "thighF": -6, "shinF": 10, "footF": -4, "thighB": 8, "shinB": -8, "footB": 0}}, "attack": {"root": {"x": 70, "y": 0, "rot": 0}, "vb": [-260, -640, 1000, 760], "face": "focus", "grounded": true, "weaponWorld": 112, "rot": {"torso": 16, "head": -8, "upperArmF": -96, "forearmF": -10, "upperArmB": 40, "forearmB": 10, "thighF": -38, "shinF": 56, "footF": -18, "thighB": 34, "shinB": 6, "footB": -40}}, "ko": {"root": {"x": -60, "y": -230, "rot": -62}, "vb": [-560, -640, 1000, 760], "face": "ko", "grounded": false, "weaponWorld": -62, "rot": {"torso": -6, "head": -12, "upperArmF": -125, "forearmF": -30, "upperArmB": -60, "forearmB": -25, "thighF": 30, "shinF": 55, "footF": 10, "thighB": -15, "shinB": 35, "footB": 15}}}, "foot": {"src": "foot.svg", "viewBox": [-26, -12, 73, 38], "pivot": [0, 0], "anchors": {"sole": 22}}}, "standard": {"nodes": [{"id": "hips", "parent": null, "pos": [0, 0], "note": "root; origin = feet midpoint on the ground"}, {"id": "footB", "part": "foot", "parent": "shinB", "pos": [0, 48], "z": 1, "tint": "back"}, {"id": "shinB", "part": "shin", "parent": "thighB", "pos": [0, 54], "z": 2, "tint": "back"}, {"id": "thighB", "part": "thigh", "parent": "hips", "pos": [-19, -124], "z": 3, "tint": "back"}, {"id": "upperArmB", "part": "upperArm", "parent": "torso", "pos": [-37, -78], "z": 4, "tint": "back"}, {"id": "forearmB", "part": "forearm", "parent": "upperArmB", "pos": [0, 44], "z": 5, "tint": "back"}, {"id": "handB", "part": "hand", "parent": "forearmB", "pos": [0, 46], "z": 6, "tint": "back"}, {"id": "footF", "part": "foot", "parent": "shinF", "pos": [0, 48], "z": 10}, {"id": "shinF", "part": "shin", "parent": "thighF", "pos": [0, 54], "z": 11}, {"id": "thighF", "part": "thigh", "parent": "hips", "pos": [19, -124], "z": 12}, {"id": "torso", "part": "torso", "parent": "hips", "pos": [0, -124], "z": 20}, {"id": "emblem", "part": "emblem", "parent": "torso", "pos": [8, -55.1], "z": 25}, {"id": "head", "part": "head", "parent": "torso", "pos": [8, -106], "z": 30}, {"id": "helm", "part": "helm", "parent": "head", "pos": [0, 0], "z": 31}, {"id": "eyes", "part": "eyes", "parent": "head", "pos": [0, 0], "z": 32, "partPattern": "eyes-{expression}.svg"}, {"id": "mouth", "part": "mouth", "parent": "head", "pos": [0, 0], "z": 33, "partPattern": "mouth-{expression}.svg"}, {"id": "brows", "part": "brows", "parent": "head", "pos": [0, 0], "z": 34, "partPattern": "brows-{expression}.svg"}, {"id": "upperArmF", "part": "upperArm", "parent": "torso", "pos": [40, -78], "z": 40}, {"id": "forearmF", "part": "forearm", "parent": "upperArmF", "pos": [0, 44], "z": 41}, {"id": "weapon", "part": "weapon", "parent": "handF", "pos": [0, 22], "z": 42}, {"id": "handF", "part": "hand", "parent": "forearmF", "pos": [0, 46], "z": 43}], "poses": {"idle": {"root": {"x": 0, "y": 0, "rot": 0}, "face": "neutral", "grounded": true, "weaponWorld": 36, "rot": {"torso": -2, "head": -3, "upperArmF": -30, "forearmF": -50, "upperArmB": 22, "forearmB": 8, "thighF": -6, "shinF": 10, "footF": -4, "thighB": 8, "shinB": -8, "footB": 0}}, "attack": {"root": {"x": 70, "y": 0, "rot": 0}, "vb": [-260, -640, 1000, 760], "face": "focus", "grounded": true, "weaponWorld": 112, "rot": {"torso": 16, "head": -8, "upperArmF": -96, "forearmF": -10, "upperArmB": 40, "forearmB": 10, "thighF": -38, "shinF": 56, "footF": -18, "thighB": 34, "shinB": 6, "footB": -40}}, "ko": {"root": {"x": -60, "y": -230, "rot": -62}, "vb": [-560, -640, 1000, 760], "face": "ko", "grounded": false, "weaponWorld": -62, "rot": {"torso": -6, "head": -12, "upperArmF": -125, "forearmF": -30, "upperArmB": -60, "forearmB": -25, "thighF": 30, "shinF": 55, "footF": 10, "thighB": -15, "shinB": 35, "footB": 15}}}, "foot": {"src": "foot.svg", "viewBox": [-29, -12, 80, 38], "pivot": [0, 0], "anchors": {"sole": 22}}}, "heavy": {"nodes": [{"id": "hips", "parent": null, "pos": [0, 0], "note": "root; origin = feet midpoint on the ground"}, {"id": "footB", "part": "foot", "parent": "shinB", "pos": [0, 46], "z": 1, "tint": "back"}, {"id": "shinB", "part": "shin", "parent": "thighB", "pos": [0, 52], "z": 2, "tint": "back"}, {"id": "thighB", "part": "thigh", "parent": "hips", "pos": [-22, -120], "z": 3, "tint": "back"}, {"id": "upperArmB", "part": "upperArm", "parent": "torso", "pos": [-44, -80], "z": 4, "tint": "back"}, {"id": "forearmB", "part": "forearm", "parent": "upperArmB", "pos": [0, 44], "z": 5, "tint": "back"}, {"id": "handB", "part": "hand", "parent": "forearmB", "pos": [0, 46], "z": 6, "tint": "back"}, {"id": "footF", "part": "foot", "parent": "shinF", "pos": [0, 46], "z": 10}, {"id": "shinF", "part": "shin", "parent": "thighF", "pos": [0, 52], "z": 11}, {"id": "thighF", "part": "thigh", "parent": "hips", "pos": [22, -120], "z": 12}, {"id": "torso", "part": "torso", "parent": "hips", "pos": [0, -120], "z": 20}, {"id": "emblem", "part": "emblem", "parent": "torso", "pos": [8, -56], "z": 25}, {"id": "head", "part": "head", "parent": "torso", "pos": [8, -108], "z": 30}, {"id": "helm", "part": "helm", "parent": "head", "pos": [0, 0], "z": 31}, {"id": "eyes", "part": "eyes", "parent": "head", "pos": [0, 0], "z": 32, "partPattern": "eyes-{expression}.svg"}, {"id": "mouth", "part": "mouth", "parent": "head", "pos": [0, 0], "z": 33, "partPattern": "mouth-{expression}.svg"}, {"id": "brows", "part": "brows", "parent": "head", "pos": [0, 0], "z": 34, "partPattern": "brows-{expression}.svg"}, {"id": "upperArmF", "part": "upperArm", "parent": "torso", "pos": [48, -80], "z": 40}, {"id": "forearmF", "part": "forearm", "parent": "upperArmF", "pos": [0, 44], "z": 41}, {"id": "weapon", "part": "weapon", "parent": "handF", "pos": [0, 22], "z": 42}, {"id": "handF", "part": "hand", "parent": "forearmF", "pos": [0, 46], "z": 43}], "poses": {"idle": {"root": {"x": 0, "y": 0, "rot": 0}, "face": "neutral", "grounded": true, "weaponWorld": 36, "rot": {"torso": -2, "head": -3, "upperArmF": -30, "forearmF": -50, "upperArmB": 22, "forearmB": 8, "thighF": -6, "shinF": 10, "footF": -4, "thighB": 8, "shinB": -8, "footB": 0}}, "attack": {"root": {"x": 70, "y": 0, "rot": 0}, "vb": [-260, -640, 1000, 760], "face": "focus", "grounded": true, "weaponWorld": 112, "rot": {"torso": 16, "head": -8, "upperArmF": -96, "forearmF": -10, "upperArmB": 40, "forearmB": 10, "thighF": -38, "shinF": 56, "footF": -18, "thighB": 34, "shinB": 6, "footB": -40}}, "ko": {"root": {"x": -60, "y": -230, "rot": -62}, "vb": [-560, -640, 1000, 760], "face": "ko", "grounded": false, "weaponWorld": -62, "rot": {"torso": -6, "head": -12, "upperArmF": -125, "forearmF": -30, "upperArmB": -60, "forearmB": -25, "thighF": 30, "shinF": 55, "footF": 10, "thighB": -15, "shinB": 35, "footB": 15}}}, "foot": {"src": "foot.svg", "viewBox": [-30, -12, 84, 38], "pivot": [0, 0], "anchors": {"sole": 22}}}};
+window.ROSTER={"vex": {"name": "VEX", "title": "The Villain", "palette": {"primary": "#E5383B", "secondary": "#22202E", "accent": "#F2C14E", "skin": "#C98B6B"}, "head": "horned_helm", "weapon": "greatsword", "emblem": "skull", "build": "heavy"}, "sage": {"name": "SAGE", "title": "The Monk", "palette": {"primary": "#2EC4A6", "secondary": "#F1E3C8", "accent": "#1B4D45", "skin": "#E0B48C"}, "head": "topknot", "weapon": "katana", "emblem": "lotus", "build": "lean"}, "glitch": {"name": "GLITCH", "title": "The Gremlin", "palette": {"primary": "#8B5CF6", "secondary": "#B6FF3B", "accent": "#1E1B2E", "skin": "#9FD4A3"}, "head": "goggles_mohawk", "weapon": "sawblade", "emblem": "bolt", "build": "lean"}, "quill": {"name": "QUILL", "title": "The Professor", "palette": {"primary": "#3A6FF2", "secondary": "#F2C14E", "accent": "#1A2350", "skin": "#F0C9A6"}, "head": "monocle_tophat", "weapon": "rapier", "emblem": "quill", "build": "standard"}, "brick": {"name": "BRICK", "title": "The Wall", "palette": {"primary": "#FF8A2B", "secondary": "#5B6475", "accent": "#2B2F3A", "skin": "#B9825E"}, "head": "great_helm", "weapon": "cleaver", "emblem": "shield", "build": "heavy"}, "pip": {"name": "PIP", "title": "The Rookie", "palette": {"primary": "#FFD23F", "secondary": "#56CCF2", "accent": "#2D3142", "skin": "#F3C7A0"}, "head": "big_helmet", "weapon": "wooden_sword", "emblem": "star", "build": "lean"}};
+</script>
+<script>// Pixel-art fighter parts for the Fight Card rig. 1 pixel = 4 rig units. Each part is drawn in its bone's local
+// frame (pivot at 0,0; limbs hang along +y; head/helm face +x; weapons point up -y).
+(function () {
+  const U = 4; // rig units per pixel
+
+  // ---------- colour ----------
+  const FIXED = {
+    O: '#14121F', W: '#F7F1E3', w: '#C9C1D8', G: '#EEF3FA', M: '#A9B3C8', m: '#626B86', g: '#3B4058',
+    X: '#B9824A', x: '#7E522E', z: '#4E2F1C', Y: '#F7CF5A', y: '#B5802C', R: '#C2364E', r: '#6E1C30', E: '#14121F',
+  };
+  const hex2hsl = (h) => {
+    const n = parseInt(h.slice(1), 16), r = (n >> 16 & 255) / 255, g = (n >> 8 & 255) / 255, b = (n & 255) / 255;
+    const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2, d = mx - mn;
+    let H = 0, S = 0;
+    if (d) {
+      S = d / (1 - Math.abs(2 * l - 1));
+      H = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4;
+      H *= 60; if (H < 0) H += 360;
+    }
+    return [H, S, l];
+  };
+  const hsl2hex = (H, S, L) => {
+    S = Math.max(0, Math.min(1, S)); L = Math.max(0, Math.min(1, L)); H = ((H % 360) + 360) % 360;
+    const c = (1 - Math.abs(2 * L - 1)) * S, x = c * (1 - Math.abs((H / 60) % 2 - 1)), m = L - c / 2;
+    const [r, g, b] = H < 60 ? [c, x, 0] : H < 120 ? [x, c, 0] : H < 180 ? [0, c, x] : H < 240 ? [0, x, c] : H < 300 ? [x, 0, c] : [c, 0, x];
+    return '#' + [r, g, b].map((v) => Math.round((v + m) * 255).toString(16).padStart(2, '0')).join('').toUpperCase();
+  };
+  // Move hue toward a target by up to `deg` along the short way round.
+  const toward = (h, target, deg) => { let d = ((target - h + 540) % 360) - 180; return h + Math.sign(d) * Math.min(Math.abs(d), deg); };
+  /** 4-step ramp with hue shifting: shadows lean cool (violet, the arena's ambient), highlights lean warm (sunset). */
+  function ramp(hex, tint = 1) {
+    let [h, s, l] = hex2hsl(hex);
+    l *= tint;
+    const dark = l < 0.22;
+    return {
+      base: hsl2hex(h, s, l),
+      light: hsl2hex(toward(h, 48, 12), s * 0.95, l + (dark ? 0.16 : 0.13)),
+      shadow: hsl2hex(toward(h, 255, 14), Math.min(1, s * 1.05 + 0.04), l - (dark ? 0.07 : 0.15)),
+      deep: hsl2hex(toward(h, 255, 26), Math.min(1, s * 1.05 + 0.06), l - (dark ? 0.12 : 0.27)),
+    };
+  }
+  // Token letters per palette slot: [light, base, shadow, deep]
+  const SLOTS = { primary: ['Q', 'P', 'p', 'd'], secondary: ['T', 'S', 's', 'e'], accent: ['B', 'A', 'a', 'c'], skin: ['L', 'K', 'k', 'n'] };
+  function colorMap(palette, tint = 1) {
+    const map = {};
+    for (const [k, v] of Object.entries(FIXED)) map[k] = tint === 1 ? v : scale(v, tint);
+    for (const [slot, toks] of Object.entries(SLOTS)) {
+      const r = ramp(palette[slot], tint);
+      [r.light, r.base, r.shadow, r.deep].forEach((c, i) => { map[toks[i]] = c; });
+    }
+    return map;
+  }
+  function scale(hex, f) {
+    const n = parseInt(hex.slice(1), 16);
+    return '#' + [16, 8, 0].map((s) => Math.round(((n >> s) & 255) * f).toString(16).padStart(2, '0')).join('');
+  }
+
+  // ---------- painter ----------
+  class Px {
+    constructor() { this.p = new Map(); }
+    k(x, y) { return x + ',' + y; }
+    get(x, y) { return this.p.get(this.k(x, y)); }
+    set(x, y, t) { if (t === null) this.p.delete(this.k(x, y)); else this.p.set(this.k(x, y), t); return this; }
+    rect(x0, y0, x1, y1, t) { for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) this.set(x, y, t); return this; }
+    hline(x0, x1, y, t) { return this.rect(Math.min(x0, x1), y, Math.max(x0, x1), y, t); }
+    vline(x, y0, y1, t) { return this.rect(x, Math.min(y0, y1), x, Math.max(y0, y1), t); }
+    ellipse(cx, cy, rx, ry, t) {
+      for (let y = Math.floor(cy - ry); y <= Math.ceil(cy + ry); y++)
+        for (let x = Math.floor(cx - rx); x <= Math.ceil(cx + rx); x++) {
+          const dx = (x + 0.5 - cx) / rx, dy = (y + 0.5 - cy) / ry;
+          if (dx * dx + dy * dy <= 1.0) this.set(x, y, t);
+        }
+      return this;
+    }
+    poly(pts, t) {
+      const ys = pts.map((p) => p[1]);
+      for (let y = Math.floor(Math.min(...ys)); y <= Math.ceil(Math.max(...ys)); y++) {
+        const cy = y + 0.5, xs = [];
+        for (let i = 0; i < pts.length; i++) {
+          const [ax, ay] = pts[i], [bx, by] = pts[(i + 1) % pts.length];
+          if ((ay <= cy && by > cy) || (by <= cy && ay > cy)) xs.push(ax + ((cy - ay) / (by - ay)) * (bx - ax));
+        }
+        xs.sort((a, b) => a - b);
+        for (let i = 0; i + 1 < xs.length; i += 2)
+          for (let x = Math.ceil(xs[i] - 0.5); x <= Math.floor(xs[i + 1] - 0.5); x++) this.set(x, y, t);
+      }
+      return this;
+    }
+    line(x0, y0, x1, y1, t) {
+      let dx = Math.abs(x1 - x0), dy = -Math.abs(y1 - y0), sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1, e = dx + dy;
+      for (;;) {
+        this.set(x0, y0, t);
+        if (x0 === x1 && y0 === y1) break;
+        const e2 = 2 * e;
+        if (e2 >= dy) { e += dy; x0 += sx; }
+        if (e2 <= dx) { e += dx; y0 += sy; }
+      }
+      return this;
+    }
+    /** Tapered limb from (0,y0) to (0,y1) with half-widths r0 → r1 and rounded ends; centred on x = cx. */
+    limb(cx, y0, y1, r0, r1, t) {
+      for (let y = Math.floor(y0 - r0); y <= Math.ceil(y1 + r1); y++)
+        for (let x = Math.floor(cx - Math.max(r0, r1)) - 1; x <= Math.ceil(cx + Math.max(r0, r1)) + 1; x++) {
+          const px = x + 0.5, py = y + 0.5;
+          const f = Math.max(0, Math.min(1, (py - y0) / (y1 - y0)));
+          const r = r0 + (r1 - r0) * f, qy = y0 + (y1 - y0) * f;
+          if ((px - cx) ** 2 + (py - qy) ** 2 <= r * r) this.set(x, y, t);
+        }
+      return this;
+    }
+    /** Directional shading: light from the upper left. Pixels of `base` within `sw` px of the right/bottom edge of
+     *  their colour family become `shadow`; pixels on the left/top edge become `light`. */
+    shade(base, light, shadow, family, sw = 2, sb = 1) {
+      const fam = new Set(family || [base, light, shadow]);
+      const out = (x, y) => !fam.has(this.get(x, y));
+      const todo = [];
+      for (const [key, t] of this.p) {
+        if (t !== base) continue;
+        const [x, y] = key.split(',').map(Number);
+        let sh = false;
+        for (let i = 1; i <= sw; i++) if (out(x + i, y)) sh = true;
+        for (let i = 1; i <= sb; i++) if (out(x, y + i)) sh = true;
+        if (sh) todo.push([x, y, shadow]);
+        else if (light && (out(x - 1, y) || out(x, y - 1))) todo.push([x, y, light]);
+      }
+      todo.forEach(([x, y, t]) => this.set(x, y, t));
+      return this;
+    }
+    /** 1-px outline around the silhouette (4-neighbour, so corners stay soft). */
+    outline(t = 'O') {
+      const add = [];
+      for (const key of this.p.keys()) {
+        const [x, y] = key.split(',').map(Number);
+        for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) if (!this.p.has(this.k(x + dx, y + dy))) add.push([x + dx, y + dy]);
+      }
+      add.forEach(([x, y]) => this.set(x, y, t));
+      return this;
+    }
+    replace(from, to) { for (const [k, t] of this.p) if (t === from) this.p.set(k, to); return this; }
+    bounds() {
+      let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+      for (const key of this.p.keys()) { const [x, y] = key.split(',').map(Number); x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y); }
+      return { x0, y0, x1, y1 };
+    }
+  }
+
+  // ---------- body parts per build ----------
+  // Dimensions in pixels. Lengths come from parts.json (units / 4).
+  const BUILD = {
+    heavy: { ua: [5, 4.2], fa: [4.4, 3.6], th: [5.2, 4.4], sh: [4.4, 3.6], thL: 13, shL: 11.5, hand: 3.6, foot: 12,
+      torso: { top: -28, sl: -16, sr: 17, wl: -12, wr: 13, hip: 3 } },
+    standard: { ua: [4, 3.4], fa: [3.6, 3], th: [4.4, 3.6], sh: [3.6, 3], thL: 13.5, shL: 12, hand: 3.2, foot: 11,
+      torso: { top: -27, sl: -12, sr: 13, wl: -9, wr: 10, hip: 3 } },
+    lean: { ua: [3.4, 2.8], fa: [3, 2.5], th: [3.8, 3.1], sh: [3.1, 2.6], thL: 14, shL: 12.5, hand: 2.9, foot: 10,
+      torso: { top: -26, sl: -10, sr: 11, wl: -7, wr: 8, hip: 3 } },
+  };
+
+  function torso(b) {
+    const T = BUILD[b].torso, d = new Px();
+    const { top, sl, sr, wl, wr, hip } = T;
+    // Tunic: shoulders → waist, slight barrel chest.
+    d.poly([[sl + 3, top], [sr - 3, top], [sr, top + 4], [sr - 1, top + 12], [wr, -4], [wl, -4], [sl + 1, top + 12], [sl, top + 4]], 'P');
+    d.ellipse(sl + 3, top + 4, 3.5, 4, 'P').ellipse(sr - 3, top + 4, 3.5, 4, 'P');
+    // Tunic skirt below the belt, flaring over the hips.
+    d.poly([[wl, -3], [wr, -3], [wr + 2, hip + 1], [wl - 2, hip + 1]], 'P');
+    d.shade('P', 'Q', 'p', ['P', 'Q', 'p'], 3, 1);
+    const cx = Math.round((wl + wr) / 2) + 1;
+    // Chest: lit cluster upper-left, pec shadow arcs, centre seam (article tips 1 + 7).
+    d.rect(sl + 4, top + 3, cx - 2, top + 6, 'Q');
+    d.hline(cx - 6, cx - 1, top + 10, 'p').set(cx - 7, top + 9, 'p').hline(cx + 2, cx + 7, top + 10, 'p').set(cx + 8, top + 9, 'p');
+    d.vline(cx, top + 4, -6, 'p');
+    d.line(cx - 4, -9, cx - 3, -6, 'p').line(cx + 5, -10, cx + 4, -6, 'p');   // waist creases
+    // Skirt folds: alternating light and shadow strips.
+    for (const [x, t] of [[cx - 5, 'p'], [cx - 3, 'Q'], [cx + 2, 'p'], [cx + 4, 'Q'], [cx + 7, 'd']]) d.vline(x, -1, hip + 1, t);
+    // V collar (accent).
+    d.line(cx - 4, top, cx, top + 4, 'A').line(cx + 4, top, cx, top + 4, 'A').hline(cx - 1, cx + 1, top, 'K').set(cx, top + 1, 'k');
+    // Belt + buckle.
+    d.hline(wl, wr, -4, 'A').hline(wl, wr, -3, 'a').rect(cx - 1, -5, cx + 1, -2, 'Y').set(cx, -4, 'y').set(cx, -3, 'y');
+    return d.outline();
+  }
+
+  function upperArm(b, heavyPad) {
+    const [r0, r1] = BUILD[b].ua, d = new Px();
+    d.limb(0, 0, 11, r0, r1, 'S');
+    d.shade('S', 'T', 's', null, 2, 1);
+    // Shoulder pad (primary) over the top third.
+    d.ellipse(0, 1, r0 + (heavyPad ? 1.6 : 0.9), r0 + 0.6, 'P');
+    d.shade('P', 'Q', 'p', ['P', 'Q', 'p'], 2, 1);
+    d.hline(-Math.floor(r0) , Math.floor(r0), Math.round(r0 + 1.4), 'd');
+    return d.outline();
+  }
+
+  function forearm(b) {
+    const [r0, r1] = BUILD[b].fa, d = new Px();
+    d.limb(0, 0, 11.5, r0, r1, 'K');
+    d.shade('K', 'L', 'k', null, 2, 1);
+    // Bracer (accent) with a light rim.
+    d.limb(0, 6.5, 11.5, r1 + 0.7, r1 + 0.7, 'A');
+    d.shade('A', 'B', 'a', ['A', 'B', 'a'], 2, 1);
+    d.hline(-Math.floor(r1), Math.floor(r1), 7, 'B');
+    return d.outline();
+  }
+
+  function hand(b) {
+    const r = BUILD[b].hand + 0.5, d = new Px();
+    d.ellipse(0, 4.5, r + 0.4, r, 'K');
+    d.shade('K', 'L', 'k', null, 1, 1);
+    // Knuckle line and thumb.
+    d.hline(-Math.floor(r) + 1, Math.floor(r) - 1, 3, 'k');
+    d.set(Math.round(r), 5, 'k');
+    return d.outline();
+  }
+
+  function thigh(b) {
+    const [r0, r1] = BUILD[b].th, L = BUILD[b].thL, d = new Px();
+    d.limb(0, 0, L, r0, r1, 'S');
+    d.shade('S', 'T', 's', null, 2, 1);
+    d.line(1, Math.round(L * 0.45), 2, Math.round(L * 0.7), 's');   // fold
+    return d.outline();
+  }
+
+  function shin(b) {
+    const [r0, r1] = BUILD[b].sh, L = BUILD[b].shL, d = new Px();
+    d.limb(0, 0, L, r0, r1, 'S');
+    // Boot shaft (primary) from mid-shin, knee pad (accent).
+    d.limb(0, L * 0.45, L + 1, r1 + 0.9, r1 + 0.9, 'P');
+    d.shade('S', 'T', 's', null, 2, 1);
+    d.shade('P', 'Q', 'p', ['P', 'Q', 'p'], 2, 1);
+    d.ellipse(0.5, 0.5, r0 - 0.4, r0 - 1, 'A');
+    d.shade('A', 'B', 'a', ['A', 'B', 'a'], 1, 1);
+    d.hline(-Math.floor(r1), Math.floor(r1) + 1, Math.round(L * 0.45), 'Q');
+    return d.outline();
+  }
+
+  function foot(b) {
+    const len = BUILD[b].foot, d = new Px();
+    // Boot: heel behind the ankle, toe forward and angled down (article tip 6).
+    d.poly([[-3, -2], [3, -2], [len - 2, 1], [len, 3], [len, 4], [-3, 4]], 'P');
+    d.shade('P', 'Q', 'p', ['P', 'Q', 'p'], 1, 1);
+    d.hline(-3, len, 4, 'c');          // sole: the outline below it sits on the ground line (sole anchor 22)
+    d.set(len - 1, 3, 'p');
+    return d.outline();
+  }
+
+  // ---------- head, faces ----------
+  // Chibi head (~22 px), 3/4 view facing +x. Brow line y = -17; the face (x 2..11, y -18..-4) stays clear of helmets.
+  function head() {
+    const d = new Px();
+    d.rect(-3, -5, 3, 1, 'k').rect(-3, -5, 3, -4, 'n');              // neck, dark under the chin (tip 2)
+    d.ellipse(1, -13.5, 10.5, 10, 'K');
+    d.poly([[-6, -10], [11, -10], [11, -6], [8, -3], [0, -3], [-6, -6]], 'K');
+    d.vline(12, -13, -11, 'K');                                      // nose
+    d.shade('K', 'L', 'k', ['K', 'L', 'k'], 2, 1);
+    for (let y = -19; y <= -5; y++) for (let x = 2; x <= 11; x++) { const t = d.get(x, y); if (t === 'K' || t === 'k') d.set(x, y, 'L'); }
+    d.set(12, -11, 'k').hline(1, 8, -3, 'k').set(9, -4, 'k').set(10, -5, 'k').set(11, -6, 'k');
+    d.ellipse(-3.5, -12, 2, 2.6, 'k').set(-3, -12, 'n').set(-3, -11, 'n');   // ear
+    return d.outline();
+  }
+
+  // Two eyes in 3/4 view: near eye x 3..4, far eye x 8..9.
+  const FACES = {
+    neutral: {
+      eyes: (d) => d.rect(3, -15, 4, -13, 'W').vline(4, -14, -13, 'E').rect(8, -15, 9, -13, 'W').vline(9, -14, -13, 'E'),
+      brows: (d) => d.hline(2, 5, -17, 'O').hline(8, 10, -17, 'O'),
+      mouth: (d) => d.hline(6, 9, -8, 'r'),
+    },
+    focus: {
+      eyes: (d) => d.rect(3, -14, 4, -13, 'W').vline(4, -14, -13, 'E').rect(8, -14, 9, -13, 'W').vline(9, -14, -13, 'E'),
+      brows: (d) => d.set(2, -18, 'O').hline(3, 4, -17, 'O').set(5, -16, 'O').set(8, -16, 'O').hline(9, 10, -17, 'O'),
+      mouth: (d) => d.rect(5, -9, 9, -8, 'W').set(7, -9, 'w').set(7, -8, 'w').hline(5, 9, -7, 'r'),
+    },
+    smug: {
+      eyes: (d) => d.hline(3, 4, -14, 'O').set(3, -13, 'W').set(4, -13, 'E').hline(8, 9, -14, 'O').set(8, -13, 'W').set(9, -13, 'E'),
+      brows: (d) => d.hline(2, 5, -17, 'O').set(8, -17, 'O').hline(9, 10, -18, 'O'),
+      mouth: (d) => d.hline(5, 7, -7, 'r').set(8, -8, 'r').set(9, -9, 'r'),
+    },
+    hurt: {
+      eyes: (d) => d.set(3, -15, 'E').set(4, -14, 'E').set(3, -13, 'E').set(9, -15, 'E').set(8, -14, 'E').set(9, -13, 'E'),
+      brows: (d) => d.set(2, -16, 'O').hline(3, 4, -17, 'O').set(5, -18, 'O').set(8, -18, 'O').set(9, -17, 'O').set(10, -16, 'O'),
+      mouth: (d) => d.rect(6, -9, 9, -6, 'r').hline(6, 9, -9, 'W'),
+    },
+    ko: {
+      eyes: (d) => { for (const x0 of [3, 8]) d.set(x0, -15, 'E').set(x0 + 2, -15, 'E').set(x0 + 1, -14, 'E').set(x0, -13, 'E').set(x0 + 2, -13, 'E'); return d; },
+      brows: (d) => d,
+      mouth: (d) => d.rect(5, -8, 9, -5, 'r').rect(6, -6, 8, -5, 'R'),
+    },
+  };
+  function facePart(expr, kind) { const d = new Px(); FACES[expr][kind](d); return d; }
+
+  /** Clear helmet pixels that would cover the face: front of the head below the brow line. */
+  function clearFace(d, brow = -18) {
+    for (const key of [...d.p.keys()]) {
+      const [x, y] = key.split(',').map(Number);
+      if (x >= 1 && y > brow) d.p.delete(key);
+      else if (x >= -3 && x < 1 && y > brow + 4) d.p.delete(key);
+    }
+    return d;
+  }
+  /** Thick curve (quadratic bezier) painted with discs; radius tapers r0 → r1. */
+  function stroke(d, p0, p1, p2, r0, r1, t) {
+    for (let i = 0; i <= 24; i++) {
+      const u = i / 24, a = (1 - u) ** 2, b = 2 * (1 - u) * u, c = u * u;
+      d.ellipse(a * p0[0] + b * p1[0] + c * p2[0], a * p0[1] + b * p1[1] + c * p2[1], r0 + (r1 - r0) * u, r0 + (r1 - r0) * u, t);
+    }
+    return d;
+  }
+
+  // ---------- helms (head frame) ----------
+  const HELMS = {
+    horned_helm(d) {
+      // Dome (primary) with a gold brow band and nose guard; big gold horns sweeping up and out.
+      d.ellipse(1, -17.5, 11.8, 8.5, 'P').rect(-10, -17, -4, -8, 'P');
+      clearFace(d, -18);
+      d.rect(11, -18, 11, -13, 'P');
+      d.shade('P', 'Q', 'p', ['P', 'Q', 'p'], 2, 1);
+      d.hline(-10, 12, -18, 'A').hline(-10, 11, -19, 'a');
+      d.set(-2, -23, 'Y').set(3, -24, 'Y').set(7, -22, 'Y').set(-6, -20, 'Y');
+      stroke(d, [7, -23], [14, -25], [14, -34], 2.1, 0.7, 'A');
+      stroke(d, [-5, -23], [-12, -25], [-12, -34], 2.1, 0.7, 'A');
+      d.shade('A', 'B', 'a', ['A', 'B', 'a'], 1, 1);
+      d.rect(6, -6, 9, -4, 'S').set(10, -5, 'S').set(7, -3, 'S').set(8, -3, 'S');   // goatee
+    },
+    topknot(d) {
+      // Dark hair (accent deep) with a hairline at the brow, bun on top, cream headband with trailing tails.
+      d.ellipse(1, -17, 11.3, 8, 'c').rect(-10, -17, -5, -8, 'c');
+      clearFace(d, -19);
+      d.ellipse(-2, -27, 4.2, 3.6, 'c');
+      for (const [x, y] of [[-6, -22], [-3, -24], [1, -24], [5, -23], [-8, -17], [-8, -13], [-4, -29], [-1, -29]]) d.set(x, y, 'a');
+      d.hline(-10, 11, -19, 'S').hline(-10, 10, -20, 'T');
+      d.rect(-3, -25, -1, -24, 'S');
+      stroke(d, [-10, -19], [-13, -18], [-16, -13], 0.9, 0.6, 'S');
+      stroke(d, [-10, -19], [-12, -15], [-14, -10], 0.8, 0.5, 's');
+    },
+    goggles_mohawk(d) {
+      // Mohawk spikes (primary), goggles on the forehead: lime strap (secondary), dark lens (accent).
+      d.ellipse(0, -23, 8, 3, 'P');
+      [[-7, -29], [-4, -33], [0, -35], [4, -33], [7, -29]].forEach(([x, y], i) => d.poly([[x - 2.6, -23], [x + 2.6, -23], [x + 0.8, y]], i % 2 ? 'P' : 'Q'));
+      d.shade('P', 'Q', 'p', ['P', 'Q', 'p'], 1, 0);
+      d.hline(-11, 11, -20, 'S').hline(-11, 11, -19, 's');
+      d.ellipse(7, -21, 3.6, 3, 'g').ellipse(7, -21, 2.4, 1.9, 'A');
+      d.set(6, -22, 'B').set(7, -22, 'T');
+    },
+    monocle_tophat(d) {
+      // Top hat (accent) with a gold band (secondary) and a wide brim; grey sideburns; gold monocle on the far eye.
+      d.rect(-7, -36, 8, -22, 'A');
+      d.shade('A', 'B', 'a', ['A', 'B', 'a'], 2, 0);
+      d.hline(-7, 8, -36, 'B');
+      d.rect(-7, -25, 8, -24, 'S').hline(-7, 8, -24, 's');
+      d.hline(-12, 12, -21, 'A').hline(-11, 13, -20, 'a');
+      d.rect(-9, -19, -5, -10, 'w').set(-5, -10, 'M').set(-9, -10, 'M');
+      for (const [x, y] of [[7, -17], [8, -17], [9, -17], [10, -16], [10, -15], [10, -14], [10, -13], [7, -11], [8, -11], [9, -11], [6, -16], [6, -15], [6, -14], [6, -13], [6, -12]]) d.set(x, y, 'Y');
+      d.line(7, -10, 4, -3, 'y');
+      d.hline(5, 10, -10, 'w').set(4, -9, 'w').set(11, -9, 'w').set(4, -10, 'M').set(11, -10, 'M');   // handlebar moustache
+    },
+    great_helm(d) {
+      // Bucket helm (secondary steel) over the whole head: visor slit at eye height, mouth grille, orange crest.
+      d.ellipse(1.5, -14, 11.5, 11, 'S').rect(-9, -15, 12, -3, 'S');
+      d.shade('S', 'T', 's', ['S', 'T', 's'], 2, 1);
+      d.rect(2, -15, 12, -13, 'O');                                       // visor slit (eyes show through)
+      d.rect(5, -9, 11, -6, 'O').set(7, -8, 's').set(9, -8, 's');         // grille (mouth shows through)
+      d.hline(-9, 12, -18, 'e').vline(1, -12, -3, 's');
+      d.poly([[-8, -25], [5, -26], [8, -30], [-1, -32], [-11, -28]], 'P');
+      d.shade('P', 'Q', 'p', ['P', 'Q', 'p'], 1, 1);
+    },
+    big_helmet(d) {
+      // Oversized rookie helmet (primary) with a blue racing stripe and a small visor peak.
+      d.ellipse(1, -20, 13, 10.5, 'P').rect(-12, -20, -6, -8, 'P');
+      clearFace(d, -18);
+      d.shade('P', 'Q', 'p', ['P', 'Q', 'p'], 2, 1);
+      for (let x = -10; x <= 11; x++) d.set(x, -30 + Math.round(((x - 1) / 12) ** 2 * 9), 'S').set(x, -29 + Math.round(((x - 1) / 12) ** 2 * 9), 's');
+      d.hline(3, 16, -18, 'A').hline(5, 16, -17, 'a');
+      d.set(-6, -24, 'Q').set(-5, -26, 'Q').set(-7, -22, 'Q');
+      d.ellipse(-8, -11, 1.6, 1.6, 'S');
+      d.line(-6, -9, -1, -4, 'a');                                         // chin strap
+      d.set(3, -11, 'k').set(5, -11, 'k').set(4, -10, 'k').set(8, -11, 'k').set(10, -11, 'k');   // freckles
+    },
+    crown(d) {
+      // Gold crown with four points and red jewels over swept-back hair.
+      d.ellipse(0, -17, 10.5, 6, 'x').rect(-10, -17, -5, -9, 'x');
+      clearFace(d, -19);
+      d.rect(-9, -21, 11, -18, 'Y');
+      for (const x of [-8, -3, 2, 7]) d.poly([[x - 1.5, -21], [x + 2.5, -21], [x + 0.5, -27]], 'Y');
+      d.shade('Y', null, 'y', ['Y', 'y'], 1, 0);
+      d.hline(-9, 11, -18, 'y');
+      for (const x of [-7, -2, 3, 8]) d.set(x, -20, 'R');
+      d.set(-6, -15, 'z').set(-8, -12, 'z');
+    },
+    hood(d) {
+      // Deep hood (primary) framing the face, shadowed rim, drape behind the neck.
+      d.ellipse(0, -14, 12, 11.5, 'P').rect(-12, -14, -4, 2, 'P');
+      clearFace(d, -19);
+      for (const key of [...d.p.keys()]) { const [x, y] = key.split(',').map(Number); if (x >= -1 && y > -19 && x < 1) d.p.delete(key); }
+      d.shade('P', 'Q', 'p', ['P', 'Q', 'p'], 2, 1);
+      d.hline(0, 11, -19, 'd').vline(-2, -18, -6, 'd');
+      d.line(-10, -10, -9, 0, 'p').line(-6, -12, -6, 1, 'p');
+    },
+  };
+  function helm(id) { const d = new Px(); HELMS[id](d); return d.outline(); }
+
+  // ---------- weapons (socket at 0,0, blade up) ----------
+  const WEAPONS = {
+    greatsword(d) {
+      // 110 px long: wide blade with a fuller, broad crossguard, wrapped grip, pommel.
+      d.poly([[-3, -8], [3, -8], [3, -96], [0, -101], [-3, -96]], 'M');
+      d.vline(-2, -8, -96, 'G').vline(-3, -9, -95, 'G');
+      d.vline(2, -8, -96, 'm');
+      d.vline(0, -12, -90, 'g');                           // fuller
+      d.rect(-7, -8, 7, -6, 'A').hline(-7, 7, -8, 'B').set(-8, -7, 'A').set(8, -7, 'A');
+      d.rect(-1, -5, 1, 5, 'x').set(0, -4, 'X').set(0, -1, 'X').set(0, 2, 'X');
+      d.rect(-2, 6, 2, 8, 'A').set(-1, 6, 'B');
+    },
+    katana(d) {
+      // Slight curve toward +x near the tip; round tsuba; wrapped grip.
+      for (let y = -8; y >= -92; y--) {
+        const k = (-8 - y) / 84, off = Math.round(3.5 * k * k);
+        d.set(off - 1, y, 'G').set(off, y, 'M').set(off + 1, y, y < -88 ? 'M' : 'm');
+      }
+      d.set(4, -93, 'G').set(3, -93, 'M');
+      d.ellipse(0, -7, 3.6, 1.6, 'A').set(-2, -7, 'B');
+      d.rect(-1, -5, 1, 10, 'S').set(0, -3, 's').set(0, 0, 's').set(0, 3, 's').set(0, 6, 's');
+      d.rect(-1, 10, 1, 11, 'A');
+    },
+    rapier(d) {
+      // Needle blade, gold cup guard and knuckle bow.
+      d.vline(0, -8, -98, 'G').vline(1, -8, -95, 'm');
+      d.ellipse(0, -6, 4.5, 2.2, 'Y').ellipse(0, -6, 2.5, 1, 'y');
+      d.line(4, -5, 4, 3, 'Y').line(4, 3, 2, 5, 'Y');
+      d.rect(-1, -4, 1, 4, 'x').set(0, -2, 'X').set(0, 1, 'X');
+      d.ellipse(0, 6, 1.6, 1.6, 'Y');
+    },
+    sawblade(d) {
+      // Pole with a spinning saw disc on top (primary hub, steel teeth).
+      d.rect(-1, -48, 1, 8, 'g').vline(-1, -48, 8, 'm');
+      d.rect(-2, 2, 2, 3, 'S').rect(-2, -2, 2, -1, 'S');
+      const cy = -56;
+      for (let i = 0; i < 12; i++) {
+        const a = (i / 12) * Math.PI * 2, x = Math.round(Math.cos(a) * 11.5), y = Math.round(cy + Math.sin(a) * 11.5);
+        d.ellipse(x, y, 1.6, 1.6, 'm');
+      }
+      d.ellipse(0, cy, 10.5, 10.5, 'M');
+      d.shade('M', 'G', 'm', ['M', 'G', 'm'], 2, 1);
+      d.ellipse(0, cy, 4.5, 4.5, 'P').ellipse(0, cy, 1.6, 1.6, 'A');
+      d.line(-6, cy - 3, -3, cy - 7, 'G');
+    },
+    cleaver(d) {
+      // Broad chopping blade with a hang hole; riveted wooden handle.
+      d.poly([[-5, -8], [6, -8], [7, -64], [-5, -66]], 'M');
+      d.vline(-5, -8, -66, 'G').vline(-4, -9, -65, 'G');
+      d.vline(6, -9, -63, 'm');
+      d.ellipse(1, -58, 2, 2, null);
+      d.hline(-4, 5, -12, 'm');
+      d.rect(-2, -7, 2, 9, 'X').vline(2, -7, 9, 'x').set(0, -4, 'Y').set(0, 2, 'Y').set(0, 7, 'Y');
+    },
+    wooden_sword(d) {
+      // Practice sword: wooden blade with grain, rounded tip, simple guard.
+      d.poly([[-2, -8], [2, -8], [2, -60], [0, -63], [-2, -60]], 'X');
+      d.vline(-2, -8, -60, 'Y').vline(2, -8, -60, 'x');
+      for (let y = -14; y > -58; y -= 9) d.set(0, y, 'x').set(0, y - 1, 'x');
+      d.rect(-5, -7, 5, -6, 'x').hline(-5, 5, -7, 'X');
+      d.rect(-1, -5, 1, 6, 'S').set(0, -3, 's').set(0, 0, 's').set(0, 3, 's');
+      d.rect(-1, 7, 1, 8, 'x');
+    },
+  };
+  function weapon(id) { const d = new Px(); WEAPONS[id](d); return d.outline(); }
+
+  // ---------- emblems (chest, ~9 px) ----------
+  const EMBLEMS = {
+    skull: (d) => { d.ellipse(0, -1, 4, 3.6, 'Y').rect(-2, 2, 2, 3, 'Y'); d.rect(-2, -1, -1, 0, 'O').rect(1, -1, 2, 0, 'O').set(0, 2, 'O').set(-1, 3, 'y').set(1, 3, 'y'); },
+    lotus: (d) => { d.poly([[0, -5], [2, 0], [0, 3], [-2, 0]], 'S'); d.poly([[-5, -2], [-1, 1], [-1, 3], [-4, 2]], 'T'); d.poly([[5, -2], [1, 1], [1, 3], [4, 2]], 's'); d.hline(-3, 3, 3, 'A'); },
+    bolt: (d) => d.poly([[1, -5], [-3, 1], [0, 1], [-1, 5], [3, -1], [0, -1]], 'S').set(0, -2, 'T'),
+    quill: (d) => { d.poly([[3, -5], [1, -2], [-2, 3], [-1, 3], [2, -1]], 'W'); d.line(-2, 3, -3, 5, 'S'); d.set(2, -4, 'w'); },
+    shield: (d) => { d.poly([[-4, -4], [4, -4], [4, 0], [0, 5], [-4, 0]], 'P'); d.vline(0, -4, 4, 'A').hline(-4, 4, -1, 'A'); d.set(-3, -3, 'Q'); },
+    eye: (d) => { d.ellipse(0, 0, 5, 3, 'W').ellipse(0, 0, 2.2, 2.2, 'A').rect(0, -1, 0, 0, 'O').set(-1, -1, 'W'); d.hline(-3, 3, -3, 'S'); },
+    flame: (d) => { d.poly([[0, -6], [3, -2], [4, 2], [2, 5], [-2, 5], [-4, 2], [-3, -1], [-1, 0]], 'R'); d.poly([[0, -2], [2, 1], [1, 4], [-1, 4], [-2, 2]], 'Y'); },
+    star: (d) => d.poly([[0, -5], [1.4, -1.6], [5, -1.4], [2.2, 1], [3.2, 5], [0, 2.8], [-3.2, 5], [-2.2, 1], [-5, -1.4], [-1.4, -1.6]], 'S').set(0, -2, 'T').set(-1, -1, 'T'),
+  };
+  function emblem(id) { const d = new Px(); EMBLEMS[id](d); return d.outline(); }
+
+  // ---------- assembly ----------
+  function partFor(node, face, skin) {
+    const b = skin.build;
+    switch (node.part) {
+      case 'torso': return torso(b);
+      case 'upperArm': return upperArm(b, b === 'heavy');
+      case 'forearm': return forearm(b);
+      case 'hand': return hand(b);
+      case 'thigh': return thigh(b);
+      case 'shin': return shin(b);
+      case 'foot': return foot(b);
+      case 'head': return head();
+      case 'helm': return helm(skin.head);
+      case 'weapon': return weapon(skin.weapon);
+      case 'emblem': return emblem(skin.emblem);
+      case 'eyes': return facePart(face, 'eyes');
+      case 'brows': return facePart(face, 'brows');
+      case 'mouth': return facePart(face, 'mouth');
+    }
+    return null;
+  }
+
+  function toCanvas(px, colors) {
+    const b = px.bounds();
+    const c = document.createElement('canvas');
+    c.width = b.x1 - b.x0 + 1; c.height = b.y1 - b.y0 + 1;
+    const g = c.getContext('2d');
+    for (const [key, t] of px.p) {
+      const [x, y] = key.split(',').map(Number);
+      const col = colors[t];
+      if (!col) continue;
+      g.fillStyle = col; g.fillRect(x - b.x0, y - b.y0, 1, 1);
+    }
+    return { canvas: c, ox: b.x0, oy: b.y0, colors: px.p.size };
+  }
+
+  // worldTransforms(), ported from apps/web/src/arena/manifest.ts (units → px at the end).
+  const rad = (d) => (d * Math.PI) / 180;
+  function worldTransforms(build, pose) {
+    const m = window.BUILDS[build];
+    const byId = new Map(m.nodes.map((n) => [n.id, n]));
+    const out = {};
+    const solve = (id) => {
+      if (out[id]) return out[id];
+      const n = byId.get(id);
+      let xf;
+      if (n.parent === null) xf = { x: pose.root.x + n.pos[0], y: pose.root.y + n.pos[1], rot: pose.root.rot };
+      else {
+        const p = solve(n.parent), c = Math.cos(rad(p.rot)), s = Math.sin(rad(p.rot));
+        const rot = n.part === 'weapon' ? pose.weaponWorld : p.rot + (pose.rot[id] ?? 0);
+        xf = { x: p.x + n.pos[0] * c - n.pos[1] * s, y: p.y + n.pos[0] * s + n.pos[1] * c, rot };
+      }
+      return (out[id] = xf);
+    };
+    m.nodes.forEach((n) => solve(n.id));
+    if (pose.grounded) {
+      const sole = Number(m.foot.anchors?.sole ?? 22);
+      let low = -Infinity;
+      for (const n of m.nodes) {
+        if (n.part !== 'foot') continue;
+        const f = out[n.id], c = Math.cos(rad(f.rot)), s = Math.sin(rad(f.rot));
+        for (const lx of [-24, 46]) low = Math.max(low, f.y + lx * s + sole * c);
+      }
+      if (Number.isFinite(low) && low !== 0) for (const k of Object.keys(out)) out[k] = { ...out[k], y: out[k].y - low };
+    }
+    return out;
+  }
+
+  const VICTORY = (idle) => ({ ...idle, face: 'smug', weaponWorld: 8, rot: { ...idle.rot, upperArmF: -160, forearmF: -6, upperArmB: 30, forearmB: 6, torso: 0, head: 2 } });
+  function poseFor(build, name) {
+    const ps = window.BUILDS[build].poses;
+    return name === 'victory' ? VICTORY(ps.idle) : ps[name];
+  }
+
+  /** Draw a posed fighter into ctx at native pixel resolution (1 px = 4 units), feet midpoint at (fx, fy). */
+  function drawFighter(ctx, skin, poseName, fx, fy, facing = 1, faceOverride) {
+    const pose = poseFor(skin.build, poseName);
+    const face = faceOverride || pose.face;
+    const xfs = worldTransforms(skin.build, pose);
+    const nodes = [...window.BUILDS[skin.build].nodes].sort((a, b) => (a.z ?? 0) - (b.z ?? 0));
+    const front = colorMap(skin.palette), back = colorMap(skin.palette, 0.8);
+    ctx.imageSmoothingEnabled = false;
+    for (const n of nodes) {
+      if (!n.part) continue;
+      const px = partFor(n.part === 'eyes' || n.part === 'brows' || n.part === 'mouth' ? n : n, face, skin);
+      if (!px || px.p.size === 0) continue;
+      const t = toCanvas(px, n.tint === 'back' ? back : front);
+      const xf = xfs[n.id], c = Math.cos(rad(xf.rot)), s = Math.sin(rad(xf.rot));
+      const X = xf.x / U, Y = xf.y / U;
+      ctx.setTransform(facing * c, s, -facing * s * 1, c, fx + facing * X, fy + Y);
+      // mirrored: x' = facing*(x*c - y*s), y' = x*s + y*c
+      if (facing === -1) ctx.setTransform(-c, s, s, c, fx - X, fy + Y);
+      ctx.drawImage(t.canvas, t.ox, t.oy);
+    }
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+  }
+
+  window.PixelFighters = { drawFighter, partFor, colorMap, toCanvas, Px, BUILD, HELMS, WEAPONS, EMBLEMS, FACES, U, ramp };
+})();
+</script>
+<script>
+(function () {
+  const { drawFighter } = window.PixelFighters;
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const B = window.BUILDS;
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const ease = (t) => t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2;
+  function mix(p, q, t) {
+    const rot = {};
+    for (const k of new Set([...Object.keys(p.rot), ...Object.keys(q.rot)])) rot[k] = lerp(p.rot[k] ?? 0, q.rot[k] ?? 0, t);
+    return { root: { x: lerp(p.root.x, q.root.x, t), y: lerp(p.root.y, q.root.y, t), rot: lerp(p.root.rot, q.root.rot, t) }, face: t < 0.5 ? p.face : q.face, grounded: true, weaponWorld: lerp(p.weaponWorld, q.weaponWorld, t), rot };
+  }
+  // Swing loop: idle (breathing) → strike → hold → recover.
+  function swing(build, ms) {
+    const idle = B[build].poses.idle, atk = B[build].poses.attack, T = (ms % 2600) / 2600;
+    if (T < 0.45) { const br = Math.sin(T / 0.45 * Math.PI * 2) * 1.5; return { ...idle, rot: { ...idle.rot, torso: idle.rot.torso + br * 0.6, head: idle.rot.head - br * 0.8, upperArmF: idle.rot.upperArmF + br } }; }
+    if (T < 0.58) return mix(idle, atk, ease((T - 0.45) / 0.13));
+    if (T < 0.72) return atk;
+    return mix(atk, idle, ease((T - 0.72) / 0.28));
+  }
+  // drawFighter takes a pose name; register an animated pose under a temporary name.
+  function drawPose(ctx, skin, pose, x, y, facing, face) {
+    const store = B[skin.build].poses, prev = store._anim;
+    store._anim = pose;
+    drawFighter(ctx, skin, '_anim', x, y, facing, face);
+    if (prev === undefined) delete store._anim; else store._anim = prev;
+  }
+
+  // Lineup
+  const L = document.getElementById('lineup'), lg = L.getContext('2d');
+  function sky(g, w, h) { const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#2b1b5a'); gr.addColorStop(0.72, '#8a4f7d'); gr.addColorStop(1, '#ff8a5b'); g.fillStyle = gr; g.fillRect(0, 0, w, h); }
+  function drawLineup() {
+    lg.setTransform(1, 0, 0, 1, 0, 0); sky(lg, 480, 150);
+    lg.fillStyle = '#4a4466'; lg.fillRect(0, 128, 480, 22); lg.fillStyle = '#8f86a8'; lg.fillRect(0, 128, 480, 3); lg.fillStyle = '#14121f'; lg.fillRect(0, 127, 480, 1);
+    Object.values(window.ROSTER).forEach((s, i) => drawFighter(lg, s, 'idle', 24 + i * 74, 128, 1));
+  }
+  drawLineup();
+
+  // Cards
+  const cards = document.getElementById('cards'), live = [];
+  const NOTES = {
+    vex: 'Heavy build, red armour, gold horned helm and greatsword. Goatee and a skull crest for the villain.',
+    sage: 'Lean monk in teal with a cream headband, dark topknot and katana. Lotus on the chest.',
+    glitch: 'Purple mohawk, lime goggles strap and a saw-blade staff. Green skin keeps the gremlin read.',
+    quill: 'Standard build, blue coat, top hat, gold monocle and handlebar moustache. Rapier with a cup guard.',
+    brick: 'Heavy build in a slate bucket helm with an orange crest. Eyes show through the visor slit. Cleaver.',
+    pip: 'Lean rookie in an oversized yellow helmet with a blue stripe, freckles and a wooden practice sword.',
+  };
+  const RAMPS = { primary: 'Primary', secondary: 'Secondary', accent: 'Accent', skin: 'Skin' };
+  for (const [id, s] of Object.entries(window.ROSTER)) {
+    const card = document.createElement('article'); card.className = 'card';
+    const view = document.createElement('div'); view.className = 'view';
+    const C = document.createElement('canvas'); C.width = 200; C.height = 172; C.setAttribute('aria-label', `${s.name} animated preview`);
+    view.append(C);
+    const body = document.createElement('div'); body.className = 'body';
+    body.innerHTML = `<div class="namebar"><h2>${s.name}</h2><span class="title">${s.title}</span></div>
+      <div class="kit"><b>${s.build}</b> build · ${s.head.replace(/_/g, ' ')} · ${s.weapon.replace(/_/g, ' ')} · ${s.emblem} emblem</div>
+      <p class="note">${NOTES[id]}</p>`;
+    const poses = document.createElement('div'); poses.className = 'poses'; poses.setAttribute('role', 'group'); poses.setAttribute('aria-label', `${s.name} pose`);
+    const state = { mode: reduce ? 'idle' : 'swing' };
+    for (const [key, label] of [['swing', 'Animate'], ['idle', 'Idle'], ['attack', 'Attack'], ['victory', 'Victory'], ['ko', 'KO'], ['flip', 'Facing left']]) {
+      const b = document.createElement('button'); b.type = 'button'; b.id = `pose-${id}-${key}`; b.textContent = label;
+      b.setAttribute('aria-pressed', String(state.mode === key));
+      b.addEventListener('click', () => { state.mode = key; poses.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); render(performance.now()); });
+      poses.append(b);
+    }
+    body.append(poses);
+    const faces = document.createElement('div'); faces.className = 'row';
+    for (const e of ['neutral', 'focus', 'smug', 'hurt', 'ko']) {
+      const F = document.createElement('canvas'); F.width = 32; F.height = 32;
+      drawFighter(F.getContext('2d'), s, 'idle', 7, 86, 1, e);   // feet below the frame: crop to the head
+      const w = document.createElement('div'); w.className = 'face'; w.append(F, e); faces.append(w);
+    }
+    body.append(faces);
+    const ramps = document.createElement('div'); ramps.className = 'ramps';
+    for (const [k, label] of Object.entries(RAMPS)) {
+      const r = window.PixelFighters.ramp(s.palette[k]);
+      const row = document.createElement('div'); row.className = 'ramp';
+      row.innerHTML = `<span>${label}</span>` + [r.light, r.base, r.shadow, r.deep].map((c) => `<i style="background:${c}" title="${c}"></i>`).join('');
+      ramps.append(row);
+    }
+    body.append(ramps);
+    card.append(view, body); cards.append(card);
+    const g = C.getContext('2d');
+    function render(ms) {
+      g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, 200, 172);
+      g.fillStyle = '#4a4466'; g.fillRect(0, 158, 200, 14); g.fillStyle = '#8f86a8'; g.fillRect(0, 158, 200, 2);
+      const m = state.mode;
+      if (m === 'swing') drawPose(g, s, swing(s.build, ms), 70, 158, 1);
+      else if (m === 'flip') drawFighter(g, s, 'idle', 120, 158, -1);
+      else if (m === 'ko') drawFighter(g, s, 'ko', 140, 158, 1);
+      else drawFighter(g, s, m, m === 'attack' ? 40 : 70, 158, 1);
+    }
+    render(0);
+    live.push({ state, render });
+  }
+  if (!reduce) {
+    const tick = (ms) => { for (const c of live) if (c.state.mode === 'swing') c.render(ms); requestAnimationFrame(tick); };
+    requestAnimationFrame(tick);
+  }
+})();
+</script>
+
+</body>
+</html>

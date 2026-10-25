@@ -4,6 +4,7 @@ import { HOUSE_FIGHTERS, HOUSE_ROSTER, type SkinSpec } from '@fc/contracts';
 import { BUILDS, FALLBACK_BUILD, joinArt, partDefFromSvg, resolveSkinParts, type ReadArt } from '../src/arena/assets';
 import { composePortrait } from '../src/arena/compose';
 import { worldTransforms } from '../src/arena/manifest';
+import { RAMP_PLACEHOLDERS } from '../src/arena/palette';
 
 const ART = new URL('../public/art/', import.meta.url);
 const fsRead: ReadArt = async (rel) => readFileSync(new URL(rel, ART), 'utf8');
@@ -65,7 +66,8 @@ describe('fallbacks', () => {
   });
   it('partDefFromSvg reads viewBox + weapon anchors', () => {
     const d = partDefFromSvg(readFileSync(new URL('weapons/katana.svg', ART), 'utf8'), 'x')!;
-    expect(d.viewBox).toEqual([-34, -382, 76, 430]);
+    expect(d.viewBox).toEqual([-16, -376, 44, 428]);   // pixel art: 1 px = 4 units, so the box sits on the 4-unit grid
+    expect(d.viewBox.every((v) => v % 4 === 0)).toBe(true);
     expect(d.anchors).toMatchObject({ socket: '0,0', tip: '14,-372' });
     expect(partDefFromSvg('<svg></svg>', 'x')).toBeNull();
   });
@@ -119,7 +121,8 @@ describe('weapon library convention (art-bible §7.1)', () => {
       expect(vx).toBeLessThan(0); expect(vy).toBeLessThan(0); expect(vx + vw).toBeGreaterThan(0); expect(vy + vh).toBeGreaterThan(0);
       const tip = /data-tip="(-?[\d.]+),(-?[\d.]+)"/.exec(t)!; expect(Number(tip[2])).toBeLessThan(-200);
       const fills = new Set([...t.matchAll(/(?:fill|stroke)="(#[0-9A-Fa-f]{6})"/g)].map((m) => m[1]));
-      for (const c of fills) expect(['#14121F', '#FFFFFF', '#C9CEDB', '#FF00FF', '#00FFFF', '#FFFF00', '#FFAA88']).toContain(c);
+      const pixelSteelWoodGold = ['#EEF3FA', '#A9B3C8', '#626B86', '#3B4058', '#B9824A', '#7E522E', '#4E2F1C', '#F7CF5A', '#B5802C', '#F7F1E3', '#C9C1D8', '#C2364E', '#6E1C30'];
+      for (const c of fills) expect(['#14121F', '#FFFFFF', '#C9CEDB', '#FF00FF', '#00FFFF', '#FFFF00', '#FFAA88', ...Object.values(RAMP_PLACEHOLDERS).flatMap((r) => Object.values(r)), ...pixelSteelWoodGold]).toContain(c);
     });
   }
 });

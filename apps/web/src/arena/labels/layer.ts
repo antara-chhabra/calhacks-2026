@@ -3,6 +3,7 @@ import { Container, Graphics, Text } from 'pixi.js';
 import type { ArenaCue, MatchState } from '@fc/engine';
 import type { FighterId } from '@fc/contracts';
 import { LabelModel, damageColor, damageText } from './model';
+import { STAGE_W } from '../stage/layout';
 
 export interface LabelLayerOpts {
   parent: Container;
@@ -18,6 +19,7 @@ export interface LabelLayerOpts {
 export interface LabelLayer { onCue(cue: ArenaCue): void; update(dtMs: number): void; snap(): void; destroy(): void }
 
 const FONT = 'system-ui, sans-serif';
+const STAGE_CENTER_X = STAGE_W / 2;
 const stroke = { color: 0x14121f, width: 5, join: 'round' as const };
 
 class Pool<T extends Container> {
@@ -55,9 +57,13 @@ export function createLabelLayer(o: LabelLayerOpts): LabelLayer {
         const c = bubbles.take(); const [g, tx] = c.children as [Graphics, Text];
         tx.text = b.lines.join('\n'); tx.anchor.set(0.5, 1); tx.y = -14;
         const w = tx.width + 28, h = tx.height + 24;
-        g.clear().roundRect(-w / 2, -h - 2, w, h, 14).fill(0xffffff).stroke({ color: 0x14121f, width: 4 })
-          .poly([-10, -3, 10, -3, 0, 14]).fill(0xffffff);
-        c.position.set(a.x, a.y - 120);
+        // Upper-platform fighters stand near the stage top. If the bubble would leave the stage, put it beside the
+        // head (toward the stage centre) instead of over the name tag, with no tail.
+        const beside = a.y - 120 < h + 12;
+        g.clear().roundRect(-w / 2, -h - 2, w, h, 14).fill(0xffffff).stroke({ color: 0x14121f, width: 4 });
+        if (!beside) g.poly([-10, -3, 10, -3, 0, 14]).fill(0xffffff);
+        const side = a.x < STAGE_CENTER_X ? 1 : -1;
+        c.position.set(beside ? a.x + side * (w / 2 + 70) : a.x, beside ? Math.max(a.y - 10, h + 12) : a.y - 120);
         c.alpha = Math.min(1, (b.ttlMs - b.ageMs) / 250);
       }
     }

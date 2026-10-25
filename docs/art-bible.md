@@ -100,6 +100,16 @@ Generated art (image models) is allowed only for the stage backdrop painting, po
 - **Slots.** Weapon `data-socket="0,0"` is the grip centre, blade along -y; the rig sets weapon rotation so the blade reaches a wanted world angle. Helm is drawn over `head.svg` at the same pivot; emblem is placed at the torso's `data-emblem` anchor.
 - **Reference evidence.** `public/art/reference/vex-{idle,attack,ko}.svg`, PNGs in `docs/status/img/A-01-vex-*.png`.
 
+## 7.5 Pixel-art parts (A-11, 2026-10-25)
+
+The fighters are now pixel art. The skeleton, pivots, node positions, poses, clips and z-order are unchanged; only the part art and how the arena draws it changed.
+
+- **Grid.** 1 art pixel = 4 rig units = 4 stage px. Every part SVG is `<rect>` runs on the 4-unit grid with `shape-rendering="crispEdges"` and carries `data-pixel="4"`; viewBoxes sit on the grid.
+- **Rendering.** `rig.ts` rasterises a `data-pixel` part at one texel per art pixel with nearest sampling. `ArenaCanvas.tsx` draws the rigs into a 480×270 render texture and upscales it 4× with nearest sampling, so rotated limbs land on one shared pixel grid. Stage, VFX and labels stay full resolution.
+- **Colour.** Each palette slot has a 4-shade ramp: base (`#FF00FF`, `#00FFFF`, `#FFFF00`, `#FFAA88`) plus light / shadow / deep placeholders (`palette.ts` `RAMP_PLACEHOLDERS`). `ramp()` derives them from the skin colour: highlights shift warm (sunset), shadows shift violet (the arena sky). Fixed colours: outline `#14121F`, steel `#EEF3FA` / `#A9B3C8` / `#626B86` / `#3B4058`, wood `#B9824A` / `#7E522E` / `#4E2F1C`, gold `#F7CF5A` / `#B5802C`, cloth white `#F7F1E3` / `#C9C1D8`, mouth `#C2364E` / `#6E1C30`.
+- **Style rules** (after Innkeep's "Eight ways to improve your pixel art"): the face is the brightest area, with a dark band under the chin; helmets stop at the brow line (great helm shows the eyes through its visor slit and the mouth through its grille); few colours per part, clean clusters; folds on the tunic and skirt; 1 px outline per part.
+- **Source.** `apps/web/src/arena/dev/pixel-art/pixel.js` draws every part; `export.mjs` writes the SVGs and updates only the `viewBox` of each part in the `parts.json` manifests: `node apps/web/src/arena/dev/pixel-art/export.mjs $PWD/apps/web/public/art`. Demo sheets: `submission/design/pixel-roster-uiux-demo.html` (pixel) and `submission/design/ui-ux-old.html` (the earlier vector art).
+
 ## 8. Reference and acceptance
 
 - **Drawn reference: VEX** (heavy brawler, horned helm, greatsword, skull emblem). Draw him fully first; every other fighter inherits his template.

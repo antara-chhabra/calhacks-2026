@@ -1,5 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-44 -76 88 96" width="88" height="96" data-part="mouth-focus" data-pivot="0,0">
-<g stroke="#14121F" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" fill="none">
-<rect x="14" y="-19" width="19" height="10" rx="3" fill="#FFFFFF" stroke-width="3"/><path d="M 20 -19 L 20 -9 M 26 -19 L 26 -9" stroke-width="2.5"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="20 -36 20 12" width="20" height="12" data-part="mouth-focus" data-pivot="0,0" data-pixel="4">
+<g shape-rendering="crispEdges">
+<rect x="20" y="-36" width="8" height="4" fill="#F7F1E3"/>
+<rect x="28" y="-36" width="4" height="4" fill="#C9C1D8"/>
+<rect x="32" y="-36" width="8" height="4" fill="#F7F1E3"/>
+<rect x="20" y="-32" width="8" height="4" fill="#F7F1E3"/>
+<rect x="28" y="-32" width="4" height="4" fill="#C9C1D8"/>
+<rect x="32" y="-32" width="8" height="4" fill="#F7F1E3"/>
+<rect x="20" y="-28" width="20" height="4" fill="#6E1C30"/>
 </g>
 </svg>

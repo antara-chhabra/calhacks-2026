@@ -1,7 +1,7 @@
 import { createElement, useEffect, useRef } from 'react';
 import type { JSX } from 'react';
 import type { ArenaCue } from '@fc/engine';
-import { Application } from 'pixi.js';
+import { Application, Container, Matrix, RenderTexture, Sprite } from 'pixi.js';
 import { HOUSE_ROSTER, type FighterId, type SkinSpec } from '@fc/contracts';
 import { useStore } from '@/data/store';
 import { VEX_SKIN } from './assets';
@@ -19,6 +19,10 @@ export { SLOTS };
 
 const skinOf = (id: FighterId): SkinSpec => useStore.getState().fighters[id]?.skin ?? (HOUSE_ROSTER as Record<string, { skin: SkinSpec }>)[id]?.skin ?? VEX_SKIN;
 
+/** Stage px per art pixel: the fighters render at 1/4 resolution and upscale with nearest sampling, so every limb,
+ *  rotated or not, lands on one shared pixel grid (matches the 4-unit pixel-art parts). */
+const ART_PIXEL = 4;
+
 /** FC-F-128: the prop or the OS setting. */
 const prefersReduced = (): boolean => typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
@@ -33,6 +37,13 @@ export function ArenaCanvas(props: { reducedMotion: boolean }): JSX.Element {
     const stage = createStage();
     const world = stage.world;
     const rigs = new Map<string, { sig: string; rig: Rig }>();   // by fighter id
+    // Rigs live in an off-stage container that is drawn into a low-res texture each frame; stage.fighters shows it.
+    const pixelSrc = new Container({ label: 'fighters-pixel-src' });
+    const pixelRT = RenderTexture.create({ width: STAGE_W / ART_PIXEL, height: STAGE_H / ART_PIXEL, resolution: 1, scaleMode: 'nearest', antialias: false });
+    const pixelView = new Sprite(pixelRT);
+    pixelView.label = 'fighters-pixel'; pixelView.scale.set(ART_PIXEL);
+    stage.fighters.addChild(pixelView);
+    const pixelXf = new Matrix().scale(1 / ART_PIXEL, 1 / ART_PIXEL);
     const vfxRef: { v?: Vfx } = {};   // created below (needs the player's hitStop); hooks resolve it lazily
     const player = new CuePlayer({
       speed: () => useStore.getState().watch.speed || 1,
@@ -125,7 +136,7 @@ export function ArenaCanvas(props: { reducedMotion: boolean }): JSX.Element {
         const sl = SLOTS[i]!;
         b.rig.root.position.set(sl.x, sl.y);
         b.rig.setFacing(sl.facing);
-        if (!b.rig.root.parent) stage.fighters.addChild(b.rig.root);
+        if (!b.rig.root.parent) pixelSrc.addChild(b.rig.root);
       });
       for (const id of handles.keys()) if (!rigs.has(id)) handles.delete(id);
       player.setFighters(built.map((b, i) => handleFor(b.id, b.rig, i)));
@@ -146,6 +157,7 @@ export function ArenaCanvas(props: { reducedMotion: boolean }): JSX.Element {
         for (const [id, r] of rigs) r.rig.root.visible = !director.isHidden(id);   // waiting for its drop-in
         vfx.tick(gdt);
         labels.update(st.playing ? t.deltaMS : 0);
+        app.renderer.render({ container: pixelSrc, target: pixelRT, clear: true, clearColor: [0, 0, 0, 0], transform: pixelXf });
       });
       fit();
       app.renderer.on('resize', fit);
@@ -176,7 +188,7 @@ export function ArenaCanvas(props: { reducedMotion: boolean }): JSX.Element {
       clearTimeout(report); director.destroy(); seqLayer.destroy(); vfx.destroy(); labels.destroy(); player.setFighters([]);
       stage.destroy();
       unsubOrder(); unsubCues();
-      void ready.then(() => { app.destroy(true, { children: true }); }).catch(() => undefined);
+      void ready.then(() => { app.destroy(true, { children: true }); pixelSrc.destroy({ children: true }); pixelRT.destroy(true); }).catch(() => undefined);
     };
   }, []);
   return createElement('div', {

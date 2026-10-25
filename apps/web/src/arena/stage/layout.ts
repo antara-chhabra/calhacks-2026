@@ -20,6 +20,10 @@ export const PLATFORMS = {
   main: { x: 560, y: 760, w: 800, h: 80 },
 } as const;
 
+/** Jumbotron frame: bottom centre, below the main platform's top (fighters stand at y 760, labels and weapons
+ *  stay above it), so the scoreboard never covers a fighter. */
+export const JUMBO = { x: 600, y: 922, w: 720, h: 132 } as const;
+
 /** m:ss remaining. Clamped to [0, limit]; no start yet = full limit. */
 export function matchClockMs(timeLimitMs: number, startedT: number | null, t: number): number {
   if (startedT === null) return Math.max(0, timeLimitMs);

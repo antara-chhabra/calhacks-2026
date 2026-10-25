@@ -1,5 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-44 -76 88 96" width="88" height="96" data-part="eyes-ko" data-pivot="0,0">
-<g stroke="#14121F" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" fill="none">
-<path d="M 4 -36 L 16 -24 M 16 -36 L 4 -24" stroke-width="4"/><path d="M 22 -36 L 34 -24 M 34 -36 L 22 -24" stroke-width="4"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="12 -60 32 12" width="32" height="12" data-part="eyes-ko" data-pivot="0,0" data-pixel="4">
+<g shape-rendering="crispEdges">
+<rect x="12" y="-60" width="4" height="4" fill="#14121F"/>
+<rect x="20" y="-60" width="4" height="4" fill="#14121F"/>
+<rect x="32" y="-60" width="4" height="4" fill="#14121F"/>
+<rect x="40" y="-60" width="4" height="4" fill="#14121F"/>
+<rect x="16" y="-56" width="4" height="4" fill="#14121F"/>
+<rect x="36" y="-56" width="4" height="4" fill="#14121F"/>
+<rect x="12" y="-52" width="4" height="4" fill="#14121F"/>
+<rect x="20" y="-52" width="4" height="4" fill="#14121F"/>
+<rect x="32" y="-52" width="4" height="4" fill="#14121F"/>
+<rect x="40" y="-52" width="4" height="4" fill="#14121F"/>
 </g>
 </svg>
