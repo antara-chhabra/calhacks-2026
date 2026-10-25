@@ -4,8 +4,8 @@
 
 | Gate | Planned | Status |
 |---|---|---|
-| G-1 Scaffold | 01:30 | Done 02:58 (`538dded`): workspaces install and typecheck; §8.7/§8.9 stubs; worktrees `../fc-o1`…`../fc-o7` on `ws/o1`…`ws/o7`; requests/status files. H-01 done; H-02 partial (see Blocked) |
-| G0 Contracts frozen | 02:15 | HEAD side done ~03:20 (`6acc6a2`): K-02–K-05, K-07 green (125 tests). Still open for G0: B-01 (O3), A-01 VEX drawn (O1), F-01 spike (O5), K-08 module-build check (needs B-01) |
+| G-1 Scaffold | 01:30 | Done ~02:45 (`538dded`): workspaces install and typecheck; §8.7/§8.9 stubs; worktrees `../fc-o1`…`../fc-o7` on `ws/o1`…`ws/o7`; requests/status files. H-01 done; H-02 partial (see Blocked) |
+| G0 Contracts frozen | 02:15 | HEAD side done ~02:55 (`6acc6a2`): K-02–K-05, K-07 green (125 tests). Merged ~03:20 (`4f2a6d4`): B-01 (O3, typecheck only — not published), R-01 (O4), A-01 VEX (O1), K-06a replay. 184 tests green. Still open for G0: F-01 Droid spike (no `droid` CLI here), K-08 module build (no `spacetime` CLI here) |
 
 Kickoff ran ~1h40 late. Per §17.2, gates shift by the delay; §5.6 cut order applies at G2.
 
@@ -17,8 +17,10 @@ Kickoff ran ~1h40 late. Per §17.2, gates shift by the delay; §5.6 cut order ap
   - Scripts: `keys.mjs` covers the PRD's `setup-keys`/`check-keys` (`npm run keys`, `npm run keys:check`).
   - Each workstream's local web port: `FC_WEB_PORT=<5173+n> npm run dev:web`.
 
-## In progress
-- (none) — worktrees `ws/o1`…`ws/o7` fast-forwarded to `6acc6a2`
+## In progress (sub-agents, P1)
+- O3: B-02 match reducers · B-03 betting + ledger · B-04 settlement · B-05 forge (one file each; shared `auth.ts`, `events.ts` by HEAD)
+- O4: R-02a lifecycle I (against fake stdb + fake fighters) · O5: F-02 mock backend · F-05 personas · O1: A-02 rig + portrait
+- Not started: O2 (another session is working in `apps/web`), O6 (deferred), O7 (starts at G3)
 
 ## Done at G0
 - K-02 schemas: 36 tests. Caps beyond the PRD are loose guesses (name ≤ 24 vs Forge 3–14; the reducer enforces FC-F-066).
@@ -36,6 +38,8 @@ Kickoff ran ~1h40 late. Per §17.2, gates shift by the delay; §5.6 cut order ap
 - Admin router is mounted at root; O4 defines full `/admin/*` paths.
 - Time bases: `solved[p].atMs` and envelope `t` are ms since match.created; `bettingClosesAt` in the fixture is relative (ms since created) — §8.4 must say which. `Standing.firstHitMs`/`lastScoreMs` are relative to the bell.
 - `betting.locked.pools` carry staked amounts only (no seeds).
+- **VAR check (R-01b):** the final check also requires F itself to be finite and real at every sample point; a derivative-only check is domain-blind and lets `log(x+1)` through on x < −1. Integration: 1500 generated problems, every reference passes; 509/509 traps caught (live pass, final fail).
+- **Views (B-01):** SDK 2.13 views must be `public: true`; `my_ledger_tx` and `runner_fighter_secrets` filter on `ctx.sender` instead.
 - Fixture file format is HEAD-defined (`MockBasicFixture` in `scripts/gen-mock-basic.ts`); the PRD only names its contents.
 
 ## Blocked
