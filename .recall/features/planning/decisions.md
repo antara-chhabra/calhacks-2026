@@ -55,3 +55,44 @@ The full ADR log is docs/PRD.md §18; these are the headline calls with their re
 **Date:** 2026-10-25
 **Call:** Library SFX and speech blips now; same hook for ElevenLabs later.
 **Why:** Removes three account setups from the critical path.
+
+## Seed totals in §11.8 are dollars -> cents x100 (winner 20000, score_li
+**Date:** 2026-10-25
+**Call:** Seed totals in §11.8 are dollars -> cents x100 (winner 20000, score_line 10000, beat_clock 10000, first_blood 20000), floor 50¢; MarketSpec.seeds are cents end to end.
+**Why:** A1 moved to cents without rescaling; §8.3 says min 50.
+
+## apps/web stays React 19 + Tailwind 4 + KokonutUI (PRD §9.2 amendment p
+**Date:** 2026-10-25
+**Call:** apps/web stays React 19 + Tailwind 4 + KokonutUI (PRD §9.2 amendment pending).
+**Why:** platform direction already built on it.
+
+## FundingAdapter stub in packages/contracts/src/money.ts + apps/runner/s
+**Date:** 2026-10-25
+**Call:** FundingAdapter stub in packages/contracts/src/money.ts + apps/runner/src/funding.ts.
+**Why:** A1 names it, §8.9 never defines it.
+
+## Time base: envelope t and solved[p].atMs are ms since match.created; b
+**Date:** 2026-10-25
+**Call:** Time base: envelope t and solved[p].atMs are ms since match.created; bell-relative values subtract startedT.
+**Why:** §8.4 is silent; beat_clock bug came from this.
+
+## Route registry: apps/web/src/ui/routes/*.tsx via import.meta.glob (ord
+**Date:** 2026-10-25
+**Call:** Route registry: apps/web/src/ui/routes/*.tsx via import.meta.glob (order export).
+**Why:** §17.4 rule 13 append-only screens; let 5 UI agents work in parallel.
+
+## /m has its own entry (main.tsx dynamic import of mobile-entry vs App)
+**Date:** 2026-10-25
+**Call:** /m has its own entry (main.tsx dynamic import of mobile-entry vs App).
+**Why:** FC-F-222 cellular budget; App pulls Pixi.
+
+## Runner tests run with --no-file-parallelism
+**Date:** 2026-10-25
+**Call:** Runner tests run with --no-file-parallelism.
+**Why:** F-02 determinism test is wall-clock sensitive.
+
+## DV1277 is HEAD after 152f694; .recall dumps go on branches for him to 
+**Date:** 2026-10-25
+**Call:** DV1277 is HEAD after 152f694; .recall dumps go on branches for him to merge.
+**Why:** single writer to main.
+

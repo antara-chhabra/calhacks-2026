@@ -4,27 +4,27 @@ Last touched: 2026-10-25
 
 ## Features
 
-- **planning** [active] — PRD v1.1.0 (A1: real-currency ledger, cheap models, library audio); keys set up via scripts/keys.mjs; HEAD (O0) owns PRD, contracts, engine, data layer, scaffold
+- **planning** [active] — HEAD done (152f694): scaffold, contracts, engine, replay, runner wiring all on main, 540 tests; DV1277 is HEAD with 6 lanes (docs/status/HANDOFF-DV1277.md)
   - paths: `docs/PRD.md`, `docs/status/HEAD.md`, `docs/requests/HEAD.md`, `packages/**`, `fixtures/**`, `apps/web/src/data/**`, `apps/web/src/{main,App,config}.tsx`, `apps/web/src/bridge.ts`, `apps/runner/src/{index,env,stdb,wiring}.ts`, `apps/runner/src/http/app.ts`, `apps/runner/src/fighters/{types,registry}.ts`, `scripts/*.mjs`, `scripts/{claim-runner.ts,scan-secrets.sh}`, `package.json`, `tsconfig*.json`, `.env.example`, `CLAUDE.md`, `AGENTS.md`
-  - last: 2026-10-25 (a1-money-keys-setup)
-- **arena** [active] — O1: Pixi SVG-rig sword-fight renderer; art bible written, code not started (P0: A-01, A-02)
+  - last: 2026-10-25 (head-build-wave)
+- **arena** [active] — O1: A-01…A-09 done — 6 fighters, stage, clips, cue player, VFX, labels, intro/outro; full fight on /replay/mock-basic
   - paths: `apps/web/src/arena/**`, `apps/web/public/art/**`, `docs/art-bible.md`, `docs/{status,requests}/O1.md`
-  - last: 2026-10-25 (arena-art-bible)
-- **platform** [active] — O2: KokonutUI market UI in code (Kalshi/Polymarket black); `/` Flow Field entry + `/markets` dashboard on mock data; no Figma for UI
+  - last: 2026-10-25 (arena-build)
+- **platform** [active] — O2: U-01…U-09 on store data (KokonutUI black): lobby, match/results, bet slip, cards, leaderboard, Forge, /m, Director, receipt
   - paths: `apps/web/src/{ui,styles,pages,components,lib}/**`, `apps/web/src/index.css`, `apps/web/{index.html,components.json,vite.config.ts,tsconfig.json,package.json}`, `docs/{status,requests}/O2.md`
-  - last: 2026-10-25 (kokonut-market-ui)
-- **backend** [active] — O3: SpacetimeDB 2.x module (markets, bets, fight log, settlement); not started (P0: B-01)
+  - last: 2026-10-25 (platform-screens)
+- **backend** [active] — O3: module B-01…B-05 written, typechecked only — never published (DV1277 lane A)
   - paths: `spacetime/**`, `docs/{status,requests}/O3.md`
-  - last: 2026-10-25 (initial)
-- **runtime** [active] — O4: problem generator/verifier, match lifecycle, VAR, season loop; not started (P0: R-01)
+  - last: 2026-10-25 (module-reducers)
+- **runtime** [active] — O4: R-01…R-05 — problems/VAR, full lifecycle, admin/BYO, season, smoke PASS (fake stdb)
   - paths: `apps/runner/src/{match,problems,season}/**`, `apps/runner/src/http/{admin,byo}.ts`, `scripts/{smoke,record,recompute,try-problems}.ts`, `docs/{status,requests}/O4.md`
-  - last: 2026-10-25 (initial)
-- **fighters** [active] — O5: Droid SDK fighters, referee, personas, mock/direct/BYO; not started (P0: F-01 spike)
+  - last: 2026-10-25 (match-runtime)
+- **fighters** [active] — O5: mock backend + personas done; real Droid fighters are DV1277 lane D
   - paths: `apps/runner/src/fighters/**`, `apps/runner/bin/**`, `agents/**`, `scripts/{try-fighter,list-models}.ts`, `docs/{status,requests}/O5.md`
-  - last: 2026-10-25 (initial)
-- **integrations** [active] — O6: x402/CDP wallets, audio + ElevenLabs, Fetch.ai (COULD); not started (P0: I-01 spike)
+  - last: 2026-10-25 (mock-and-personas)
+- **integrations** [active] — O6: I-03 procedural WebAudio SFX installed; payments/ElevenLabs/Fetch deferred
   - paths: `apps/runner/src/payments/**`, `apps/runner/src/http/public-bookie.ts`, `apps/web/src/audio/**`, `apps/web/public/audio/**`, `services/fetch-agent/**`, `scripts/{gen-barks,try-x402}.ts`, `submission/coinbase.md`, `docs/{status,requests}/O6.md`
-  - last: 2026-10-25 (initial)
+  - last: 2026-10-25 (procedural-sfx)
 - **ship** [active] — O7: README, Devpost, pitch, sponsor artifacts; Figma-track stage log running (`submission/figma-stage-log.md`)
   - paths: `README.md`, `submission/**`, `docs/SPONSORS.md`, `docs/{status,requests}/O7.md`
   - last: 2026-10-25 (figma-stage-log)

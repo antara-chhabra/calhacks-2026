@@ -25,3 +25,19 @@ Project-wide decisions live in docs/PRD.md §18 (ADR-001…022); record only O2-
 **Date:** 2026-10-25
 **Call:** `narrowSpan` in the owned bento-grid returns 2.
 **Why:** Half-width market tiles were unreadable at 375 px.
+
+## Screens are ui/routes/NN-name.tsx files exporting route(s)+order
+**Date:** 2026-10-25
+**Call:** Screens are ui/routes/NN-name.tsx files exporting route(s)+order.
+**Why:** append-only extension point.
+
+## Replay mode is read-only: placeBet/register reject not_connected with 
+**Date:** 2026-10-25
+**Call:** Replay mode is read-only: placeBet/register reject not_connected with explicit copy.
+**Why:** no fake money paths.
+
+## Director token lives in location.hash -> sessionStorage, stripped from
+**Date:** 2026-10-25
+**Call:** Director token lives in location.hash -> sessionStorage, stripped from the URL.
+**Why:** never in query strings or logs.
+

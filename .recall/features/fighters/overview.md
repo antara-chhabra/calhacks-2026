@@ -8,14 +8,14 @@
 Workstream O5 of the Fight Card build. Fighter backends: Factory Droid SDK sessions + in-process MCP arena tools, referee permission policy, sandbox wrapper, mock/direct/BYO, house personas. Owns exactly the paths above (PRD §9.3, §17.5); everything else is read-only for this workstream.
 
 ## Current state
-- Not started. Defined in `docs/PRD.md` only; no code exists yet (repo not initialized).
+- Mock backend and house personas are on `main`. Real Droid fighters are DV1277's lane D.
 
 ## Open threads
-- [ ] Task cards: F-01 Droid spike (P0) · F-02 mock + F-05 personas (P1) · F-03 droid backend, F-04 referee, F-07 validation (P2) · F-08 BYO (P3) · F-06 direct (P4)
-- [ ] Read first: PRD §1.4, §4, §8, §9.3, §17; then PRD E03, E04, §11.1–11.3, §11.6–11.7, §11.10 (Droid notes)
+- [ ] F-01 Droid spike, F-03 droid backend, F-04 referee + sandbox, F-07 validation, F-06 direct, F-08 BYO (DV1277 lane D)
+- [ ] Founder review of personas
 
 ## Key files
 - `docs/PRD.md` §17.6 (O5 task cards) and §17.5 (charter)
 
 ## Recent sessions
-- (none yet; planning context is in `features/planning/`)
+- 2026-10-25-mock-and-personas — F-02 mock backend, F-05 personas; Droid work is DV1277 lane D

@@ -8,14 +8,15 @@
 Workstream O6 of the Fight Card build. x402/CDP agent wallets (entry fee, purse, hint shop), SFX + ElevenLabs barks, Fetch.ai bookie (COULD). Owns exactly the paths above (PRD §9.3, §17.5); everything else is read-only for this workstream.
 
 ## Current state
-- Not started. Defined in `docs/PRD.md` only; no code exists yet (repo not initialized).
+- I-03 procedural SFX merged and installed; sounds never listened to by a human. Payments/ElevenLabs/Fetch remain deferred.
 
 ## Open threads
-- [ ] Task cards: I-01 x402 spike (P0) · I-03 SFX (P1) · I-02 payments (P2) · I-04 barks + I-05 coinbase.md (P3) · I-06–I-08 COULD (P4)
-- [ ] Read first: PRD §1.4, §4, §8, §9.3, §17; then PRD E15, E16, E17, §5.7, §11.10 (x402/Fetch/ElevenLabs notes)
+- [ ] Listen in a real browser and tune
+- [ ] <MuteToggle/> placement (O2)
+- [ ] x402/CDP, ElevenLabs, Fetch.ai still deferred
 
 ## Key files
 - `docs/PRD.md` §17.6 (O6 task cards) and §17.5 (charter)
 
 ## Recent sessions
-- (none yet; planning context is in `features/planning/`)
+- 2026-10-25-procedural-sfx — I-03 WebAudio SFX installed on cues$

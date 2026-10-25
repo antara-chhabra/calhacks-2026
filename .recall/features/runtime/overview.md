@@ -8,14 +8,15 @@
 Workstream O4 of the Fight Card build. Runner match runtime: integral generator + mathjs whitelist verifier, match lifecycle, FighterIO, VAR, commit-reveal, season loop, admin/BYO HTTP. Owns exactly the paths above (PRD §9.3, §17.5); everything else is read-only for this workstream.
 
 ## Current state
-- Not started. Defined in `docs/PRD.md` only; no code exists yet (repo not initialized).
+- O4 R-01…R-05 merged; the runner runs full matches end to end against the fake stdb; `npm run smoke` PASS (fake mode). Live mode untested (no module running).
 
 ## Open threads
-- [ ] Task cards: R-01 problems (P0) · R-02a/R-02b lifecycle + R-05 smoke (P1) · R-03 admin API + R-04 season loop (P2) · R-06 demo mode (P3)
-- [ ] Read first: PRD §1.4, §4, §8, §9.3, §17; then PRD E01, E02, E05, E13, E14, §11.4–11.5, §8.9–8.10
+- [ ] R-06 demo mode (DV1277 lane E)
+- [ ] smoke --live once the module is published
+- [ ] wonAtOdds null at settle (upset frame never triggers from runner path)
 
 ## Key files
 - `docs/PRD.md` §17.6 (O4 task cards) and §17.5 (charter)
 
 ## Recent sessions
-- (none yet; planning context is in `features/planning/`)
+- 2026-10-25-match-runtime — R-01…R-05; full mock match to settled; smoke PASS (fake)

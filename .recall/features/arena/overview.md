@@ -8,15 +8,20 @@
 Workstream O1 of the Fight Card build. Pixi v8 arena: SVG cut-out rigs, GSAP clips, cue player, VFX, FighterPortrait (E07, FC-F-130). Owns exactly the paths above (PRD §9.3, §17.5); everything else is read-only for this workstream.
 
 ## Current state
-- `docs/art-bible.md` exists (style, tokens, 14 arena components, motion rules, VEX reference, acceptance). No arena code yet.
+- O1 is built through A-09 and merged on `main`: 6 house fighters (3 builds, 8 heads, 6 weapons, 8 emblems), Sky Colosseum stage + jumbotron, 17 clips, cue player, VFX, in-canvas labels, intro/outro with podium handoff, reduced motion. 170 arena tests.
+- `/replay/mock-basic` plays a full fight with no console errors (verified in the browser pane).
+- Remaining: A-10 (parallax, crowd, perf), a few layout nits.
 
 ## Open threads
-- [ ] Build against the bible; VEX is the drawn reference (A-01)
-- [ ] Task cards: A-01 Art Bible v1 + VEX drawn (P0) · A-02 rig system (P0) · A-03–A-06, A-08 (P1) · A-07 VFX (P2) · A-09 (P3) · A-10 (P4)
-- [ ] Read first: PRD §1.4, §4, §8, §9.3, §17; then PRD §10.1, §10.5–10.8, §8.6 (cue table), E07
+- [ ] Match screen (O2) should listen to fc:podium to reveal results
+- [ ] Jumbotron covers name tags on floating slots 0 and 3
+- [ ] A-10 parallax/crowd + perf pass (≥55 fps p95)
+- [ ] Forge needs an arena preview export for real idle/slashHeavy clips
+- [ ] fighters/vex can be deleted once tests/reference point at builds/heavy
 
 ## Key files
 - `docs/PRD.md` §17.6 (O1 task cards) and §17.5 (charter)
 
 ## Recent sessions
+- 2026-10-25-arena-build — A-01…A-09 via sub-agents; full fight plays on /replay/mock-basic
 - 2026-10-25-arena-art-bible — wrote docs/art-bible.md

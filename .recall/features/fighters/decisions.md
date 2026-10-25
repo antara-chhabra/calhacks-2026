@@ -5,3 +5,9 @@ Why things are the way they are. Append-only-ish: add new entries, don't rewrite
 Each entry: short title, the call, the reason, the date.
 Project-wide decisions live in docs/PRD.md §18 (ADR-001…022); record only O5-local decisions here.
 -->
+
+## Mock gets correct answers only via injected answerFor
+**Date:** 2026-10-25
+**Call:** Mock gets correct answers only via injected answerFor.
+**Why:** FighterProblem has no reference and types are frozen.
+
