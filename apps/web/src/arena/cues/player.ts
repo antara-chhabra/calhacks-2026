@@ -60,6 +60,7 @@ export class CuePlayer {
   private readonly fighters = new Map<FighterId, Fighter>();
   private list: Fighter[] = [];
   private lastScale = 1;
+  private readonly frozen = new Map<FighterId, number>();   // hit-stop: remaining ms (game time) per fighter
   readonly stats: Record<string, KindStats> = {};
   constructor(private readonly d: CuePlayerDeps) {
     for (const k of CUE_KINDS) this.stats[k] = { received: 0, played: 0, hooked: 0, dropped: 0 };
@@ -85,6 +86,7 @@ export class CuePlayer {
 
   /** Catch-up rule (PRD §8.7): kill everything, clear queues, show the state-derived pose. */
   snap(): void {
+    this.frozen.clear();
     for (const f of this.list) { this.kill(f); f.queue.length = 0; f.pendingReact = null; f.held = null; f.blasted = false; this.settle(f); }
   }
 
@@ -156,11 +158,20 @@ export class CuePlayer {
     for (let i = 0; i < list.length; i++) {
       const f = list[i]!, a = f.active;
       if (!a) continue;
+      if (this.frozen.size) {
+        const z = this.frozen.get(f.h.id);
+        if (z !== undefined) { if (z > dt * 1000) { this.frozen.set(f.h.id, z - dt * 1000); continue; } this.frozen.delete(f.h.id); }
+      }
       const tl = a.tl;
       if (respeed) tl.timeScale(sp);
       tl.totalTime(tl.totalTime() + dt);
       if (a.job && tl.totalTime() >= tl.totalDuration() - 1e-6) this.finishStep(f);
     }
+  }
+
+  /** Hit-stop (PRD §10.5, FC-F-124): freeze these fighters' timelines for `ms` of game time. VFX (A-07) calls it at impact. */
+  hitStop(ms: number, ids: readonly FighterId[]): void {
+    for (const id of ids) if (this.fighters.has(id)) this.frozen.set(id, Math.max(ms, this.frozen.get(id) ?? 0));
   }
 
   // ---- cue intake ----
