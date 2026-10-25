@@ -1,3 +1,4 @@
+import type { Category } from '@fc/contracts';
 // Director controller (R-03): state + commands behind the admin API (PRD §8.10, FC-F-007, FC-F-260).
 // Knows nothing about match internals; the wiring injects callbacks.
 export type MatchStatusLite = 'betting' | 'locked' | 'live' | 'review' | 'settled' | 'void' | string;
@@ -6,7 +7,7 @@ export class DirectorError extends Error {
   constructor(public status: number, public code: string, message: string) { super(message); }
 }
 
-export type StartMatchOpts = { fighters?: string[]; betWindowS?: number };
+export type StartMatchOpts = { fighters?: string[]; betWindowS?: number; category?: Category };
 export type StartedMatch = { matchId: string; done?: Promise<unknown> };
 
 export type DirectorDeps = {

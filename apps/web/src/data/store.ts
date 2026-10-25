@@ -2,7 +2,7 @@
 // SpacetimeDB adapter and the replay source. O1 and O2 read this store and never import generated bindings.
 import { create } from 'zustand';
 import type {
-  CardFrame, FighterId, FighterOrigin, FighterPublic, FighterStats, ForgeSpec, MarketSpec, MatchMode, MatchStatus, ProblemMeta,
+  Category, CardFrame, FighterId, FighterOrigin, FighterPublic, FighterStats, ForgeSpec, MarketSpec, MatchMode, MatchStatus, ProblemMeta, Slot,
 } from '@fc/contracts';
 import { initialMatchState, type ArenaCue, type MatchState } from '@fc/engine';
 import type { LiveAdapter } from './adapter';
@@ -11,8 +11,8 @@ import { loadFixture, ReplaySource } from './replay';
 
 export type Subscribe<T> = (f: (x: T) => void) => () => void;
 export type FighterCardData = FighterPublic & { origin: FighterOrigin; creatorHandle: string | null; status: 'active' | 'provisional' | 'retired';
-  elo: number; stats: FighterStats | null; frame: CardFrame; walletAddress: string | null; version: number };
-export type MatchRow = { id: string; number: number; status: MatchStatus; mode: MatchMode; isDemo: boolean; fighterIds: FighterId[];
+  elo: number; stats: FighterStats | null; categoryStats?: Partial<Record<Category, FighterStats>>; frame: CardFrame; walletAddress: string | null; version: number };
+export type MatchRow = { slots?: Slot[]; category?: Category; id: string; number: number; status: MatchStatus; mode: MatchMode; isDemo: boolean; fighterIds: FighterId[];
   problems: ProblemMeta[]; commitHash: string; bettingClosesAt: number; startedAt: number | null; timeLimitMs: number; winnerId: FighterId | null };
 export type MarketView = MarketSpec & { status: 'open' | 'locked' | 'settled' | 'void'; result: string | null;
   pools: Record<string, { staked: number; seed: number; bettors: number }>; odds: Record<string, number> };

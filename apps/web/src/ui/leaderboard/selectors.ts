@@ -1,4 +1,5 @@
 // Leaderboard + profile view models (PRD FC-F-165, FC-F-182). Pure selectors over a store snapshot.
+import { cardFrame } from '@fc/engine';
 import { formatCents } from "@fc/contracts";
 import type { Category } from "@fc/contracts";
 import type { FighterCardData, MatchRow, Store } from "@/data/store";
@@ -7,7 +8,6 @@ import { formChips, recordText, winPct } from "@/ui/card/helpers";
 export type BoardSnapshot = Pick<Store, "fighters" | "matches" | "openMatchId">;
 export type BoardFilter = "all" | "house" | "community";
 export type BoardTab = Category;
-export const LIVE_TABS: readonly BoardTab[] = ["integrals"];
 
 export interface LeaderRow {
   rank: number; id: string; name: string; title: string; color: string; origin: string; fighter: FighterCardData;
@@ -17,18 +17,19 @@ export interface LeaderRow {
 
 const isHouse = (f: FighterCardData) => f.origin === "house";
 export const matchesFilter = (f: FighterCardData, filter: BoardFilter): boolean => filter === "all" || (filter === "house" ? isHouse(f) : !isHouse(f));
-export const inTab = (f: FighterCardData, tab: BoardTab): boolean => (f.stats?.category ?? "integrals") === tab;
+export const statsForTab = (f: FighterCardData, tab: BoardTab) => f.categoryStats?.[tab] ?? (f.stats?.category === tab ? f.stats : null);
+const eloForTab = (f: FighterCardData, tab: BoardTab): number => statsForTab(f, tab)?.eloHistory.at(-1) ?? (tab === 'integrals' ? f.elo : 1000);
 
 /** Elo desc; ties by OVR desc, then name. Retired fighters are hidden. */
 export function selectLeaderboard(s: Pick<BoardSnapshot, "fighters">, tab: BoardTab = "integrals", filter: BoardFilter = "all"): LeaderRow[] {
   const list = Object.values(s.fighters)
-    .filter((f) => f.status !== "retired" && inTab(f, tab) && matchesFilter(f, filter))
-    .sort((a, b) => b.elo - a.elo || (b.stats?.ovr ?? 0) - (a.stats?.ovr ?? 0) || a.name.localeCompare(b.name));
+    .filter((f) => f.status !== "retired" && matchesFilter(f, filter))
+    .sort((a, b) => eloForTab(b, tab) - eloForTab(a, tab) || (statsForTab(b, tab)?.ovr ?? 0) - (statsForTab(a, tab)?.ovr ?? 0) || a.name.localeCompare(b.name));
   return list.map((f, i) => {
-    const st = f.stats;
+    const st = statsForTab(f, tab);
     return {
-      rank: i + 1, id: f.id, name: f.name, title: f.title, color: f.skin.palette.primary, origin: f.origin, fighter: f,
-      ovr: st ? st.ovr : null, elo: f.elo, matches: st?.matches ?? 0, wins: st?.wins ?? 0,
+      rank: i + 1, id: f.id, name: f.name, title: f.title, color: f.skin.palette.primary, origin: f.origin, fighter: { ...f, stats: st, elo: st?.eloHistory.at(-1) ?? (tab === 'integrals' && st ? f.elo : 1000), frame: st ? cardFrame(st, f.status === 'provisional', Date.now()) : f.status === 'provisional' ? 'rookie' : 'bronze' },
+      ovr: st ? st.ovr : null, elo: eloForTab(f, tab), matches: st?.matches ?? 0, wins: st?.wins ?? 0,
       record: st ? `${st.wins}-${Math.max(0, st.matches - st.wins)}` : "–", winPct: winPct(st),
       avgScore: st && st.matches > 0 ? `${Math.round(st.avgScorePct * 100)}%` : "–", form: st?.form ?? "",
       earnings: st ? `${st.earningsUsdc.toFixed(2)} USDC` : "–", backers: st ? formatCents(st.backersWon) : "–", href: `/fighter/${f.id}`,

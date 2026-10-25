@@ -3,6 +3,7 @@
 import type { Problem, Interval } from '@fc/contracts';
 import { math, parseAnswer, parseNode, toEvaluator } from './parse.js';
 import type { MathNode } from 'mathjs';
+import { checkCode } from './code.js';
 
 const TOL_SYMBOLIC = 1e-6;
 const TOL_NUMERIC = 1e-4;
@@ -80,6 +81,8 @@ function run(p: Problem, node: MathNode, pts: number[]): { considered: number; p
 }
 
 export function checkLive(p: Problem, answer: string): { ok: boolean; reason?: 'mismatch' | 'invalid_syntax'; detail?: string } {
+  if (p.evaluation?.kind === 'code') return checkCode(p, answer, false);
+  if (p.evaluation?.kind === 'exact') return checkExact(p, answer);
   const r = parseAnswer(answer);
   if ('error' in r) return { ok: false, reason: 'invalid_syntax', detail: r.detail };
   const { considered, passed } = run(p, r.node, samplePoints(p, [p.liveDomain], 3, 'live'));
@@ -88,10 +91,48 @@ export function checkLive(p: Problem, answer: string): { ok: boolean; reason?: '
 }
 
 export function checkFinal(p: Problem, answer: string): { ok: boolean; passRate: number } {
+  if (p.evaluation?.kind === 'code') { const result = checkCode(p, answer, true); return { ok: result.ok, passRate: result.passRate }; }
+  if (p.evaluation?.kind === 'exact') { const ok = checkExact(p, answer).ok; return { ok, passRate: ok ? 1 : 0 }; }
   const r = parseAnswer(answer);
   if ('error' in r) return { ok: false, passRate: 0 };
   const { considered, passed } = run(p, r.node, samplePoints(p, p.finalDomains, FINAL_POINTS, 'final'));
   if (considered === 0) return { ok: false, passRate: 0 };
   const passRate = passed / considered;
   return { ok: passRate >= FINAL_PASS_RATE, passRate };
+}
+
+const MAX_EXACT_ANSWER = 10_000;
+function canonical(value: unknown, depth = 0): string {
+  if (depth > 24) throw new Error('JSON nesting too deep');
+  if (typeof value === 'number' && !Number.isFinite(value)) throw new Error('JSON number must be finite');
+  if (value === null || typeof value !== 'object') return JSON.stringify(value) ?? '';
+  if (Array.isArray(value)) return `[${value.map((v) => canonical(v, depth + 1)).join(',')}]`;
+  const obj = value as Record<string, unknown>;
+  return `{${Object.keys(obj).sort().map((k) => `${JSON.stringify(k)}:${canonical(obj[k], depth + 1)}`).join(',')}}`;
+}
+function normalizedText(s: string, caseSensitive = false): string {
+  if (caseSensitive) return s.trim();
+  return s.normalize('NFKC').trim().replace(/\s*,\s*/g, ',').replace(/\s+/g, ' ').toLocaleLowerCase('en-US');
+}
+function checkExact(p: Problem, answer: string): { ok: boolean; reason?: 'mismatch' | 'invalid_syntax'; detail?: string } {
+  const ev = p.evaluation;
+  if (!ev || ev.kind !== 'exact' || !Array.isArray(ev.answers) || ev.answers.length === 0 || typeof answer !== 'string' || answer.length > MAX_EXACT_ANSWER) return { ok: false, reason: 'invalid_syntax', detail: 'invalid or oversized answer' };
+  try {
+    let candidate: string;
+    let validAnswers: string[];
+    if (ev.format === 'number') {
+      if (!/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?$/i.test(answer.trim())) return { ok: false, reason: 'invalid_syntax', detail: 'expected a finite number' };
+      const n = Number(answer.trim());
+      if (!Number.isFinite(n)) return { ok: false, reason: 'invalid_syntax', detail: 'expected a finite number' };
+      const expected = ev.answers.map((a) => { if (!/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?$/i.test(a)) throw new Error('bad expected number'); const v = Number(a); if (!Number.isFinite(v)) throw new Error('bad expected number'); return v; });
+      return expected.some((v) => Math.abs(n - v) <= 1e-9 * Math.max(1, Math.abs(v))) ? { ok: true } : { ok: false, reason: 'mismatch' };
+    } else if (ev.format === 'json') {
+      candidate = canonical(JSON.parse(answer));
+      validAnswers = ev.answers.map((a) => canonical(JSON.parse(a)));
+    } else if (ev.format === 'text') {
+      candidate = normalizedText(answer, ev.caseSensitive);
+      validAnswers = ev.answers.map((a) => normalizedText(a, ev.caseSensitive));
+    } else return { ok: false, reason: 'invalid_syntax', detail: 'unknown exact answer format' };
+    return validAnswers.includes(candidate) ? { ok: true } : { ok: false, reason: 'mismatch' };
+  } catch { return { ok: false, reason: 'invalid_syntax', detail: 'malformed exact answer' }; }
 }

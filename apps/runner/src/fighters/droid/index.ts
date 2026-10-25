@@ -9,7 +9,7 @@ import type { ProblemIdx } from '@fc/contracts';
 import type { FighterBackend, FighterIO, FighterRunInput, FighterRunResult } from '../types.js';
 import { createReferee } from './referee.js';
 import { prepareSandbox } from './sandbox.js';
-import { problemPrompt, systemPrompt } from './prompts.js';
+import { answerLimit, problemPrompt, systemPrompt } from './prompts.js';
 import { speechAllowed } from '../speech.js';
 
 type Ready = { session: DroidSession; io?: FighterIO; solved: Set<ProblemIdx>; completed: boolean; timer?: ReturnType<typeof setTimeout>; stopTimer?: ReturnType<typeof setTimeout> };
@@ -55,8 +55,8 @@ export function createDroidBackend(options: Options = {}): FighterBackend {
     await prepareSandbox(input, false);
     let ready: Ready | undefined;
     const server = createSdkMcpServer({ name: 'arena', tools: [
-      tool('submit_answer', 'Submit an antiderivative for problem 1–5. Live-checked instantly; wrong answers cost 5 points; max 3 per problem.',
-        { problem: z.number().int().min(1).max(5), antiderivative: z.string().min(1).max(400) }, async ({ problem, antiderivative }) => {
+      tool('submit_answer', 'Submit your answer for problem 1–5 using the requested challenge format. Live-checked instantly; wrong answers cost 5 points; max 3 per problem.',
+        { problem: z.number().int().min(1).max(5), antiderivative: z.string().min(1).max(answerLimit(input)) }, async ({ problem, antiderivative }) => {
           if (!ready?.io || ready.io.isOut() || ready.io.remainingMs() <= 0) return 'Time is up. Submission not scored.';
           const verdict = await ready.io.submit(problem as ProblemIdx, antiderivative);
           if (verdict.ok) ready.solved.add(problem as ProblemIdx);

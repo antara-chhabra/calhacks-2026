@@ -26,6 +26,10 @@ export type MatchDeps = {
   stdb: Stdb;
   backendFor: (c: Candidate) => FighterBackend;
   now?: () => number;
+  /** Observe the one committed set (mock reference lookup only; never forwarded to real fighters). */
+  onProblemSet?: (matchId: string, set: ProblemSet) => void;
+  /** Fetch a fresh external source before creating a live-web match. Injectable for offline acceptance. */
+  webSnapshot?: () => Promise<import('../problems/web.js').WebSnapshot>;
   /** Lines for match.intro. Default: agents/house/<id>.lines.json if present, else the catchphrase. */
   introLine?: (c: Candidate, rnd: () => number) => string | null;
   log?: (msg: string) => void;
@@ -33,6 +37,7 @@ export type MatchDeps = {
 
 export type MatchOpts = {
   candidates: Candidate[];
+  onCreated?: () => void;
   category?: Category;
   mode?: MatchMode;
   isDemo?: boolean;

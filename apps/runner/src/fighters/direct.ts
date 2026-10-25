@@ -1,15 +1,18 @@
 import { z } from 'zod';
 import type { ProblemIdx } from '@fc/contracts';
 import type { FighterBackend, FighterRunResult } from './types.js';
-import { problemPrompt, systemPrompt } from './droid/prompts.js';
+import { answerLimit, problemPrompt, systemPrompt } from './droid/prompts.js';
 import { speechAllowed } from './speech.js';
 
-const submit = z.object({ problem: z.number().int().min(1).max(5), antiderivative: z.string().min(1).max(400) });
 const taunt = z.object({ text: z.string().min(1).max(80) });
-const tools = [
-  { type: 'function', function: { name: 'submit_answer', description: 'Submit an antiderivative. Wrong answers cost 5 points; max 3 attempts per problem.', parameters: { type: 'object', properties: { problem: { type: 'integer', minimum: 1, maximum: 5 }, antiderivative: { type: 'string', maxLength: 400 } }, required: ['problem', 'antiderivative'], additionalProperties: false } } },
+const tools = (input: Parameters<FighterBackend['run']>[0]) => {
+  const maxAnswerLength = answerLimit(input);
+  const code = maxAnswerLength > 400;
+  return [
+  { type: 'function', function: { name: 'submit_answer', description: code ? 'Submit a pure JavaScript function expression as the answer. Wrong answers cost 5 points; max 3 attempts per problem.' : 'Submit your answer for one problem in the requested challenge format. Wrong answers cost 5 points; max 3 attempts per problem.', parameters: { type: 'object', properties: { problem: { type: 'integer', minimum: 1, maximum: 5 }, antiderivative: { type: 'string', maxLength: maxAnswerLength } }, required: ['problem', 'antiderivative'], additionalProperties: false } } },
   { type: 'function', function: { name: 'taunt', description: 'Say one in-character line, maximum 80 characters.', parameters: { type: 'object', properties: { text: { type: 'string', maxLength: 80 } }, required: ['text'], additionalProperties: false } } },
-];
+  ];
+};
 type Message = { role: string; content?: string | null; tool_calls?: Call[]; tool_call_id?: string };
 type Call = { id: string; type: 'function'; function: { name: string; arguments: string } };
 type Completion = { choices?: { message?: Message }[]; usage?: { prompt_tokens?: number; completion_tokens?: number } };
@@ -27,11 +30,12 @@ export function createDirectBackend(options: Options = {}): FighterBackend {
     let usage: FighterRunResult['usage'] = null, inputTokens = 0, outputTokens = 0, turns = 1, followup = false;
     const solved = new Set<ProblemIdx>();
     try {
+      const submit = z.object({ problem: z.number().int().min(1).max(5), antiderivative: z.string().min(1).max(answerLimit(input)) });
       const messages: Message[] = [{ role: 'system', content: await systemPrompt({ ...input, strategy: { ...input.strategy, verify: false } }) }, { role: 'user', content: problemPrompt(input) }];
       for (let request = 0; request < 20 && !ctrl.signal.aborted && !io.isOut(); request++) {
         io.activity({ kind: 'thinking' });
         const res = await (options.fetch ?? fetch)(`${base.replace(/\/$/, '')}/chat/completions`, { method: 'POST', signal: ctrl.signal,
-          headers: { 'content-type': 'application/json', authorization: `Bearer ${apiKey}` }, body: JSON.stringify({ model, messages, tools, tool_choice: 'auto' }) });
+          headers: { 'content-type': 'application/json', authorization: `Bearer ${apiKey}` }, body: JSON.stringify({ model, messages, tools: tools(input), tool_choice: 'auto' }) });
         if (!res.ok) throw new Error('completion failed');
         const body = await res.json() as Completion;
         if (body.usage) { inputTokens += body.usage.prompt_tokens ?? 0; outputTokens += body.usage.completion_tokens ?? 0; usage = { inputTokens, outputTokens, factoryCredits: null }; }

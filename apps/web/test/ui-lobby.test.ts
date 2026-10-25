@@ -41,6 +41,34 @@ describe('lobby selectors on mock-basic', () => {
     const feed = selectFeed(s);
     expect(feed.length).toBeGreaterThan(0);
     expect(feed[0]!.stakeText).toMatch(/^\$\d/);
+
+    const id = Object.keys(s.matches)[0]!;
+    const squadMatch = { ...s.matches[id]!, category: 'squads' as const, winnerId: 'vex', slots: [3, 0, 2, 1] as (0 | 1 | 2 | 3)[] };
+    const squadSnapshot = {
+      ...s,
+      matches: { ...s.matches, [id]: squadMatch },
+      markets: { ...s.markets, [`${id}:team_winner`]: { ...Object.values(s.markets)[0]!, id: `${id}:team_winner`, kind: 'team_winner' as const, result: 'team_a' } },
+      bets: [{ ...s.bets[0]!, id: 'squad-bet', matchId: id, outcome: 'TEAM_A', placedAt: Number.MAX_SAFE_INTEGER }, ...s.bets.slice(1)],
+    };
+    expect(selectPoster(squadSnapshot, 'squads')?.fighters.map((f) => f.team)).toEqual(['B', 'A', 'B', 'A']);
+    expect(selectFeed(squadSnapshot, 6, 'squads')[0]!.outcome).toBe('Team A');
+    expect(selectResults(squadSnapshot, 5, 'squads')[0]!.winnerName).toBe('Team A');
+  });
+
+  it('shows lobby data only for the selected category', async () => {
+    await loadFixture('mock-basic');
+    useStore.getState().openReplay('mock-basic', 1);
+    await flush();
+    await vi.advanceTimersByTimeAsync(2000);
+    const s = useStore.getState();
+    expect(selectPoster(s, 'code')).toBeNull();
+    expect(selectResults(s, 5, 'code')).toEqual([]);
+    expect(selectFeed(s, 6, 'code')).toEqual([]);
+
+    const id = Object.keys(s.matches)[0]!;
+    const categorized = { ...s, matches: { ...s.matches, [id]: { ...s.matches[id]!, category: 'code' as const } } };
+    expect(selectPoster(categorized, 'code')?.matchId).toBe(id);
+    expect(selectPoster(categorized, 'integrals')).toBeNull();
   });
 
   it('me, handle and countdown helpers', () => {

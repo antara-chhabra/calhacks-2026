@@ -58,7 +58,22 @@ export function resolveMarkets(state: MatchState, markets: MarketSpec[]): { mark
     let outcome: string | null = null;
     switch (m.kind) {
       case 'winner': outcome = winnerId(); break;
-      case 'team_winner': { const w = winnerId(); outcome = w && m.outcomes.includes(w) ? w : null; break; }
+      case 'team_winner': {
+        if (state.category !== 'squads') { const w = winnerId(); outcome = w && m.outcomes.includes(w) ? w : null; break; }
+        // Team membership is fixed by the public slots: 0/1 versus 2/3.
+        // Equal points: faster last surviving hit, then fewer misses, then Team A.
+        const teams = [0, 1].map((team) => {
+          const rows = (state.standings ?? []).filter((s) => state.fighters[s.fighterId] && Math.floor(state.fighters[s.fighterId].slot / 2) === team);
+          const times = rows.flatMap((s) => s.lastScoreMs === null ? [] : [s.lastScoreMs]);
+          return { team, points: rows.reduce((n, s) => n + s.points, 0),
+            time: times.length ? Math.max(...times) : Infinity, misses: rows.reduce((n, s) => n + s.misses, 0) };
+        });
+        if ((state.standings?.length ?? 0) === 4) {
+          teams.sort((a, b) => b.points - a.points || a.time - b.time || a.misses - b.misses || a.team - b.team);
+          outcome = teams[0].team === 0 ? 'team_a' : 'team_b';
+        }
+        break;
+      }
       case 'score_line': {
         const pct = state.standings?.find((x) => x.fighterId === m.subject)?.scorePct;
         if (pct !== undefined && m.line !== null) outcome = pct >= m.line ? 'over' : 'under';

@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
 import { getPodium, subscribePodium } from '@/arena/sequences/podium';
 import { AppShell } from '@/ui/shell';
 import { BetSlip } from '@/ui/betslip';
-import { clockText, FEED_STYLE, feedStamp, matchNumber, matchSourceFor, plates, problemGems, ResultsRevealGate, STATUS_BADGE } from './model';
+import { categoryLabel, clockText, FEED_STYLE, feedStamp, matchNumber, matchSourceFor, plates, problemGems, ResultsRevealGate, STATUS_BADGE } from './model';
 import { ResultsPanel } from './results';
 
 /** Wait through connection hydration, then attach to a known DB match or bundled fixture. */
@@ -55,7 +55,7 @@ function TopBar() {
   const num = matchNumber(state.matchId);
   return (
     <header className="flex flex-wrap items-center gap-x-5 gap-y-1 border-b border-zinc-800 px-4 py-2.5 text-sm">
-      <div className="font-semibold text-zinc-100">MATCH{num ? ` #${num}` : ''} <span className="font-normal text-zinc-500">· {state.category.toUpperCase()}</span></div>
+      <div className="font-semibold text-zinc-100">MATCH{num ? ` #${num}` : ''} <span className="font-normal text-zinc-500">· {categoryLabel(state.category)}</span></div>
       <Gems />
       <div className="tabular-nums text-zinc-100" data-testid="clock">{clockText(state)}</div>
       <div className="min-w-0 flex-1 truncate text-zinc-400" data-testid="status-line">{statusLine(state)}</div>
@@ -81,7 +81,7 @@ function Plates() {
         >
           <span className="size-10 shrink-0 overflow-hidden rounded-md bg-zinc-900">{p.skin && <FighterPortrait pose={p.status === 'winner' ? 'victory' : p.status === 'ko' ? 'ko' : 'idle'} size={40} skin={p.skin} />}</span>
           <span className="min-w-0 flex-1">
-            <span className="flex items-baseline justify-between gap-2"><b className="truncate text-sm text-zinc-100">{p.name}</b><span className="tabular-nums text-sm text-zinc-100">{p.points}</span></span>
+            <span className="flex items-baseline justify-between gap-2"><b className="truncate text-sm text-zinc-100">{p.name}{p.team && <span className="ml-1.5 rounded bg-zinc-800 px-1 py-0.5 text-[9px] font-semibold text-zinc-400">TEAM {p.team}</span>}</b><span className="tabular-nums text-sm text-zinc-100">{p.points}</span></span>
             <span className="block truncate text-[11px] tabular-nums text-zinc-500">{p.hits}✓ {p.misses}✗ · 🟨{p.yellow}{p.red ? ` 🟥${p.red}` : ''} · {p.statusLabel}</span>
             {p.activity && <span className="block truncate text-[11px] italic text-zinc-500">“{p.activity}”</span>}
           </span>

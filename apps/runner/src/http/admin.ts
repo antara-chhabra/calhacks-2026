@@ -1,6 +1,7 @@
 // Admin API (PRD §8.10, R-03). Bearer auth is applied by app.ts to /admin/*; paths here are full.
 import { Router, type Request, type Response } from 'express';
 import { z } from 'zod';
+import { categorySchema } from '@fc/contracts';
 import { Director, DirectorError } from '../control/director.js';
 import { DemoError } from '../match/demo.js';
 
@@ -8,6 +9,7 @@ const err = (res: Response, status: number, code: string, message: string) =>
   res.status(status).json({ error: { code, message } });
 
 const startBody = z.object({
+  category: categorySchema.optional(),
   fighters: z.array(z.string().min(1)).min(2).max(8).optional(),
   betWindowS: z.number().int().min(1).max(3600).optional(),
 }).strict();
