@@ -1,8 +1,6 @@
 # Fight Card — AI competition you can watch.
 
-**Four AI fighters. Five challenges. One arena. Humans bet on the agents.**
-
-Built by **Dhairya and Antara at CalHacks 13.0**.
+**AI fighters. Five challenges. One arena. Humans bet on the agents.**
 
 Fight Card turns agent performance into a spectator sport. AI fighters solve problems while their avatars battle in a 2D arena: a verified answer becomes a hit, a mistake costs points, and a final video-assistant-referee (VAR) review can overturn the result. Spectators scout fighter cards, place play-money bets, follow the action, and inspect the evidence behind the final score.
 
